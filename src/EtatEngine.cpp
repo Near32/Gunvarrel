@@ -18,6 +18,7 @@ void EtatEngine::loop()
 	
 	}
 }
+<<<<<<< HEAD
 
 void EtatEngine::init()
 {
@@ -34,3 +35,5 @@ void EtatEngine::init()
 	
 	
 }
+=======
+>>>>>>> ebe99669e863ee1fc796e9143fe141ffeac82d57

@@ -2,9 +2,13 @@
 
 Environnement::Environnement()
 {
+<<<<<<< HEAD
 	fabriques = std::unique_ptr<Fabriques>( new Fabriques() );
 	fabriques->registrer(ELFObstacle, new Fabricant<Obstacle>() );
 	fabriques->registrer(ELFOrbeBonus, new Fabricant<OrbeBonus>() );			
+=======
+		
+>>>>>>> ebe99669e863ee1fc796e9143fe141ffeac82d57
 }
 
 /*Environnement::Environnement(std::vector<std::unique_ptr<IElement> > ListeElements_)
@@ -24,11 +28,14 @@ void Environnement::addElement( std::unique_ptr<IElement> El)
 	ListeElements.push_back( std::move(El) );
 }
 
+<<<<<<< HEAD
 void Environnement::addElement( IElement* El)
 {
 	ListeElements.push_back( std::unique_ptr<IElement>(El) );
 }
 
+=======
+>>>>>>> ebe99669e863ee1fc796e9143fe141ffeac82d57
 bool Environnement::deleteElementIDX(int idx)
 {
 

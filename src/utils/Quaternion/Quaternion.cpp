@@ -64,6 +64,7 @@ Mat<float> Euler2Rot( const float& roll, const float& pitch, const float& yaw)
 	return rz*(ry*rx);
 }
 
+<<<<<<< HEAD
 /* Returns the corresponding roll pitch yaw euler angles from SO(3) matrix.*/
 void Rot2Euler( const Mat<float>& R, Mat<float>& angles)
 {
@@ -95,6 +96,8 @@ void Rot2Euler( const Mat<float>& R, Mat<float>& angles)
 	}
 }
 
+=======
+>>>>>>> ebe99669e863ee1fc796e9143fe141ffeac82d57
 
 /* Return norm of quaternion, the sum of the squares of the components. */
 #define Qt_Norm(q) ((q).x*(q).x + (q).y*(q).y + (q).z*(q).z + (q).w*(q).w)

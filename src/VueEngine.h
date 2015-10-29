@@ -9,7 +9,10 @@
 #include <cstdlib>
 #include "TrackBallCamera.h"
 #include "common/objloader.h"
+<<<<<<< HEAD
 #include "utils/math.h"
+=======
+>>>>>>> ebe99669e863ee1fc796e9143fe141ffeac82d57
 
 class VueEngine : IEngine
 {
