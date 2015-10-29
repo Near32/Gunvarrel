@@ -27,7 +27,6 @@ typedef float HMatrix[4][4];
 //#define W 3
 
 
-<<<<<<< HEAD
 Quat Qt_Mul(Quat qL, Quat qR);
 Quat Euler2Qt(float roll, float pitch, float yaw);
 void Qt2Euler( const Quat& q, float* roll, float* pitch, float* yaw);
@@ -49,8 +48,6 @@ Mat<T> Qt2Mat(Quat q);
 
 
 
-=======
->>>>>>> ebe99669e863ee1fc796e9143fe141ffeac82d57
 
 #endif
 

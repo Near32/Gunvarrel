@@ -17,10 +17,9 @@ class EtatEngine : IEngine
 	~EtatEngine();
 	
 	void loop() override ;
-<<<<<<< HEAD
+
 	void init();
-=======
->>>>>>> ebe99669e863ee1fc796e9143fe141ffeac82d57
+
 };
 
 #endif

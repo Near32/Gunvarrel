@@ -31,7 +31,6 @@ void VueEngine::Dessiner(float angleX, float angleZ)
 
 	drawGunvarrel();
 	
-<<<<<<< HEAD
 	Environnement* env = game->ptrEtat->env;//getEnvironnementFromETATENGINE();
 	
 	for(int i=0;i<env->ListeElements.size();i++)
@@ -72,9 +71,6 @@ void VueEngine::Dessiner(float angleX, float angleZ)
 	/*-----------------------------------*/
 	
 	//ground...
-=======
-	
->>>>>>> ebe99669e863ee1fc796e9143fe141ffeac82d57
 	glBegin(GL_QUADS);
 	glColor3ub(230,230,230);
     glVertex3d(-100,-100,-2);
@@ -84,18 +80,12 @@ void VueEngine::Dessiner(float angleX, float angleZ)
 	glEnd();
 	
 	
-<<<<<<< HEAD
 	
     glRotated(angleX,1,0,0);	
     glRotated(angleZ,0,0,1);
 
 
 	//OrbeBonus...
-=======
-    glRotated(angleZ,0,0,1);
-    glRotated(angleX,1,0,0);
-
->>>>>>> ebe99669e863ee1fc796e9143fe141ffeac82d57
     glBegin(GL_QUADS);
     glColor3ub(0,0,0); 
     glVertex3d(1,1,1);
@@ -132,13 +122,10 @@ void VueEngine::Dessiner(float angleX, float angleZ)
     glVertex3d(1,1,1);
     glVertex3d(-1,1,1);
     glVertex3d(-1,-1,1);
-<<<<<<< HEAD
     
     /*--------------------------------------------*/	
 	/*END OF : test code that will be deleted....*/
 	/*------------------------------------------*/
-=======
->>>>>>> ebe99669e863ee1fc796e9143fe141ffeac82d57
 
     glEnd();
 

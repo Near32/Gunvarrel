@@ -24,12 +24,7 @@ class IElement
 	
 	~IElement();
 	
-	
-<<<<<<< HEAD
 	virtual bool isFixe() =0 ;
-=======
-	virtual bool isFixe()=0;
->>>>>>> ebe99669e863ee1fc796e9143fe141ffeac82d57
 	
 	
 };
