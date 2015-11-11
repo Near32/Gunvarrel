@@ -5,7 +5,8 @@ enum GameState {
 	MENUINIT,
 	JEUMODECOURSE,
 	JEUMODESUMO,
-	NOP
+	MENUJEU,
+	UNDEFINED
 };
 
 #endif
