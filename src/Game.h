@@ -6,6 +6,7 @@
 #include "GameState.h"
 #include "EtatEngine.h"
 #include "VueEngine.h"
+#include "ICommand.h"
 
 
 
@@ -20,7 +21,11 @@ class Game
 	bool gameON;
 	
 	TrackBallCamera* camera;
-		
+	
+	std::vector<ICommand> currentCommands;
+	std::vector<ICommand> waitingCommands;
+	int nbrCurrentCommandsHandled;
+	
 	//---------------------------------------
 	//---------------------------------------
 	
@@ -31,6 +36,9 @@ class Game
 	void loop();	
 	
 	void init();
+	
+	
+	void incrementNbrHandledCommands();
 	
 };
 

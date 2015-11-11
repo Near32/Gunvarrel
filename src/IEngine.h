@@ -4,6 +4,7 @@
 #include <iostream>
 #include <memory>
 #include "GameState.h"
+#include "ICommand.h"
 
 class Game;
 
@@ -13,6 +14,7 @@ class IEngine
 	
 	Game* game;
 	GameState gameState;
+	std::vector<ICommand> commandsToHandle;
 	
 	//-----------------------------------------------------------
 	//-----------------------------------------------------------
@@ -21,8 +23,14 @@ class IEngine
 	IEngine(Game* game_, GameState gameState_);
 	virtual ~IEngine();
 	
+	
+	//---------------------------------------
+	
 	virtual void loop()=0;
 	
+	//---------------------------------------
+	
+	void addCommandToHandle(const ICommand& command);
 };
 
 #endif

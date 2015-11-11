@@ -4,7 +4,7 @@
 
 IEngine::IEngine()
 {
-	gameState = NOP;
+	gameState = UNDEFINED;
 }
 
 IEngine::IEngine(Game* game_, GameState gameState_) : game(game_), gameState(gameState_)
@@ -15,4 +15,9 @@ IEngine::IEngine(Game* game_, GameState gameState_) : game(game_), gameState(gam
 IEngine::~IEngine()
 {
 
+}
+
+void IEngine::addCommandToHandle(const ICommand& command)
+{
+	commandsToHandle.insert( commandsToHandle.end(), command);
 }

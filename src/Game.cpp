@@ -2,7 +2,7 @@
 
 Game::Game() : gameON(true), gameState( MENUINIT ), ptrEtat( new EtatEngine(this, MENUINIT) ), ptrVue( new VueEngine(this, MENUINIT) )
 {
-
+	nbrCurrentCommandsHandled = 0;
 }
 
 Game::~Game()
@@ -116,3 +116,11 @@ void Game::init()
     glEnable(GL_DEPTH_TEST);
     
 }
+
+
+void Game::incrementNbrHandledCommands()
+{
+	nbrCurrentCommandsHandled++;
+}
+
+
