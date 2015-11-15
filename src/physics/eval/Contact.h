@@ -7,8 +7,8 @@ typedef struct Contact
 {
 	RigidBody* rbA;
 	RigidBody* rbB;
-	Mat<float> contactPoint;
-	Mat<float> normal;
+	std::vector<Mat<float> > contactPoint;	//there can be multiple contact points...
+	std::vector<Mat<float> > normal;
 } Contact;
 
 #endif;

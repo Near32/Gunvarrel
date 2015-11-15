@@ -43,9 +43,9 @@ class CollisionDetector
 	{
 		contacts.clear();
 		
-		broadPhase(contacts);
-		midNarrowPhase(contacts);
-		contactGenerator(contacts);
+		broadPhase.checkForCollisions(contacts);
+		midNarrowPhase.checkForCollisions(contacts);
+		contactGenerator.generateContactConstraints(contacts);
 	}
 	
 	

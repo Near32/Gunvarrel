@@ -15,7 +15,17 @@ void VueEngine::loop()
 {
 	while(game->gameON)
 	{
-		
+		if( commandsToHandle.size() > 0)
+		{
+			//let's verify that it is one of those dedicated commands :
+			switch( commandsToHandle[0].getCommandType())
+			{
+				default :
+				
+				commandsToHandle.erase(commandsToHandle.begin(),0);
+				break;
+			}
+		}
 	}
 }
 
