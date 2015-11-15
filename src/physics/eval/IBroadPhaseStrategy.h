@@ -63,21 +63,22 @@ class BroadPhaseStrategyA
 	virtual void checkForCollisions(std::vector<Contact>& c) override
 	{
 		//let us access all the RigidBodys in the Simulation and check if they are in contact broadly via the boundingRadius of their Shape :
-		std::iterator<ISimulationObject> it = sim->simulatedObjects.begin();
+		std::vector<ISimulationObject>::iterator it = sim->simulatedObjects.begin();
 		
-		while(it != sim->simulatedObjects.end())
+		while( it != sim->simulatedObjects.end())
 		{
-			if(it->getType() == TSORigidBody)
+			if( (*it)->getType() == TSORigidBody)
 			{
 				//let us access to all of the RigidBody that haven't already been checked with regards to this one :
-				std::iterator<ISimulationObject> other = it;
+				std::vector<ISimulationObject>::iterator other = it;
 				other++;
 				
-				enum ShapeType typeIt = it->getShapeType();
-				enum ShapeType typeOther = other->getShapeType();
+				ShapeType typeIt = (*it)->getShapeType();
+				ShapeType typeOther = (*other)->getShapeType();
 				
-				while(other != sim->simulatedObjects.end())
+				while( (*other) != sim->simulatedObjects.end())
 				{
+					/*
 					int nbrContact = 0;					
 					switch(typeIt)
 					{
@@ -273,6 +274,28 @@ class BroadPhaseStrategyA
 						
 						break;
 						
+					}
+					*/
+					
+					//------------------
+					if( (*other)->getType() == TSORigidBody)
+					{
+						Mat<float> midline( (*it)->getPosition()-(*other)->getPosition());
+						float magnitude = norme2(midline);
+						
+						if(magnitude < (*it=->getShapeReference().getBRadius() + (*other)->getShapeReference().getBRadius() )
+						{
+							// then there is a potentiel contact :
+							Contact contact;
+							contact.rbA = **it;
+							contact.rbB = **other;
+							contact.contactPoint.insert( contact.contactPoint.end(), (*other)->getPosition()+(1.0f/2.0f)*midline);
+							contact.contactNormal.insert( contact.contactNormal.end(), (1.0f/magnitude)*midline);
+							
+							c.insert(c.end(), contact);
+						}
+						 
+					
 					}
 					
 					other++;

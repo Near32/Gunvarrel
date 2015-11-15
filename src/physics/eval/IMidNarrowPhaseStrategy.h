@@ -54,7 +54,213 @@ class MidNarrowPhaseStrategyA
 	
 	virtual void checkForCollisions(std::vector<Contact>& c) override
 	{
-		//let us go throught the c and assert if there is really a contact :
+		//let us iterate over the contact set :
+		std::vector<IContact>::iterator contact = c.begin();
+		
+		while( contact != c.end())
+		{
+			ShapeType typeA = contact->rbA.getShapeType();
+			ShapeType typeB = contact->rbB.getShapeType();
+						
+			int nbrContact = 0;					
+			switch(typeA)
+			{
+				case ABSTRACT :
+				
+				switch(typeB)
+				{
+					case ABSTRACT :
+					
+					break;
+				
+					case SPHERE :
+					
+					break;
+				
+					case PLANE :
+					
+					break;
+				
+					case BOX :
+					
+					break;
+				
+					case COMPOSIT :
+					
+					break;
+				
+					default :
+					
+					break;
+				
+				}
+				
+				break;
+				
+				case SPHERE :
+				
+				switch(typeB)
+				{
+					case ABSTRACT :
+					
+					break;
+				
+					case SPHERE :
+					//nothing to do.
+					break;
+				
+					case PLANE :
+					
+					break;
+				
+					case BOX :
+					
+					break;
+				
+					case COMPOSIT :
+					
+					break;
+				
+					default :
+					
+					break;
+				
+				}
+				
+				break;
+				
+				case PLANE :
+				
+				switch(typeB)
+				{
+					case ABSTRACT :
+					
+					break;
+				
+					case SPHERE :
+					
+					break;
+				
+					case PLANE :
+					
+					break;
+				
+					case BOX :
+					
+					break;
+				
+					case COMPOSIT :
+					
+					break;
+				
+					default :
+					
+					break;
+				
+				}
+				
+				break;
+				
+				case BOX :
+				
+				switch(typeB)
+				{
+					case ABSTRACT :
+					
+					break;
+				
+					case SPHERE :
+					
+					break;
+				
+					case PLANE :
+					
+					break;
+				
+					case BOX :
+					
+					break;
+				
+					case COMPOSIT :
+					
+					break;
+				
+					default :
+					
+					break;
+				
+				}
+				
+				break;
+				
+				case COMPOSIT :
+				
+				switch(typeB)
+				{
+					case ABSTRACT :
+					
+					break;
+				
+					case SPHERE :
+					
+					break;
+				
+					case PLANE :
+					
+					break;
+				
+					case BOX :
+					
+					break;
+				
+					case COMPOSIT :
+					
+					break;
+				
+					default :
+					
+					break;
+				
+				}
+				
+				break;
+				
+				default :
+				
+				switch(typeB)
+				{
+					case ABSTRACT :
+					
+					break;
+				
+					case SPHERE :
+					
+					break;
+				
+					case PLANE :
+					
+					break;
+				
+					case BOX :
+					
+					break;
+				
+					case COMPOSIT :
+					
+					break;
+				
+					default :
+					
+					break;
+				
+				}
+				
+				break;
+				
+			}
+			
+			contact++;
+		}
 		
 	}
 };

@@ -28,6 +28,10 @@ void Environnement::addElement( IElement* El)
 {
 	ListeElements.push_back( std::unique_ptr<IElement>(El) );
 }
+/*void Environnement::addElement( IElement El)
+{
+	ListeElements.push_back(El);
+}*/
 
 bool Environnement::deleteElementIDX(int idx)
 {

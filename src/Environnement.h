@@ -15,6 +15,7 @@ class Environnement
 	public:
 	
 	std::vector<std::unique_ptr<IElement>> ListeElements;
+	//std::vector<IElement> ListeElements;
 	std::unique_ptr<Fabriques> fabriques;
 	
 //-----------------------------------------------------
@@ -28,6 +29,7 @@ class Environnement
 	
 	void addElement( std::unique_ptr<IElement> El);
 	void addElement( IElement* El);
+	//void addElement( IElement El);
 		
 	bool deleteElementIDX(int idx);
 	bool deleteElementSTRING(std::string name);

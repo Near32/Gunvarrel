@@ -69,6 +69,8 @@ class RigidBody : public ISimulationObject, public IMoveable
 	const Mat<float> getInertialLocal() const	{	return Inertia;	}
 	const Mat<float> getInverseInertialLocal() const	{	return iInertia;	}	
 	const Mat<float> getInverseInertialWorld() const	{	return iInertiaWorld;	}		
+	
+	const IShape& getShapeReference() const	{ return *ptrShape;	}
 		
 	
 };
