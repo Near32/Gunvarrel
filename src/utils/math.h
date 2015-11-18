@@ -25,9 +25,10 @@ class se3
 	~se3();
 	
 	Mat<float> exp();					//compute the (R | t) matrix.
+	Mat<float> getT()	{	return t;	}
 	void setT(const Mat<float>& t_);
 	void setW(const Mat<float>& w_);
-	
+	void setOrientation( const Quat& q);	
 
 };
 

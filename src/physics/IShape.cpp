@@ -7,14 +7,14 @@ IShape::IShape(RigidBody* Owner_, float boundingRadius_) : boundingRadius(boundi
 }
 
 
-IShape::IShape( const se3& Pose_, RigidBody* Owner_, float boundingRadius_) : boundingRadius(boundingRadius_), hasMoved(false), Owner(Owner_), type(ABSTRACT)
+IShape::IShape( const se3& Pose_, RigidBody* Owner_, float boundingRadius_) : IMoveable(Pose_), boundingRadius(boundingRadius_), hasMoved(false), Owner(Owner_), type(ABSTRACT)
 {
-	IMoveable(Pose_);
+	
 }
 
-IShape::IShape( const se3& Pose_, const Mat<float>& Lvel, const Mat<float>& Avel, RigidBody* Owner_, float boundingRadius_) : boundingRadius(boundingRadius_), hasMoved(false), Owner(Owner_), type(ABSTRACT)
+IShape::IShape( const se3& Pose_, const Mat<float>& Lvel, const Mat<float>& Avel, RigidBody* Owner_, float boundingRadius_) : 	IMoveable(Pose_,Lvel,Avel), boundingRadius(boundingRadius_), hasMoved(false), Owner(Owner_), type(ABSTRACT)
 {
-	IMoveable(Pose_,Lvel,Avel);
+
 }
 
 IShape::~IShape()
@@ -52,15 +52,18 @@ BoxShape::~BoxShape()
 
 
 
-CompositShape::CompositShape(RigidBody* Owner_, float boundingRadius_) : IShape(Owner_,boundingRadius), nbrShape(0), type(COMPOSIT)
+CompositShape::CompositShape(RigidBody* Owner_, float boundingRadius_) : IShape(Owner_,boundingRadius), nbrShapes(0)
 {
-	
+	type = COMPOSIT;	
 }
 	
-CompositShape::CompositShape(RigidBody* Owner_, std::vector<std::unique_ptr<IShape> > Shapes_) : IShape(Owner_, (float)0), type(COMPOSIT)
+CompositShape::CompositShape(RigidBody* Owner_, std::vector<std::unique_ptr<IShape> > Shapes_) : IShape(Owner_, (float)0)
 {
-	Shapes = Shapes_;
-	nbrShape = Shapes.size();
+	type = COMPOSIT;	
+	nbrShapes = Shapes.size();
+	//Shapes = Shapes_;
+	for(int i=nbrShapes;i--;)	Shapes.insert( Shapes.begin(), std::move( Shapes_[i] ));
+		
 	
 	//TODO boundingRadius ? 
 }
@@ -72,20 +75,15 @@ CompositShape::~CompositShape()
 
 void CompositShape::addShape( std::unique_ptr<IShape> shape)
 {
-	nbrShape++;
-	Shapes.insert( Shapes.begin(), shape);
+	nbrShapes++;
+	Shapes.insert( Shapes.end(), std::move(shape));
 }
 
 void CompositShape::removeShape( int id)
 {
-	for(int i=Shapes.size(); i--;)
+	if(id<=0 && id < Shapes.size())
 	{
-		if(Shapes[i].id == id)
-		{
-			//let us remove it :
-			nbrShape--;
-			Shapes.erase(i);
-		}
+		Shapes.erase(Shapes.begin()+id);
 	}
 }
 

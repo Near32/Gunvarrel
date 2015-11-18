@@ -1,7 +1,6 @@
-#ifndef IMOVEABLE_H
-#define IMOVEABLE_H
+#pragma once
 
-#include "utils/math.h"
+#include "../utils/math.h"
 
 class IMoveable
 {
@@ -10,7 +9,7 @@ class IMoveable
 	se3 Pose;
 	
 	Mat<float> LinearVelocity;
-	Mat<float> Angularvelocity;
+	Mat<float> AngularVelocity;
 	
 //-----------------------------------------------------
 //-----------------------------------------------------
@@ -21,7 +20,10 @@ class IMoveable
 	IMoveable( const se3& Pose_);													//Orientation has to be initialized from Pose.
 	IMoveable( const se3& Pose_, const Mat<float>& Lvel, const Mat<float>& Avel);	//Orientation has to be initialized from Pose.
 	
-	~IMoveable(){};
+	~IMoveable()
+	{
+	
+	}
 	
 	
 	//---------------------------------------------------------
@@ -34,7 +36,7 @@ class IMoveable
 		return Pose.getT();
 	}
 		
-	const Quat getOrientation()		{	return Quat(Pose.exp());	}
+	const Quat getOrientation()		{	return Qt_FromMat(Pose.exp());	}
 	const Mat<float> getTransformation() 	{	return Pose.exp();	}
 	
 	const Mat<float> getLinearVelocity()	{	return LinearVelocity;	}
@@ -52,4 +54,4 @@ class IMoveable
 	void setAngularVelocity( const Mat<float>& avel)	{	AngularVelocity = avel;	}
 };
 
-#endif
+

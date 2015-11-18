@@ -2,6 +2,8 @@
 #define IMIDNARROWPHASESTRATEGY_H
 
 #include "Contact.h"
+#include "../Simulation.h"
+#include "HelperFunctions.h"
 
 
 
@@ -66,11 +68,11 @@ class MidNarrowPhaseStrategyA
 			switch(typeA)
 			{
 				case ABSTRACT :
-				
+				//TODO : exception ?
 				switch(typeB)
 				{
 					case ABSTRACT :
-					
+					//TODO : exception ?
 					break;
 				
 					case SPHERE :
@@ -102,14 +104,17 @@ class MidNarrowPhaseStrategyA
 				switch(typeB)
 				{
 					case ABSTRACT :
-					
+					//TODO : exception ?
 					break;
 				
 					case SPHERE :
-					//nothing to do.
+					//nothing to do, it has already been handled if a bounding sphere has been used.
+					//TODO : handle the case when the IBroadPhaseStrategy is different of the one using spheres...
 					break;
 				
 					case PLANE :
+					//let us compute the distance between the center of the sphere and the plane :
+					
 					
 					break;
 				
@@ -134,18 +139,31 @@ class MidNarrowPhaseStrategyA
 				switch(typeB)
 				{
 					case ABSTRACT :
-					
+					//TODO : exception ?
 					break;
 				
 					case SPHERE :
-					
+					// 
 					break;
 				
 					case PLANE :
-					
+					// let us think of it as a really thin box :
+					//TODO : handle the infinity size ?
 					break;
 				
 					case BOX :
+					
+					bool testIntersection = testOBBPlane( (*contact)->rbA, (*contact)->rbB);
+					if(testIntersection)
+					{
+						//the plane and the box are intersecting : let us fill in the Contact structure :
+						
+					}
+					else
+					{
+						//the plane and the box are not intersecting.
+						c.erase(contact);
+					}
 					
 					break;
 				

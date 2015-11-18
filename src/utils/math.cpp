@@ -79,3 +79,26 @@ void se3::setW(const Mat<float>& w_)
 		hasChanged = true;
 	}
 }
+
+void se3::setOrientation( const Quat& q)
+{
+	Mat<float>* so3;
+	Quat2SO3(q,so3);
+	
+	Mat<float> wX( logMEuler(*so3));
+	w.set( -wX.get(2,3), 1,1);
+	w.set( wX.get(1,3), 2,1);
+	w.set( -wX.get(1,2), 3,1);
+	
+	hasChanged = true;
+}
+
+	//---------------------------------------------------------
+	//---------------------------------------------------------
+	
+	
+
+Mat<float> crossproductV( const Mat<float>& p1, const Mat<float>& p2)
+{
+	return crossProduct(p1)*p2;
+}

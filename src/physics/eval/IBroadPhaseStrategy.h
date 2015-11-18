@@ -69,236 +69,43 @@ class BroadPhaseStrategyA
 		{
 			if( (*it)->getType() == TSORigidBody)
 			{
-				//let us access to all of the RigidBody that haven't already been checked with regards to this one :
-				std::vector<ISimulationObject>::iterator other = it;
-				other++;
-				
-				ShapeType typeIt = (*it)->getShapeType();
-				ShapeType typeOther = (*other)->getShapeType();
-				
-				while( (*other) != sim->simulatedObjects.end())
+				if( (*it)->getCollisionStatus() )
 				{
-					/*
-					int nbrContact = 0;					
-					switch(typeIt)
-					{
-						case ABSTRACT :
-						
-						switch(typeOther)
-						{
-							case ABSTRACT :
-							
-							break;
-						
-							case SPHERE :
-							
-							break;
-						
-							case PLANE :
-							
-							break;
-						
-							case BOX :
-							
-							break;
-						
-							case COMPOSIT :
-							
-							break;
-						
-							default :
-							
-							break;
-						
-						}
-						
-						break;
-						
-						case SPHERE :
-						
-						switch(typeOther)
-						{
-							case ABSTRACT :
-							
-							break;
-						
-							case SPHERE :
-							
-							break;
-						
-							case PLANE :
-							
-							break;
-						
-							case BOX :
-							
-							break;
-						
-							case COMPOSIT :
-							
-							break;
-						
-							default :
-							
-							break;
-						
-						}
-						
-						break;
-						
-						case PLANE :
-						
-						switch(typeOther)
-						{
-							case ABSTRACT :
-							
-							break;
-						
-							case SPHERE :
-							
-							break;
-						
-							case PLANE :
-							
-							break;
-						
-							case BOX :
-							
-							break;
-						
-							case COMPOSIT :
-							
-							break;
-						
-							default :
-							
-							break;
-						
-						}
-						
-						break;
-						
-						case BOX :
-						
-						switch(typeOther)
-						{
-							case ABSTRACT :
-							
-							break;
-						
-							case SPHERE :
-							
-							break;
-						
-							case PLANE :
-							
-							break;
-						
-							case BOX :
-							
-							break;
-						
-							case COMPOSIT :
-							
-							break;
-						
-							default :
-							
-							break;
-						
-						}
-						
-						break;
-						
-						case COMPOSIT :
-						
-						switch(typeOther)
-						{
-							case ABSTRACT :
-							
-							break;
-						
-							case SPHERE :
-							
-							break;
-						
-							case PLANE :
-							
-							break;
-						
-							case BOX :
-							
-							break;
-						
-							case COMPOSIT :
-							
-							break;
-						
-							default :
-							
-							break;
-						
-						}
-						
-						break;
-						
-						default :
-						
-						switch(typeOther)
-						{
-							case ABSTRACT :
-							
-							break;
-						
-							case SPHERE :
-							
-							break;
-						
-							case PLANE :
-							
-							break;
-						
-							case BOX :
-							
-							break;
-						
-							case COMPOSIT :
-							
-							break;
-						
-							default :
-							
-							break;
-						
-						}
-						
-						break;
-						
-					}
-					*/
-					
-					//------------------
-					if( (*other)->getType() == TSORigidBody)
-					{
-						Mat<float> midline( (*it)->getPosition()-(*other)->getPosition());
-						float magnitude = norme2(midline);
-						
-						if(magnitude < (*it=->getShapeReference().getBRadius() + (*other)->getShapeReference().getBRadius() )
-						{
-							// then there is a potentiel contact :
-							Contact contact;
-							contact.rbA = **it;
-							contact.rbB = **other;
-							contact.contactPoint.insert( contact.contactPoint.end(), (*other)->getPosition()+(1.0f/2.0f)*midline);
-							contact.contactNormal.insert( contact.contactNormal.end(), (1.0f/magnitude)*midline);
-							
-							c.insert(c.end(), contact);
-						}
-						 
-					
-					}
-					
+					//let us access to all of the RigidBody that haven't already been checked with regards to this one :
+					std::vector<ISimulationObject>::iterator other = it;
 					other++;
+				
+					ShapeType typeIt = (*it)->getShapeType();
+					ShapeType typeOther = (*other)->getShapeType();
+				
+					while( (*other) != sim->simulatedObjects.end())
+					{
+						//------------------
+						if( (*other)->getType() == TSORigidBody)
+						{
+							if( (*other)->getCollisionStatus() )
+							{
+								Mat<float> midline( (*it)->getPosition()-(*other)->getPosition());
+								float magnitude = norme2(midline);
+						
+								if(magnitude < (*it=->getShapeReference().getBRadius() + (*other)->getShapeReference().getBRadius() )
+								{
+									// then there is a potentiel contact :
+									Contact contact;
+									contact.rbA = **it;
+									contact.rbB = **other;
+									contact.contactPoint.insert( contact.contactPoint.end(), (*other)->getPosition()+(1.0f/2.0f)*midline);
+									contact.contactNormal.insert( contact.contactNormal.end(), (1.0f/magnitude)*midline);
+							
+									c.insert(c.end(), contact);
+								}
+							}
+							 
+					
+						}
+					
+						other++;
+					}
 				}
 			
 			}

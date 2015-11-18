@@ -229,6 +229,21 @@ template<typename T>	/*pas de point virgule en fin de ligne...*/
 T detRec(const Mat<T>& m);
 template<typename T>
 Mat<T> crossProduct(const Mat<T>& a, const Mat<T>& b);
+template<typename T>
+T dotProduct( const Mat<T>& a, const Mat<T>& b)
+{
+	T r = (T)0;
+
+    if(a.getLine() == b.getLine() && b.getLine() == 3 && b.getColumn() == a.getColumn() && a.getColumn() == 1)
+    {
+        r+= a.get(1,1)*b.get(1,1);
+        r+= b.get(2,1)*a.get(2,1);
+        r+= a.get(3,1)*b.get(3,1);
+    }
+
+    return r;
+	
+}
 
 #ifdef OPENCV_USE
 /*convertion des matrice de OPENCV en Mat<T> dans le tableau tab.*/

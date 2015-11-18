@@ -123,4 +123,9 @@ Mat<float> RigidBody::getPointInWorld( const Mat<float>& pointL)
 	return transpose( extract(pose.exp(), 1,1, 3,3))* (pointL-extract(pose.exp(), 1,4, 3,4) );	
 }
 
+Mat<float> RigidBody::getPointInLocal( const Mat<float>& pointW)
+{
+	return extract(pose.exp(), 1,1, 3,3) * pointW + extract(pose.exp(), 1,4, 3,4) ;	
+}
+
 

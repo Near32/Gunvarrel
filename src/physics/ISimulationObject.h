@@ -3,14 +3,14 @@
 
 #include <iostream>
 #include <string>
-#include "utils/math.h"
+#include "../utils/math.h"
 #include "TypeSimulationObject.h"
 
 class ISimulationObject 
 {
 	protected :
 	
-	std::String name;	//name of the object
+	std::string name;	//name of the object
 	int id;				//unique id of the object
 	enum TypeSimulationObject type;
 	
@@ -23,7 +23,7 @@ class ISimulationObject
 		
 	ISimulationObject();
 	ISimulationObject(int id_);
-	ISimulationObject( std::String name_, int id_, bool isActive_);
+	ISimulationObject( std::string name_, int id_, bool isActive_);
 	
 	~ISimulationObject();
 	

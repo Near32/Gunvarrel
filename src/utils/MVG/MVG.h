@@ -2,6 +2,9 @@
 #define MVG_H
 
 #include "../Mat/Mat.h"
+#include "../Quaternion/Quaternion.h"
+
+
 
 
 template<typename T>
@@ -95,6 +98,15 @@ Mat<T> crossProduct(const Mat<T>& n)
 
     return r;
 }
+
+
+//void Rot2Euler( const Mat<float>& R, Mat<float>& angles);
+Mat<float> expW3( const Mat<float>& w);
+Mat<float> logMEuler( const Mat<float>& m);
+Mat<float> rotation(float angle, int axis);
+Mat<float> logM( const Mat<float>& m);
+float trace(const Mat<float>& m);
+
 
 #endif
 
