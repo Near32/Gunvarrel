@@ -153,7 +153,7 @@ class MidNarrowPhaseStrategyA
 				
 					case BOX :
 					
-					bool testIntersection = testOBBPlane( (*contact)->rbA, (*contact)->rbB);
+					bool testIntersection = testOBBPlane( (*contact)->rbB, (*contact)->rbA);
 					if(testIntersection)
 					{
 						//the plane and the box are intersecting : let us fill in the Contact structure :
@@ -184,7 +184,7 @@ class MidNarrowPhaseStrategyA
 				switch(typeB)
 				{
 					case ABSTRACT :
-					
+					//TODO :
 					break;
 				
 					case SPHERE :
@@ -193,10 +193,34 @@ class MidNarrowPhaseStrategyA
 				
 					case PLANE :
 					
+					bool testIntersection = testOBBPlane( (*contact)->rbA, (*contact)->rbB);
+					if(testIntersection)
+					{
+						//the plane and the box are intersecting : let us fill in the Contact structure :
+						
+					}
+					else
+					{
+						//the plane and the box are not intersecting.
+						c.erase(contact);
+					}
 					break;
 				
 					case BOX :
 					
+					bool testIntersection = false;
+					Mat<float> intersectingPointsWOfA( testOBBOBB( (*contact)->rbA, (*contact)->rbB) );
+					
+					if(testIntersection)
+					{
+						//the two boxes are intersecting : let us fill in the Contact structure :
+						
+					}
+					else
+					{
+						//the two boxes are not intersecting.
+						c.erase(contact);
+					}
 					break;
 				
 					case COMPOSIT :

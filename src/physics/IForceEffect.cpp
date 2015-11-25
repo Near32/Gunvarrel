@@ -60,8 +60,8 @@ SpringForceEffect::~SpringForceEffect()
 	
 void SpringForceEffect::Apply(float dt, std::shared_ptr<RigidBody> ptrRB)
 {
-	Mat<float> p1W( body->getPointInWorld(connectionPoint) );
-	Mat<float> p2W( other->getPointInWorld(otherConnectionPoint));
+	Mat<float> p1W( body->getPointInWorld(connectionPointL) );
+	Mat<float> p2W( other->getPointInWorld(otherConnectionPointL));
 	
 	Mat<float> force(p1W-p2W);
 	
@@ -70,7 +70,7 @@ void SpringForceEffect::Apply(float dt, std::shared_ptr<RigidBody> ptrRB)
 	
 	magnitude = spingConstant*fabs_(magnitude-restLength);
 	
-	body->addForceAtWorldPoint( (float)(-magnitude)*force, p1in1);			
-	other->addForceAtWorldPoint( (float)(magnitude)*force, p2in2);
+	body->addForceAtWorldPoint( (float)(-magnitude)*force, p1W);			
+	other->addForceAtWorldPoint( (float)(magnitude)*force, p2W);
 	
 }

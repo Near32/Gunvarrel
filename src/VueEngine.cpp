@@ -36,6 +36,7 @@ void VueEngine::Dessiner(float angleX, float angleZ)
     glLoadIdentity( );
 
 	//---------------------------
+	//Mise a jour de la position de la caméra.
 	game->camera->look();
 	//----------------------------
 

@@ -43,7 +43,7 @@ Mat<float> closestPointWOfBOXgivenPointW(const RigidBody& rb, const Mat<float>& 
 }
 
 
-bool testOBBPlane( const RigidBody& plane, const RigidBody& box)
+bool testOBBPlane( const RigidBody& box, const RigidBody& plane)
 {
 	BoxShape boxs = box.getShapeReference();
 	float d = plane.getShapeReference().getDistance();
@@ -62,31 +62,61 @@ bool testOBBPlane( const RigidBody& plane, const RigidBody& box)
 	
 }
 
-bool testOBBOBB( const RigidBody& b1, const RigidBody& b2)
+/*	Returns a matrix made up with the coordinates of intersecting points in the World frame of b1 that are within b2. If there are none, it returns a zero 3x8 matrix.
+*/
+Mat<float> testOBBOBB( const RigidBody& b1, const RigidBody& b2, bool& intersect = false)
 {
-	Mat<float> pointsB1(3,8);
+	BoxShape& box1 = b1.getShapeReference();
+	BoxShape& box2 = b2.getShapeReference();
+	
+	Mat<float> pointsB1((float)0,3,8);
 	//register the position of the 8 points composing b1:
 	Mat<float> min1((float)0,3,1);
 	Mat<float> max1((float)0,3,1);
 	
-	min1.set( -box.getHeight()/2.0f, 1,1);
-	min1.set( -box.getWidth()/2.0f, 2,1);
-	min1.set( -box.getDepth()/2.0f, 3,1);
+	min1.set( -box1.getHeight()/2.0f, 1,1);
+	min1.set( -box1.getWidth()/2.0f, 2,1);
+	min1.set( -box1.getDepth()/2.0f, 3,1);
 	max1.set( -min1.get(1,1), 1,1);
 	max1.set( -min1.get(2,1), 2,1);
 	max1.set( -min1.get(3,1), 3,1);
 	
 	int col = 1;
+	Mat<float> temp(3,1);
+	Mat<float> voronoiTemp(3,1);
 	
-	for(int pm1=1;pm1--;)
+	for(int pm1=2;pm1--;)
 	{
-		for(int pm2=1;pm2--;)
+		for(int pm2=2;pm2--;)
 		{
-			for(int pm3=1;pm3--;)
+			for(int pm3=2;pm3--;)
 			{
-				pointsB1.set( pm1*( min1.get(1,1) ) + (1-pm1)*( max1.get(1,1) ), 1,col);
-				pointsB1.set( pm2*( min1.get(2,1) ) + (1-pm2)*( max1.get(2,1) ), 2,col);
-				pointsB1.set( pm3*( min1.get(3,1) ) + (1-pm3)*( max1.get(3,1) ), 3,col);
+				temp.set( pm1*( min1.get(1,1) ) + (1-pm1)*( max1.get(1,1) ), 1,1);
+				temp.set( pm2*( min1.get(2,1) ) + (1-pm2)*( max1.get(2,1) ), 2,1);
+				temp.set( pm3*( min1.get(3,1) ) + (1-pm3)*( max1.get(3,1) ), 3,1);
+				
+				
+				//--------------------
+				//let us compute its coordinate in the world frame :
+				temp = b1.getPointInWorld( temp);
+				
+				//----------------------
+				//let us find its associated projected point :
+				voronoiTemp = closestPointWOfBOXgivenPointW( b2, temp);
+				
+				//----------------------
+				//let us find out if there was an intersection
+				// <==> voronoiTemp = temp, because it would means that the projected point is already the closest to b2 for it is within it.
+				if( voronoiTemp == temp)
+				{
+					//let us refill pointsB1 with it :
+					pointsB1.set( temp.get(1,1), 1,col);
+					pointsB1.set( temp.get(2,1), 2,col);
+					pointsB1.set( temp.get(3,1), 3,col);
+					
+					intersect = true;
+				}
+				
 				
 				col++;
 			}

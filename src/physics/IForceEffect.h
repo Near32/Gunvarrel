@@ -3,12 +3,14 @@
 
 class IForceEffect
 {
-	public :
+	protected :
 	
 	float endTime;
 	
 	
 	//--------------------------------------------------------
+	
+	public :
 	
 	IForceEffect();
 	
@@ -16,6 +18,16 @@ class IForceEffect
 	
 	virtual void Apply(float dt = 0.001f, std::shared_ptr<RigidBody> ptrRB = NULL) = 0;
 	
+	
+	float getEndTime() const	
+	{	
+		return endTime;	
+	}
+	
+	void setEndTime(const float et)	
+	{
+		endTime = et;	
+	}
 };
 
 
