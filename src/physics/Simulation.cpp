@@ -8,7 +8,48 @@ Simulation::Simulation() : updater(new Updater(this, new ExplicitEulerIntegrater
 {
 
 }
-//Simulation(Environnement* env);
+
+Simulation::Simulation(Environnement* env)
+{
+	Simulation();
+	
+	//--------------------------
+	int id = 0;
+	
+	
+	std::vector<std::unique_ptr<IElement> >::iterator element = env->ListeElements.begin();
+	
+	while( element != env->ListeElements.end() )
+	{
+		// let us create the RigidBody that ought to be created given the Environnement :
+		
+		switch( element->isFixe() )
+		{
+			case true :
+			//the element is an IElementFixe :
+			
+			break;
+			
+			case false :
+			//the element is an IElementMobile :
+			switch( (IElementMobile)element->isComposit() )
+			{
+				case true :
+				
+				break;
+				
+				case false:
+				
+				break;
+				
+				
+			}
+			break;
+			
+		}
+	}
+	
+}
 	
 Simulation::~Simulation()
 {

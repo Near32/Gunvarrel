@@ -7,36 +7,51 @@ class IConstraint
 {
 	public :
 	
-	std::shared_ptr<RigidBody> rbA;
-	std::shared_ptr<RigidBody> rbB;
+	RigidBody& rbA;
+	RigidBody& rbB;
 	
 	bool bodiesCanCollide;
 	
-	Mat<float> AnchorA;
-	Mat<float> AnchorB;
+	Mat<float> AnchorAL;
+	Mat<float> AnchorBL;
 	
-	Mat<float> AxisA;
-	Mat<float> AxisB;
+	Mat<float> AxisA;	//in World
+	Mat<float> AxisB;	//in World
 	
+	//TODO : warning about their use in the HingJoint constraint and the definition in Worl of Local of the HJAxises...
+	
+	Mat<float> constraintsImpules;
+	Mat<float> constraintForce;
+	
+	Mat<float> JacobianA;
+	Mat<float> JacobianB;
 	
 	//-----------------------------------
 	//-----------------------------------
 	
 	//Anchors can be iniatilized to the center of mass, by default.
 	//Axises can be initialized to the local coordinate frame axises.
-	IConstraint(std::shared_ptr<RigidBody> rbA_, std::shared_ptr<RigidBody> rbB_);
+	IConstraint(RigidBody& rbA_, RigidBody& rbB_);
 	
 	~IConstraint()	{}
 	
 	virtual void addPenaltySpring(float dt = 0.001f) = 0;
 	virtual void applyConstraintImpulse(float dt = 0.001f) = 0;
 	virtual void applyPositionCorrection(float dt = 0.001f) = 0;
+	virtual void computeJacobians() = 0;
 	
-	virtual Mat<float> getJacobianA() = 0;
-	virtual Mat<float> getJacobianB() = 0;
 	
-	virtual Mat<float> getLowLimit() = 0;
-	virtual Mat<float> getHighLimit() = 0;
+	Mat<float> getJacobianA() const
+	{
+		return JacobianA;
+	}
+	
+	Mat<float> getJacobianB() const
+	{
+		return JacobianB;
+	}
+	
+	
 	
 };
 
@@ -54,21 +69,18 @@ class ContactConstraint : public IConstraint
 	//Penetration depth is initialized to 0, by default.	
 	//Anchors can be iniatilized to the center of mass, by default.
 	//Axises can be initialized to the local coordinate frame axises.
-	ContactConstraint(std::shared_ptr<RigidBody> rbA_, std::shared_ptr<RigidBody> rbB_, float penetrationDepth_ = 0.0f);
+	ContactConstraint(RigidBody& rbA_, RigidBody& rbB_, float penetrationDepth_ = 0.0f);
 	
 	
-	~ContactConstraint()	{}	
+	~ContactConstraint()	
+	{
+	
+	}	
 		
 	virtual void addPenaltySpring(float dt = 0.001f) override;
 	virtual void applyConstraintImpulse(float dt = 0.001f) override;
 	virtual void applyPositionCorrection(float dt = 0.001f) override;
-	
-	virtual Mat<float> getJacobianA() override;
-	virtual Mat<float> getJacobianB() override;
-	
-	virtual Mat<float> getLowLimit() override;
-	virtual Mat<float> getHighLimit() override;
-	
+	virtual void computeJacobians() override;
 	
 	
 };
@@ -84,23 +96,21 @@ class BallAndSocketJoint : public IConstraint
 	//-----------------------------------------
 	//-----------------------------------------
 	
-	//Penetration depth is initialized to 0, by default.	
 	//Anchors can be iniatilized to the center of mass, by default.
 	//Axises can be initialized to the local coordinate frame axises.
-	BallAndSocketJoint(std::shared_ptr<RigidBody> rbA_, std::shared_ptr<RigidBody> rbB_);
+	BallAndSocketJoint(RigidBody& rbA_, RigidBody& rbB_, const Mat<float>& AnchorAL, const Mat<float>& AnchorBL);
 	
 	
-	~BallAndSocketJoint()	{}
+	~BallAndSocketJoint()	
+	{
+	
+	}
 	
 	virtual void addPenaltySpring(float dt = 0.001f) override;
 	virtual void applyConstraintImpulse(float dt = 0.001f) override;
 	virtual void applyPositionCorrection(float dt = 0.001f) override;
 	
-	virtual Mat<float> getJacobianA() override;
-	virtual Mat<float> getJacobianB() override;
-	
-	virtual Mat<float> getLowLimit() override;
-	virtual Mat<float> getHighLimit() override;
+	virtual void computeJacobians() override;
 	
 	
 	
@@ -113,29 +123,31 @@ class HingeJoint : public IConstraint
 {
 	public :
 	
-	Mat<float> HingeAxis;
+	Mat<float> HJAxisW;
+	Mat<float> HJAxisW1;
+	Mat<float> HJAxisW2;
+	
+	BallAndSocketJoint BASJoint;
+	Mat<float> AnchorW;
 	
 	//-----------------------------------------
 	//-----------------------------------------
 	
-	//Penetration depth is initialized to 0, by default.	
 	//Anchors can be iniatilized to the center of mass, by default.
 	//Axises can be initialized to the local coordinate frame axises.
-	HingeJoint(std::shared_ptr<RigidBody> rbA_, std::shared_ptr<RigidBody> rbB_, const Mat<float>& HingeAxis = XAxis);
+	HingeJoint( RigidBody& rbA_, RigidBody& rbB_, const Mat<float>& HJAxis, const Mat<float> AnchorW);
 	
 	
-	~HingeJoint()	{}
+	~HingeJoint()
+	{
+	
+	}
 	
 	virtual void addPenaltySpring(float dt = 0.001f) override;
 	virtual void applyConstraintImpulse(float dt = 0.001f) override;
 	virtual void applyPositionCorrection(float dt = 0.001f) override;
 	
-	virtual Mat<float> getJacobianA() override;
-	virtual Mat<float> getJacobianB() override;
-	
-	virtual Mat<float> getLowLimit() override;
-	virtual Mat<float> getHighLimit() override;
-	
+	virtual void computeJacobians() override;
 	
 	
 };
@@ -156,20 +168,22 @@ class ILimitConstraint : public IConstraint
 	//Penetration depth is initialized to 0, by default.	
 	//Anchors can be iniatilized to the center of mass, by default.
 	//Axises can be initialized to the local coordinate frame axises.
-	ILimitConstraint(std::shared_ptr<RigidBody> rbA_, std::shared_ptr<RigidBody> rbB_, float Min_ = -INF, float Max_ = INF);
+	ILimitConstraint(RigidBody& rbA_, RigidBody& rbB_, float Min_ = -INF, float Max_ = INF);
 	
 	
-	~ILimitConstraint()	{}
+	~ILimitConstraint()	
+	{
+	
+	}
 	
 	virtual void addPenaltySpring(float dt = 0.001f) override;
 	virtual void applyConstraintImpulse(float dt = 0.001f) override;
 	virtual void applyPositionCorrection(float dt = 0.001f) override;
 	
-	virtual Mat<float> getJacobianA() override;
-	virtual Mat<float> getJacobianB() override;
+	virtual void computeJacobians() override;
 	
-	virtual Mat<float> getLowLimit() override;
-	virtual Mat<float> getHighLimit() override;
+	virtual Mat<float> getLowLimit();
+	virtual Mat<float> getHighLimit();
 	
 	
 	

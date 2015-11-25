@@ -37,6 +37,12 @@ class IMoveable
 	}
 		
 	const Quat getOrientation()		{	return Qt_FromMat(Pose.exp());	}
+	
+	const Mat<float> getMatOrientation()
+	{
+		return Qt2Mat<float>( getOrientation() );
+	}
+	
 	const Mat<float> getTransformation() 	{	return Pose.exp();	}
 	
 	const Mat<float> getLinearVelocity()	{	return LinearVelocity;	}

@@ -33,4 +33,6 @@ class se3
 };
 
 
+
+Mat<float> crossproductV( const Mat<float>& p1, const Mat<float>& p2);
 #endif

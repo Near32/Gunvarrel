@@ -14,7 +14,7 @@ class Environnement
 {
 	public:
 	
-	std::vector<std::unique_ptr<IElement>> ListeElements;
+	std::vector<std::unique_ptr<IElement> > ListeElements;
 	//std::vector<IElement> ListeElements;
 	std::unique_ptr<Fabriques> fabriques;
 	

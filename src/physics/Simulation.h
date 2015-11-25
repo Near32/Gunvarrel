@@ -23,6 +23,8 @@ class Simulation
 	std::unique_ptr<IUpdater> updater;
 	std::unique_ptr<CollisionDetector> collisionDetector;
 	
+	Mat<float> q;
+	Mat<float> qdot;
 	
 	//-------------------------------------------------------------
 	//-------------------------------------------------------------
@@ -35,5 +37,64 @@ class Simulation
 	~Simulation();
 	
 	
+	void constructQ()
+	{
+		std::vector<std_unique_ptr<ISimulationObject> >::iterator o = simulatedObjects.begin();
+		
+		//there alwas at least one element : the ground :
+		q = operatorC( o->getPosition(), o->getMatOrientation() );
+		
+		while( o != simulatedObjects.end() )
+		{
+			q = operatorC( q, 
+							operatorC( o->getPosition(), o->getMatOrientation()
+							);
+							
+		}
+		
+		
+	}
+	
+	void constructQdot()
+	{
+		std::vector<std_unique_ptr<ISimulationObject> >::iterator o = simulatedObjects.begin();
+		
+		//there alwas at least one element : the ground :
+		qdot = operatorC( o->getLinearVelocity(), o->getAngularVelocity() );
+		
+		while( o != simulatedObjects.end() )
+		{
+			q = operatorC( q, 
+							operatorC( o->getLinearVelocity(), o->getAngularVelocity()
+							);
+							
+		}
+	}
+	
+	void constructQQdotFext()
+	{
+		std::vector<std_unique_ptr<ISimulationObject> >::iterator o = simulatedObjects.begin();
+		
+		//there alwas at least one element : the ground :
+		qdot = operatorC( o->getLinearVelocity(), o->getAngularVelocity() );
+		
+		while( o != simulatedObjects.end() )
+		{
+			q = operatorC( q, 
+							operatorC( o->getLinearVelocity(), o->getAngularVelocity()
+							);
+							
+		}
+	}
+	
+	void majQ(const Mat<float>& add)
+	{
+		q += add;
+	}
+	
+	void majQdot(const Mat<float>& add)
+	{
+		qdot += add;
+	}
 };
 #endif

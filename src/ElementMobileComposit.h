@@ -26,6 +26,11 @@ class ElementMobileComposit : public IElementMobile
 
 		void addElementMobile(std::unique_ptr<IElementMobile> EleMobile);
 		void addElementMobile( IElementMobile* EleMobile);
+		
+		virtual bool isComposit()	override
+		{
+		 	return true;
+		}
 
 };
 

@@ -26,7 +26,6 @@ class IElement
 	
 	virtual bool isFixe() =0 ;
 	
-	
 };
 
 

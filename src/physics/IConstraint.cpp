@@ -1,15 +1,15 @@
 #include "IConstraint.h"
 
-IConstraint::IConstraint(std::shared_ptr<RigidBody> rbA_, std::shared_ptr<RigidBody> rbB_) : rbA(rbA_), rbB(rbB_), bodiesCanCollide(true)
+IConstraint::IConstraint(RigidBody& rbA_, RigidBody& rbB_) : rbA(rbA_), rbB(rbB_), bodiesCanCollide(true)
 {
 	
-	AnchorA = extract(rbA->exp(), 1,4, 3,4);
-	AnchorB = extract(rbB->exp(), 1,4, 3,4);
+	AnchorAL = rbA.getPointInLocal( extract(rbA->exp(), 1,4, 3,4) );
+	AnchorBL = rbB.getPointInLocal( extract(rbB->exp(), 1,4, 3,4) );
 	
 	
-	//axises of A :
+	//axises of A in W:
 	Mat<float> R(4,4);
-	Qt_ToMatrix(rbA->getOrientation(), &R);
+	Qt_ToMatrix(rbA.getOrientation(), &R);
 	R = extract( R, 1,1, 3,3);
 	
 	
@@ -28,8 +28,8 @@ IConstraint::IConstraint(std::shared_ptr<RigidBody> rbA_, std::shared_ptr<RigidB
 	//---------------------------------
 	
 	
-	//axises of B :
-	Qt_ToMatrix(rbB->getOrientation(), &R);
+	//axises of B in W:
+	Qt_ToMatrix(rbB.getOrientation(), &R);
 	R = extract( R, 1,1, 3,3);
 	
 	
@@ -66,7 +66,7 @@ IConstraint::IConstraint(std::shared_ptr<RigidBody> rbA_, std::shared_ptr<RigidB
 //Penetration depth is initialized to 0, by default.	
 //Anchors can be iniatilized to the center of mass, by default.
 //Axises can be initialized to the local coordinate frame axises.
-ContactConstraint::ContactConstraint(std::shared_ptr<RigidBody> rbA_, std::shared_ptr<RigidBody> rbB_, float penetrationDepth_) : penetrationDepth(penetrationDepth_), IConstraint( rbA_, rbB_)
+ContactConstraint::ContactConstraint(RigidBody& rbA_, RigidBody& rbB_, float penetrationDepth_) : penetrationDepth(penetrationDepth_), IConstraint( rbA_, rbB_)
 {
 
 }
@@ -82,31 +82,20 @@ void ContactConstraint::applyConstraintImpulse(float dt)
 }
 
 
-void ConstactConstraint::applyPositionCorrection(float dt)
+void ContactConstraint::applyPositionCorrection(float dt)
 {
 
 }
 
-Mat<float> ContactConstraint::getJacobianA()
+void ContactConstraint::computeJacobians()
 {
-
-}
-
-
-Mat<float> ContactConstraint::getJacobianB()
-{
-
-}
-
+	//A :
 	
-Mat<float> ContactConstraint::getLowLimit()
-{
-
-}
-
-Mat<float> ContactConstraint::getHighLimit()
-{
-
+	
+	//---------------------
+	
+	//B : 
+	
 }
 
 
@@ -130,9 +119,10 @@ Mat<float> ContactConstraint::getHighLimit()
 //Penetration depth is initialized to 0, by default.	
 //Anchors can be iniatilized to the center of mass, by default.
 //Axises can be initialized to the local coordinate frame axises.
-BallAndSocketJoint::BallAndSocketJoint(std::shared_ptr<RigidBody> rbA_, std::shared_ptr<RigidBody> rbB_) : IConstraint( rbA_, rbB_)
+BallAndSocketJoint::BallAndSocketJoint(RigidBody& rbA_, RigidBody& rbB_, const Mat<float>& AnchorAL_, const Mat<float>& AnchorBL_) : IConstraint( rbA_, rbB_)
 {
-
+	AnchorAL = AnchorAL_;
+	AnchorBL = AnchorBL_;
 }
 
 	
@@ -152,28 +142,16 @@ void BallAndSocketJoint::applyPositionCorrection(float dt)
 
 }
 
-Mat<float> BallAndSocketJoint::getJacobianA()
+void BallAndSocketJoint::computeJacobians()
 {
-
-}
-
-
-Mat<float> BallAndSocketJoint::getJacobianB()
-{
-
-}
-
+	//A :
+	JacobianA = operatorL( Identity, (-1.0f)*crossProduct(AnchorAL) );
 	
-Mat<float> BallAndSocketJoint::getLowLimit()
-{
-
+	//---------------------
+	
+	//B : 
+	JacobianB = operatorL( (-1.0f)*Identity, crossProduct(AnchorBL) );
 }
-
-Mat<float> BallAndSocketJoint::getHighLimit()
-{
-
-}
-
 
 
 
@@ -190,9 +168,18 @@ Mat<float> BallAndSocketJoint::getHighLimit()
 //Penetration depth is initialized to 0, by default.	
 //Anchors can be iniatilized to the center of mass, by default.
 //Axises can be initialized to the local coordinate frame axises.
-HingeJoint::HingeJoint(std::shared_ptr<RigidBody> rbA_, std::shared_ptr<RigidBody> rbB_, const Mat<float>& HingeAxis = XAxis) : HingeAxis(HingeAxis_), IConstraint( rbA_, rbB_)
+HingeJoint::HingeJoint( RigidBody& rbA_, RigidBody& rbB_, const Mat<float>& HJAxisW_, const Mat<float> AnchorW_) : HJAxis(HJAxisW_), AnchorW(AnchorW_), IConstraint( rbA_, rbB_)
 {
-
+	BASJoint = BallAndSocketJoint(rbA_,rbB_, rbA.getPointInLocal(AnchorW), rbB.getPointInLocal(AnchorW) );
+	
+	//--------------------
+	
+	HJAxisW1 = crossproductV( HJAxisW, extract(AxisA,1,1,3,1)+extract(AxisA,1,2,3,2)+extract(AxisA,1,3,3,3) );
+	HJAxisW2 = crossproductV( HJAxisW, HJAxisW1);
+	
+	//TODO : verify the correctness of this use of the axises in World Reference Frame ?...!!
+	
+	//--------------------
 }
 
 
@@ -213,31 +200,36 @@ void HingeJoint::applyPositionCorrection(float dt)
 
 }
 
-Mat<float> HingeJoint::getJacobianA()
+void HingeJoint::computeJacobians()
 {
-
-}
-
-
-Mat<float> HingeJoint::getJacobianB()
-{
-
-}
-
+	BASJoint.computeJacobian();
 	
-Mat<float> HingeJoint::getLowLimit()
-{
-
+	//---------------------------
+	
+	
+	//A :
+	Mat<float> zero(0.0f,1,3);
+	
+	JacobianA = operatorC( 
+	
+		operatorC( BASJoint.getJacobianA(),
+					operatorL( zero, transpose(HJAxisW1)) ),
+					
+		operatorL( zero, transpose(HJAxisW2))
+							 );
+	
+	//-----------------------
+	
+	//B :
+	JacobianB = operatorC( 
+	
+		operatorC( BASJoint.getJacobianB(),
+					operatorL( zero, -transpose(HJAxisW1)) ),
+					
+		operatorL( zero, -transpose(HJAxisW2))
+							 );
+	
 }
-
-Mat<float> HingeJoint::getHighLimit()
-{
-
-}
-
-
-
-
 
 
 //---------------------------------------------
@@ -253,7 +245,7 @@ Mat<float> HingeJoint::getHighLimit()
 //Penetration depth is initialized to 0, by default.	
 //Anchors can be iniatilized to the center of mass, by default.
 //Axises can be initialized to the local coordinate frame axises.
-ILimitConstraint::ILimitConstraint(std::shared_ptr<RigidBody> rbA_, std::shared_ptr<RigidBody> rbB_, float Min_, float Max_) : Min(Min_), Max(Max_), IConstraint( rbA_, rbB_)
+ILimitConstraint::ILimitConstraint(RigidBody& rbA_, RigidBody& rbB_, float Min_, float Max_) : Min(Min_), Max(Max_), IConstraint( rbA_, rbB_)
 {
 
 }
@@ -275,28 +267,10 @@ void ILimitConstraint::applyPositionCorrection(float dt)
 
 }
 
-Mat<float> ILimitConstraint::getJacobianA()
+void ILimitConstraint::computeJacobians()
 {
 
 }
-
-
-Mat<float> ILimitConstraint::getJacobianB()
-{
-
-}
-
-	
-Mat<float> ILimitConstraint::getLowLimit()
-{
-
-}
-
-Mat<float> ILimitConstraint::getHighLimit()
-{
-
-}
-
 
 
 

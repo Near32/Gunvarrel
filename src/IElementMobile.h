@@ -15,7 +15,8 @@ class IElementMobile : public IElement
 		
 		  
 		 virtual bool isFixe() override;
-		  
+		 
+		 virtual bool isComposit() = 0;
 		  
 };
 

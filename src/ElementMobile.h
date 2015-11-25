@@ -13,6 +13,10 @@ class ElementMobile : public IElementMobile
 		
 		virtual bool isFixe() override;
 		
+		virtual bool isComposit()	override
+		{
+		 	return false;
+		}
 };
 
 
