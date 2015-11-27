@@ -7,10 +7,12 @@ class IElementFixe : public IElement
 {  
 	public:
 		
+	Mat<float> hwd;
 //----------------------------------------------------------------
 //----------------------------------------------------------------
 	IElementFixe();
 	IElementFixe(std::string name_, std::unique_ptr<se3> pose_);
+	IElementFixe(std::string name_, std::unique_ptr<se3> pose_, const Mat<float>& hwd_);
 			
 	virtual ~IElementFixe();
 			

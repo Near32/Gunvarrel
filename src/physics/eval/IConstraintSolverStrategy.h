@@ -26,7 +26,7 @@ class IConstraintSolverStrategy
 	}
 	
 	
-	virtual void Solve(float dt, std::vector<std::unique_ptr<IConstraint> >& constraints, const Mat<float>& q, const Mat<float>& qdot, const Mat<float>& invM, const Mat<float>& Fext) = 0;
+	virtual void Solve(float dt, std::vector<std::unique_ptr<IConstraint> >& constraints, Mat<float>& q, Mat<float>& qdot, SparseMat<float>& invM, SparseMat& S, const Mat<float>& Fext) = 0;
 
 	//------------------------------------
 	
@@ -79,21 +79,28 @@ class SimultaneousImpulseBasedConstraintSolverStrategy : public IConstraintSolve
 	
 	void computeConstraintsJacobian()
 	{
-		
+		//TODO
 	}
 		
-	void Solve(float dt, std::vector<std::unique_ptr<IConstraint> >& constraints, const Mat<float>& q, const Mat<float>& qdot, const Mat<float>& invM, const Mat<float>& Fext ) override
+	void Solve(float dt, std::vector<std::unique_ptr<IConstraint> >& constraints, Mat<float>& q, Mat<float>& qdot, SparseMat<float>& invM, SparseMat<float>& S, const Mat<float>& Fext ) override
 	{
 		c = constrains;
 		computeConsraintsJacobian();
 		
-		Mat<float> temp = invGJ( constraintsJacobian*(invM*transpose(constraintsJacobian)) ) * constraintsJacobian;
+		Mat<float> tConstraintsJacobian( transpose(constraintsJacobian) );
+		Mat<float> temp( invGJ( constraintsJacobian * SM2Mat<float>( invM*tConstraintsJacobian ) ) * constraintsJacobian );
 		
-		lambda = (-1.0f) * ( temp * invM * Fext + (1.0f/dt) * ( temp * qdot) ) ;
-		 
+		Mat<float> tempInvMFext( dt*SM2Mat<float>( invM * Fext ) );
+		//lambda = (-1.0f) * ( temp * tempInvMFext + (1.0f/dt) * ( temp * qdot) ) ;
+		lambda = (-1.0f) * ( (temp * tempInvMFext) + ( temp * qdot) ) ;
 		
 		
+		constraintsImpulse =  tConstraintsJacobian * lambda;
 		
+		//qdot += dt * tempInvMFext + dt*SM2Mat<float>( invM * constraintsImpulse );
+		qdot += tempInvMFext + SM2Mat<float>( invM * constraintsImpulse );
+		
+		q += dt*( S*qdot );
 		
 	}
 

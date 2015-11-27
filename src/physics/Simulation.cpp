@@ -26,8 +26,42 @@ Simulation::Simulation(Environnement* env)
 		switch( element->isFixe() )
 		{
 			case true :
-			//the element is an IElementFixe :
+			//the element is an IElementFixe :					
+			switch((IElementFixe*)element->isObstacle())
+			{
+				case true:
+				//CAREFUL : HANDLE THE HWD : with BoxShape
+				//The element is an obstacle :
+				if( !strcmp( name, std::string("ground") ) )
+				{
+					simulatedObjects.insert( simulatedObjects.end(), new RigidBody( name,id,true) );
+					simulatedObjects.end()->setPose( element->pose);
+					simulatedObjects.end()->setPtrShape( new BoxShape( simulatedObjects.end(), element->hwd) );
+				}
+				else
+				{
+					//then it is the ground :
+					simulatedObjects.insert( simulatedObjects.end(), new RigidBody( name,id,true) );
+					simulatedObjects.end()->setPose( element->pose);
+					simulatedObjects.end()->setPtrShape( new BoxShape( simulatedObjects.end(), element->hwd) );
+					
+					//IT IS THE UNMOVEABLE GROUND :
+					simulatedObjects.end()->isFixed = true;
+				}
+				
+				break;
+				
+				case false :
+				//the element is an OrbeBonus :
+				simulatedObjects.insert( simulatedObjects.end(), new RigidBody( name,id,true) );
+					simulatedObjects.end()->setPose( element->pose);
+					
+					//CAREFUL : HANDLE THE RADIUS : with SphereShape
+					simulatedObjects.end()->setPtrShape( new SphereShape( simulatedObjects.end(), element->hwd.get(1,1) );
+				
+				break;
 			
+			}
 			break;
 			
 			case false :
@@ -47,8 +81,14 @@ Simulation::Simulation(Environnement* env)
 			break;
 			
 		}
+		
+		//TODO : set mass Inertia ...
+		id++;
 	}
 	
+	
+	invM = SparseMat<float>( 6*id);
+	S = SparseMat<float>( 7*id, 6*id);
 }
 	
 Simulation::~Simulation()

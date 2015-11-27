@@ -54,7 +54,7 @@ class ExplicitEulerIntegrator : public IIntegrator
 		assert(dt > 0.0f);
 		
 		//int nbrSimulatedObjects = sim->simulatedObjects.size();
-		std::iterator<ISimulatedObject> it = sim->simulatedObjects.begin();
+		std::vector<ISimulatedObject>::iterator it = sim->simulatedObjects.begin();
 		
 		while( it != sim->simulatedObjects.end())
 		{

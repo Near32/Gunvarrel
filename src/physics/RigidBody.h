@@ -62,12 +62,12 @@ class RigidBody : public ISimulationObject, public IMoveable
 	//------------------------------------------------------
 	//------------------------------------------------------
 	
-	const Mat<float> getForceAccumulator() const
+	Mat<float> getForceAccumulator() const
 	{
 		return userForce;
 	}
 	
-	const Mat<float> getTorqueAccumulator() const
+	Mat<float> getTorqueAccumulator() const
 	{ 	
 		return userTorque;
 	}
@@ -101,6 +101,11 @@ class RigidBody : public ISimulationObject, public IMoveable
 		return canCollide;
 	}
 	
+	const bool getFixedStatus()	const	
+	{	
+		return isFixed;
+	}
+	
 	const IShape& getShapeReference() const
 	{ 
 		return *ptrShape;
@@ -115,7 +120,15 @@ class RigidBody : public ISimulationObject, public IMoveable
 	
 	Mat<float> getPointInWorld( const Mat<float>& pointL);
 	Mat<float> getPointInLocal( const Mat<float>& pointW);
-		
+	
+	
+	//------------------------------------------
+	
+	void setPtrShape( const IShape* ptrShape_)
+	{
+		ptrShape.clear();
+		ptrShape = ptrShape_;
+	}	
 	
 };
 #endif

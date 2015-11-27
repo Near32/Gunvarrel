@@ -45,6 +45,8 @@ class Updater : public IUpdater
 	{
 	
 	}
+	
+	
 };
 
 
