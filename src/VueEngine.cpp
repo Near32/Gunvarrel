@@ -40,9 +40,11 @@ void VueEngine::Dessiner(float angleX, float angleZ)
 	game->camera->look();
 	//----------------------------
 
-	drawGunvarrel();
+	//drawGunvarrel();
 	
 	Environnement* env = game->ptrEtat->env;//getEnvironnementFromETATENGINE();
+	
+	std::string pathElement("../res/el10x10x20.obj");
 	
 	for(int i=0;i<env->ListeElements.size();i++)
 	{
@@ -63,7 +65,21 @@ void VueEngine::Dessiner(float angleX, float angleZ)
 		//--------------------------------
 		//--------------------------------
 		//let us draw the element once we have identified it...
-		
+		if( env->ListElement[i]->name != std::string("ground") )
+		{
+			drawElement( pathElement );
+		}
+		else
+		{
+			//ground...
+			glBegin(GL_QUADS);
+			glColor3ub(230,230,230);
+			glVertex3d(-100,-100,-2);
+			glVertex3d(100,-100,-2);
+			glVertex3d(100,100,-2);
+			glVertex3d(-100,100,-2);
+			glEnd();
+		}
 		//--------------------------------
 		//--------------------------------
 		
@@ -182,3 +198,35 @@ void VueEngine::drawGunvarrel()
 	//------------------------
 	//------------------------
 }
+
+void VueEngine::drawElement(const std::string& path)
+{
+	std::vector<glm::vec3> v;
+	std::vector<glm::vec2> uv;
+	std::vector<glm::vec3> n;
+	bool res = loadOBJ(path.c_str(), v,uv,n);
+	
+	if(res)
+	{
+		for(int i=0;i<v.size();i++)
+		{
+			if(i%3 == 0)
+			{
+				glBegin(GL_TRIANGLES);
+				int color = (i)%255;
+				glColor3ub(color,color,color);
+			}
+		
+			glVertex3d( v[i].x, v[i].y, v[i].z);
+		
+			if( (i+1)%3 == 0)
+			{
+				glEnd();
+			}
+		}
+	}
+	else
+	{
+		cerr << "Impossible de charger l'element : " << path << endl;
+	}
+} 

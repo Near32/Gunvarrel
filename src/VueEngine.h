@@ -23,6 +23,7 @@ class VueEngine : public IEngine
 	void Dessiner(float angleX, float angleZ);
 	
 	void drawGunvarrel();
+	void drawElement(const std::string& path);
 };
 
 #endif

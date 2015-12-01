@@ -10,6 +10,11 @@ ElementMobile::ElementMobile(std::string name_, std::unique_ptr<se3> pose_) : IE
 
 }
 
+ElementMobile(std::string name_, std::unique_ptr <se3> pose_, const Mat<float>& hwd_) : IElementMobil(name_,std::move(pose_),hwd_)
+{
+
+}
+
 ElementMobile::~ElementMobile()
 {
 
