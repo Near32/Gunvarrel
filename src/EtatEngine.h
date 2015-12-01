@@ -3,12 +3,14 @@
 
 #include "IEngine.h"
 #include "Environnement.h"
+#include "Simulation.h"
 
 class EtatEngine : IEngine
 {
 	public :
 	
 	Environnement* env;
+	Simulation* sim;
 	
 	//---------------------------------------------
 	//---------------------------------------------

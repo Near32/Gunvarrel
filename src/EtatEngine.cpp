@@ -1,14 +1,17 @@
 #include "EtatEngine.h"
 #include "Game.h"
 
+
 EtatEngine::EtatEngine(Game* game_, GameState gameState_) : IEngine(game_,gameState_)
 {
 	env = new Environnement();
+	
 }
 
 EtatEngine::~EtatEngine()
 {
 	delete env;
+	delete sim;
 }
 	
 void EtatEngine::loop()
@@ -32,15 +35,57 @@ void EtatEngine::loop()
 void EtatEngine::init()
 {
 	//let's create the Elements that we need.
-	env->addElement( env->fabriques->fabriquer(ELFObstacle, std::string("sol"), new se3() ) );
+	Mat<float> hwd(10.0f,3,1);
+	Mat<float> t(0.0f,3,1);
+	ConstraintsList cl;
+	
+	//--------------------------------
+	//create the elements :
+	//map : ground :
+	//ground :
+	t.set( -hwd.get(3,1)/2,3,1);
+	env->addElement( env->fabriques->fabriquer(ELFObstacle, std::string("ground"), new se3(t) ) );
+	//
 	//sa position est bien à l'origine..
+	//resetting :
+	t *= 0.0f;
+	hwd *= 1.0f/10.0f;
+	//--------------------------------
 	
-	env->addElement( env->fabriques->fabriquer(ELFOrbeBonus, std::string("orbebonus0"), new se3() ) );
+	
+	//Gunvarrel :
+	env->addElement( new ElementMobile(
+	
+	
+	//resetting :
+	t = Mat<float>(0.0f,3,1);
+	hwd = Mat<float>(1.0f,3,1);
+	//--------------------------------
+	
+	
+	//map : obstacles :
+	int nbrObstacle = 0;
 	//on veut changer sa position avec une hauteur un peu plus grande :
-	Mat<float> t1(0.0f,3,1);
-	t1.set(1.0f,3,1);
-	env->ListeElements[1]->pose->setT(t1);
+	t.set(2.0f,3,1);
+	t.set(1.0f,1,1);
+	t.set(3.0f,2,1); 
+	env->addElement( env->fabriques->fabriquer(ELFObstacle, std::string("obstacle")+std::string(nbrObstacle), new se3(t), hwd ) );
+	nbrObstacle++;
+	//--------------------------------
 	
 	
+	//map : orbe bonus :
+	//orbe bonus :
+	int nbrOrbeBonus = 0;
+	//on veut changer sa position avec une hauteur un peu plus grande :
+	t.set(2.0f,3,1);
+	t.set(1.0f,1,1); 
+	env->addElement( env->fabriques->fabriquer(ELFOrbeBonus, std::string("orbebonus")+std::string(nbrOrbeBonus), new se3(t), hwd ) );
+	nbrOrbeBonus++;
+	//--------------------------------
 	
+	//-------------------------------
+	
+	sim = new Simulation(env,cl);
+		
 }

@@ -26,6 +26,16 @@ class IElement
 	
 	virtual bool isFixe() =0 ;
 	
+	se3& getPoseReference() const
+	{
+		return *pose;
+	}
+	
+	void setPose( const se3& p)
+	{
+		(*pose) = p;
+	}
+	
 };
 
 

@@ -30,7 +30,7 @@ class IMoveable
 	//---------------------------------------------------------
 	
 		
-	const se3 getPose() const	{ 	return Pose;	}
+	se3 getPose() const	{ 	return Pose;	}
 	const Mat<float> getPosition()
 	{
 		return Pose.getT();
@@ -55,7 +55,7 @@ class IMoveable
 	void setPose( const se3& pose_)	{	Pose = pose_;	}
 	void setPosition( const Mat<float>& t_)	{	Pose.setT(t_);	}
 	void setOrientation( const Quat& q)	{	Pose.setOrientation(q);	}
-	
+	void setMatOrientation( const Mat<float>& q)	{	setOrientation( Mat2Qt<float>(q) );	}
 	void setLinearVelocity( const Mat<float>& lvel)	{	LinearVelocity = lvel;	}
 	void setAngularVelocity( const Mat<float>& avel)	{	AngularVelocity = avel;	}
 };

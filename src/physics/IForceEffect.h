@@ -16,7 +16,7 @@ class IForceEffect
 	
 	virtual ~IForceEffect();
 	
-	virtual void Apply(float dt = 0.001f, std::shared_ptr<RigidBody> ptrRB = NULL) = 0;
+	virtual void Apply(float dt = 0.001f, RigidBody& RB) = 0;
 	
 	
 	float getEndTime() const	
@@ -28,6 +28,8 @@ class IForceEffect
 	{
 		endTime = et;	
 	}
+	
+	virtual bool isGravity() =0;
 };
 
 
@@ -47,8 +49,12 @@ class GravityForceEffect : public IForceEffect
 	
 	~GravityForceEffect();
 	
-	virtual void Apply(float dt = 0.001f, std::shared_ptr<RigidBody> ptrRB = NULL) override;
+	virtual void Apply(float dt = 0.001f, RigidBody& RB) override;
 	
+	virtual bool isGravity() override
+	{
+		return true;
+	}
 };
 
 
@@ -73,7 +79,12 @@ class SpringForceEffect : public IForceEffect
 	
 	~SpringForceEffect();
 	
-	virtual void Apply(float dt = 0.001f, std::shared_ptr<RigidBody> ptrRB = NULL) override;
+	virtual void Apply(float dt = 0.001f, RigidBody& RB) override;
+	
+	virtual bool isGravity() override
+	{
+		return false;
+	}
 };
 
 

@@ -168,14 +168,15 @@ void BallAndSocketJoint::computeJacobians()
 //Penetration depth is initialized to 0, by default.	
 //Anchors can be iniatilized to the center of mass, by default.
 //Axises can be initialized to the local coordinate frame axises.
-HingeJoint::HingeJoint( RigidBody& rbA_, RigidBody& rbB_, const Mat<float>& HJAxisW_, const Mat<float> AnchorW_) : HJAxis(HJAxisW_), AnchorW(AnchorW_), IConstraint( rbA_, rbB_)
+HingeJoint::HingeJoint( RigidBody& rbA_, RigidBody& rbB_, const Mat<float>& HJAxisL_, const Mat<float> AnchorL_) : HJAxisL(HJAxisL_), AnchorL(AnchorL_)
 {
-	BASJoint = BallAndSocketJoint(rbA_,rbB_, rbA.getPointInLocal(AnchorW), rbB.getPointInLocal(AnchorW) );
+	BASJoint = BallAndSocketJoint(rbA_,rbB_, AnchorL, rbB.getAxisInLocal( rbA.getAxisInWorld(AnchorL) ) );
 	
 	//--------------------
 	
-	HJAxisW1 = crossproductV( HJAxisW, extract(AxisA,1,1,3,1)+extract(AxisA,1,2,3,2)+extract(AxisA,1,3,3,3) );
-	HJAxisW2 = crossproductV( HJAxisW, HJAxisW1);
+	HJAxisL1 = crossproductV( HJAxisL, Mat<float>(1.0f,3,1) );
+	//default idea, be careful with another use of this physics engine...
+	HJAxisW2 = crossproductV( HJAxisL, HJAxisL1);
 	
 	//TODO : verify the correctness of this use of the axises in World Reference Frame ?...!!
 	
@@ -213,9 +214,9 @@ void HingeJoint::computeJacobians()
 	JacobianA = operatorC( 
 	
 		operatorC( BASJoint.getJacobianA(),
-					operatorL( zero, transpose(HJAxisW1)) ),
+					operatorL( zero, transpose( rbA.getAxisInWorld(HJAxisL1) ) ) ),
 					
-		operatorL( zero, transpose(HJAxisW2))
+		operatorL( zero, transpose( rbA.getAxisInWorld(HJAxisL2) ) )
 							 );
 	
 	//-----------------------
@@ -224,9 +225,9 @@ void HingeJoint::computeJacobians()
 	JacobianB = operatorC( 
 	
 		operatorC( BASJoint.getJacobianB(),
-					operatorL( zero, -transpose(HJAxisW1)) ),
+					operatorL( zero, -transpose( rbA.getAxisInWorld( HJAxisL1 ) ) ) ),
 					
-		operatorL( zero, -transpose(HJAxisW2))
+		operatorL( zero, -transpose( rbA.getAxisInWorld( HJAxisW2 ) ) )
 							 );
 	
 }

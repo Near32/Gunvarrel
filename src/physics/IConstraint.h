@@ -2,6 +2,7 @@
 #define ICONSTRAINT_H
 
 #include "RigidBody.h"
+#include "ConstraintsList.h"
 
 class IConstraint
 {
@@ -123,19 +124,22 @@ class HingeJoint : public IConstraint
 {
 	public :
 	
-	Mat<float> HJAxisW;
-	Mat<float> HJAxisW1;
-	Mat<float> HJAxisW2;
+	//have to be used in world, but they are registered in local so that they do not change while simulating...
+	//in local of A.
+	Mat<float> HJAxisL;
+	Mat<float> HJAxisL1;
+	Mat<float> HJAxisL2;
 	
 	BallAndSocketJoint BASJoint;
-	Mat<float> AnchorW;
+	Mat<float> AnchorL;
+	//in local of A.
 	
 	//-----------------------------------------
 	//-----------------------------------------
 	
 	//Anchors can be iniatilized to the center of mass, by default.
 	//Axises can be initialized to the local coordinate frame axises.
-	HingeJoint( RigidBody& rbA_, RigidBody& rbB_, const Mat<float>& HJAxis, const Mat<float> AnchorW);
+	HingeJoint( RigidBody& rbA_, RigidBody& rbB_, const Mat<float>& HJAxisL, const Mat<float> AnchorL_);
 	
 	
 	~HingeJoint()

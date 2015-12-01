@@ -23,6 +23,7 @@ class se3
 	
 	se3();
 	se3(const Mat<float>& w_, const Mat<float>& t_);
+	se3(const Mat<float>& t_);
 	se3(const float* w_t_array);
 	
 	~se3();

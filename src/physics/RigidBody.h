@@ -18,6 +18,7 @@ class RigidBody : public ISimulationObject, public IMoveable
 	
 	float mass;
 	float imass;
+	//default = 1.0f kg ... unless ground..
 	
 	Mat<float> Inertia;
 	Mat<float> iInertia;
@@ -42,7 +43,7 @@ class RigidBody : public ISimulationObject, public IMoveable
 	~RigidBody();
 	
 	//TODO : implantation
-	Mat<float> getFirstOrderDerivatives(float dt = 0.001f);
+	//Mat<float> getFirstOrderDerivatives(float dt = 0.001f);
 	
 	//TODO : implantation
 	void Render(const se3& WorldTransformation) override;
@@ -58,7 +59,8 @@ class RigidBody : public ISimulationObject, public IMoveable
 	void clearUser();
 	void calculateDerivedData();
 		
-		
+	void computeInertia();
+	
 	//------------------------------------------------------
 	//------------------------------------------------------
 	
@@ -120,6 +122,8 @@ class RigidBody : public ISimulationObject, public IMoveable
 	
 	Mat<float> getPointInWorld( const Mat<float>& pointL);
 	Mat<float> getPointInLocal( const Mat<float>& pointW);
+	Mat<float> getAxisInWorld( const Mat<float>& aL);
+	Mat<float> getAxisInLocal( const Mat<float>& aW);
 	
 	
 	//------------------------------------------
@@ -128,6 +132,20 @@ class RigidBody : public ISimulationObject, public IMoveable
 	{
 		ptrShape.clear();
 		ptrShape = ptrShape_;
+		
+		computeInertia();
+	}
+	
+	void setMass(const float m)
+	{
+		mass = m;
+		imass = 1.0f/m;
+	}
+	
+	void setIMass(const float im)
+	{
+		imass = im;
+		mass = 1.0f/im;
 	}	
 	
 };

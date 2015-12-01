@@ -11,7 +11,7 @@
 #include "common/objloader.h"
 #include "utils/math.h"
 
-class VueEngine : IEngine
+class VueEngine : public IEngine
 {
 	public :
 	

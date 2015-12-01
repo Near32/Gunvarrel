@@ -60,11 +60,6 @@ RigidBody::~RigidBody()
 }
 
 
-//TODO : implantation
-Mat<float> RigidBody::getFirstOrderDerivatives(float dt)
-{
-
-}
 
 //TODO : implantation
 void RigidBody::Render(const se3& WorldTransformation)
@@ -73,6 +68,37 @@ void RigidBody::Render(const se3& WorldTransformation)
 }
 
 
+void RigidBody::computeInertia()
+{
+	//it is assumed that the ptrShape is initialized.
+	switch(ptrShape->getShapeType())
+	{
+		case BOX :
+		float lx = (BoxShape)(*ptrShape).getHeight();
+		float ly = (BoxShape)(*ptrShape).getWidth();
+		float lz = (BoxShape)(*ptrShape).getDepth();
+		
+		Inertia = Mat<float>(0.0f,3,3);
+		Inertia.set( (mass/12)*(ly*ly+lz*lz), 1,1); 
+		Inertia.set( (mass/12)*(lx*lx+lz*lz), 2,2);
+		Inertia.set( (mass/12)*(ly*ly+lx*lx), 3,3);
+		
+		iInertia = Inertia;
+		iInertia.set( 1.0f/iInertia.get(1,1), 1,1);
+		iInertia.set( 1.0f/iInertia.get(2,2), 2,2);
+		iInertia.set( 1.0f/iInertia.get(3,3), 3,3);
+		
+		break;
+		
+		case SPHERE :
+		//TODO....
+		break;
+		
+		default :
+		//TODO....
+		break;
+	}
+}
 
 Mat<float> RigidBody::transformInertiaTensorL2W()
 {
@@ -126,6 +152,16 @@ Mat<float> RigidBody::getPointInWorld( const Mat<float>& pointL)
 Mat<float> RigidBody::getPointInLocal( const Mat<float>& pointW)
 {
 	return extract(pose.exp(), 1,1, 3,3) * pointW + extract(pose.exp(), 1,4, 3,4) ;	
+}
+
+Mat<float> RigidBody::getAxisInWorld( const Mat<float>& aL)
+{
+	return transpose( extract(pose.exp(), 1,1, 3,3)) * aL;	
+}
+
+Mat<float> RigidBody::getAxisInLocal( const Mat<float>& aW)
+{
+	return extract(pose.exp(), 1,1, 3,3) * aW;	
 }
 
 

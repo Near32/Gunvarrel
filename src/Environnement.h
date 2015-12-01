@@ -34,6 +34,15 @@ class Environnement
 	bool deleteElementIDX(int idx);
 	bool deleteElementSTRING(std::string name);
 	
+	std::vector<std::unique_ptr<IElement> >::iterator getIteratorElementsBegin()
+	{
+		return ListeElements.begin();
+	}
+	
+	std::vector<std::unique_ptr<IElement> >::iterator getIteratorElementsEnd()
+	{
+		return ListeElements.end();
+	}
 	
 };
 

@@ -30,13 +30,11 @@ GravityForceEffect::~GravityForceEffect()
 
 }
 	
-void GravityForceEffect::Apply(float dt, std::shared_ptr<RigidBody> ptrRB)
+void GravityForceEffect::Apply(float dt, RigidBody& RB)
 {
 	// this force is applied to the center of mass of the rigid body so it does not involve the creation of any torque.
-	if(ptrRB != NULL)
-	{
-		ptrRB->addForce( ptrRB->mass*gravityVector);
-	} 
+	RB.addForce( RB.getMass()*gravityVector);
+	 
 }
 
 
@@ -58,7 +56,7 @@ SpringForceEffect::~SpringForceEffect()
 }
 
 	
-void SpringForceEffect::Apply(float dt, std::shared_ptr<RigidBody> ptrRB)
+void SpringForceEffect::Apply(float dt, RigidBody& RB)
 {
 	Mat<float> p1W( body->getPointInWorld(connectionPointL) );
 	Mat<float> p2W( other->getPointInWorld(otherConnectionPointL));

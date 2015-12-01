@@ -36,6 +36,11 @@ se3::se3(const Mat<float>& w_, const Mat<float>& t_) : t(t_), w(w_), SE3(Mat<flo
 
 }
 
+se3::se3(const Mat<float>& t_) : t(t_),w(Mat<float>(0.0f,3,1)), SE3(Mat<float>((float)0, 4,4) ), hasChanged(true)	//so that SE3 would be computed on the first access...
+{
+
+}
+
 se3::se3(const float* w_t_array) : SE3( Mat<float>((float)0,4,4) ), hasChanged(true)
 {
 	this->w.set( w_t_array[0], 1,1);

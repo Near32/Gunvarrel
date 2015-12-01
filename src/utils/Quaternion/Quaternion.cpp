@@ -12,6 +12,18 @@ Quat Qt_Mul(Quat qL, Quat qR)
 	return (qq);
 }
 
+Quat operator*(float val,const Quat& q)
+{
+	Quat ret;
+	ret.x = val*q.x;
+	ret.y = val*q.y;
+	ret.z = val*q.z;
+	ret.w = val*q.w;
+	
+	return ret;
+	
+}
+
 /* Returns the quaternion which correspond to the given euler angles.*/
 Quat Euler2Qt(float roll, float pitch, float yaw)
 {
