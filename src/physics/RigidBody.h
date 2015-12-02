@@ -74,46 +74,46 @@ class RigidBody : public ISimulationObject, public IMoveable
 		return userTorque;
 	}
 	
-	const float getMass() const
+	float getMass() const
 	{
 	 	return mass;	
 	}
-	const float getInverseMass() const
+	float getIMass() const
 	{
 		return imass;
 	}
 	
-	const Mat<float> getInertialLocal() const
+	Mat<float> getInertialLocal() const
 	{
 		return Inertia;
 	}
 	
-	const Mat<float> getInverseInertialLocal() const
+	Mat<float> getInverseInertialLocal() const
 	{
 		return iInertia;
 	}
 		
-	const Mat<float> getInverseInertialWorld() const
+	Mat<float> getInverseInertialWorld() const
 	{
 		return iInertiaWorld;
 	}
 			
-	const bool getCollisionStatus()	const	
+	bool getCollisionStatus()	const	
 	{	
 		return canCollide;
 	}
 	
-	const bool getFixedStatus()	const	
+	bool getFixedStatus()	const	
 	{	
 		return isFixed;
 	}
 	
-	const IShape& getShapeReference() const
+	IShape& getShapeReference() const
 	{ 
 		return *ptrShape;
 	}
 	
-	const ShapeType getShapeType() const	
+	ShapeType getShapeType() const	
 	{	
 		return ptrShape->getShapeType();
 	}
@@ -128,10 +128,10 @@ class RigidBody : public ISimulationObject, public IMoveable
 	
 	//------------------------------------------
 	
-	void setPtrShape( const IShape* ptrShape_)
+	void setPtrShape( IShape* ptrShape_)
 	{
-		ptrShape.clear();
-		ptrShape = ptrShape_;
+		ptrShape.reset();
+		ptrShape = std::unique_ptr<IShape>(ptrShape_);
 		
 		computeInertia();
 	}

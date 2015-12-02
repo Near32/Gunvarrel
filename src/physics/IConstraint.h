@@ -34,7 +34,7 @@ class IConstraint
 	//Axises can be initialized to the local coordinate frame axises.
 	IConstraint(RigidBody& rbA_, RigidBody& rbB_);
 	
-	~IConstraint()	{}
+	~IConstraint();
 	
 	virtual void addPenaltySpring(float dt = 0.001f) = 0;
 	virtual void applyConstraintImpulse(float dt = 0.001f) = 0;
@@ -130,7 +130,7 @@ class HingeJoint : public IConstraint
 	Mat<float> HJAxisL1;
 	Mat<float> HJAxisL2;
 	
-	BallAndSocketJoint BASJoint;
+	std::unique_ptr<BallAndSocketJoint> BASJoint;
 	Mat<float> AnchorL;
 	//in local of A.
 	
@@ -139,13 +139,10 @@ class HingeJoint : public IConstraint
 	
 	//Anchors can be iniatilized to the center of mass, by default.
 	//Axises can be initialized to the local coordinate frame axises.
-	HingeJoint( RigidBody& rbA_, RigidBody& rbB_, const Mat<float>& HJAxisL, const Mat<float> AnchorL_);
+	HingeJoint( RigidBody& rbA_, RigidBody& rbB_, const Mat<float>& HJAxisL, const Mat<float>& AnchorL_);
 	
 	
-	~HingeJoint()
-	{
-	
-	}
+	~HingeJoint();
 	
 	virtual void addPenaltySpring(float dt = 0.001f) override;
 	virtual void applyConstraintImpulse(float dt = 0.001f) override;
@@ -172,13 +169,11 @@ class ILimitConstraint : public IConstraint
 	//Penetration depth is initialized to 0, by default.	
 	//Anchors can be iniatilized to the center of mass, by default.
 	//Axises can be initialized to the local coordinate frame axises.
-	ILimitConstraint(RigidBody& rbA_, RigidBody& rbB_, float Min_ = -INF, float Max_ = INF);
+	//ILimitConstraint(RigidBody& rbA_, RigidBody& rbB_, float Min_ = -INF, float Max_ = INF);
+	ILimitConstraint(RigidBody& rbA_, RigidBody& rbB_, float Min_, float Max_);
 	
 	
-	~ILimitConstraint()	
-	{
-	
-	}
+	~ILimitConstraint();
 	
 	virtual void addPenaltySpring(float dt = 0.001f) override;
 	virtual void applyConstraintImpulse(float dt = 0.001f) override;
@@ -186,8 +181,8 @@ class ILimitConstraint : public IConstraint
 	
 	virtual void computeJacobians() override;
 	
-	virtual Mat<float> getLowLimit();
-	virtual Mat<float> getHighLimit();
+	virtual Mat<float> getLowLimit() =0;
+	virtual Mat<float> getHighLimit() =0;
 	
 	
 	

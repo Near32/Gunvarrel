@@ -1,6 +1,9 @@
 #include "VueEngine.h"
 #include "Game.h"
 
+#define debug
+
+
 VueEngine::VueEngine(Game* game_, GameState gameState_) : IEngine(game_,gameState_)
 {
 	
@@ -22,7 +25,7 @@ void VueEngine::loop()
 			{
 				default :
 				
-				commandsToHandle.erase(commandsToHandle.begin(),0);
+				commandsToHandle.erase(commandsToHandle.begin());
 				break;
 			}
 		}
@@ -40,11 +43,15 @@ void VueEngine::Dessiner(float angleX, float angleZ)
 	game->camera->look();
 	//----------------------------
 
-	//drawGunvarrel();
+	drawGunvarrel();
 	
 	Environnement* env = game->ptrEtat->env;//getEnvironnementFromETATENGINE();
 	
 	std::string pathElement("../res/el10x10x20.obj");
+
+#ifdef debug
+	std::cout << " VUE : " << env->ListeElements.size() << " element(s) to draw." << std::endl;
+#endif	
 	
 	for(int i=0;i<env->ListeElements.size();i++)
 	{
@@ -65,7 +72,7 @@ void VueEngine::Dessiner(float angleX, float angleZ)
 		//--------------------------------
 		//--------------------------------
 		//let us draw the element once we have identified it...
-		if( env->ListElement[i]->name != std::string("ground") )
+		if( env->ListeElements[i]->name != std::string("ground") )
 		{
 			drawElement( pathElement );
 		}
@@ -80,6 +87,8 @@ void VueEngine::Dessiner(float angleX, float angleZ)
 			glVertex3d(-100,100,-2);
 			glEnd();
 		}
+		
+		std::cout << " VUE : element : " << env->ListeElements[i]->name << " has been drawn." << std::endl;
 		//--------------------------------
 		//--------------------------------
 		

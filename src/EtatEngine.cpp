@@ -6,6 +6,8 @@ EtatEngine::EtatEngine(Game* game_, GameState gameState_) : IEngine(game_,gameSt
 {
 	env = new Environnement();
 	
+	init();
+	
 }
 
 EtatEngine::~EtatEngine()
@@ -25,7 +27,7 @@ void EtatEngine::loop()
 			{
 				default :
 				
-				commandsToHandle.erase(commandsToHandle.begin(),0);
+				commandsToHandle.erase(commandsToHandle.begin());
 				break;
 			}
 		}
@@ -44,7 +46,7 @@ void EtatEngine::init()
 	//map : ground :
 	//ground :
 	t.set( -hwd.get(3,1)/2,3,1);
-	env->addElement( env->fabriques->fabriquer(ELFObstacle, std::string("ground"), new se3(t) ) );
+	env->addElement( env->fabriques->fabriquer(ELFObstacle, std::string("ground"), new se3(t), hwd ) );
 	//
 	//sa position est bien à l'origine..
 	//resetting :
@@ -67,7 +69,7 @@ void EtatEngine::init()
 	AnchorAL.set( hwd.get(3,1)/2+1.0f, 3,1);
 	Mat<float> HJAxis(0.0f,3,1);
 	HJAxis.set( 1.0f, 1,1);
-	cl.insert( cl.end(), ConstraintInfo(std::string(picBas),std::string("picHaut"), CTBallAndSocketJoint, operatorL(AnchorAL,HJAxis) ) ); 
+	cl.insert( cl.end(), ConstraintInfo(std::string("picBas"),std::string("picHaut"), CTBallAndSocketJoint, operatorL(AnchorAL,HJAxis) ) ); 
 	
 	//resetting :
 	t = Mat<float>(0.0f,3,1);
@@ -81,7 +83,7 @@ void EtatEngine::init()
 	t.set(20.0f,3,1);
 	t.set(10.0f,1,1);
 	t.set(30.0f,2,1); 
-	env->addElement( env->fabriques->fabriquer(ELFObstacle, std::string("obstacle")+std::string(nbrObstacle), new se3(t), hwd ) );
+	env->addElement( env->fabriques->fabriquer(ELFObstacle, std::string("obstacle")+std::to_string(nbrObstacle), new se3(t), hwd ) );
 	nbrObstacle++;
 	//--------------------------------
 	
@@ -92,7 +94,7 @@ void EtatEngine::init()
 	//on veut changer sa position avec une hauteur un peu plus grande :
 	t.set(20.0f,3,1);
 	t.set(10.0f,1,1); 
-	env->addElement( env->fabriques->fabriquer(ELFOrbeBonus, std::string("orbebonus")+std::string(nbrOrbeBonus), new se3(t), hwd ) );
+	env->addElement( env->fabriques->fabriquer(ELFOrbeBonus, std::string("orbebonus")+std::to_string(nbrOrbeBonus), new se3(t), hwd ) );
 	nbrOrbeBonus++;
 	//--------------------------------
 	

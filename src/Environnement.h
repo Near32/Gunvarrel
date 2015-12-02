@@ -1,7 +1,8 @@
 #ifndef ENVIRONNEMENT_H
 #define ENVIRONNEMENT_H
 
-#include "IElementMobile.h"
+#include "ElementMobile.h"
+#include "ElementMobileComposit.h"
 #include "Fabriques.h"
 #include <iostream>
 #include <vector>

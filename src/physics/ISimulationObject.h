@@ -31,7 +31,8 @@ class ISimulationObject
 	
 	
 	//---------------------------------
-	enum TypeSimulationObject getType()	{	return type;	}
+	TypeSimulationObject getType()	const	{	return type;	}
+	int getID()	const	{	return id;	}
 
 };
 #endif

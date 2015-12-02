@@ -1,7 +1,7 @@
 #ifndef TYPECOMMAND_H
 #define TYPECOMMAND_H
 
-enum TypeCommand{
+enum TypeCommand {
 	TCLoadMap,
 	TCNew,
 	TCSave,
@@ -11,6 +11,6 @@ enum TypeCommand{
 	TCQuit,
 	TCRigidBody,
 	TCCamera
-}
+};
 
 #endif

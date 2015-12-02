@@ -8,11 +8,11 @@
 class ICommand
 {
 	protected :
-	enum TypeCommand type;
+	TypeCommand type;
 	
 	public :
 	
-	ICommand(const enum TypeCommand t) : type(t)
+	ICommand(const TypeCommand& t) : type(t)
 	{
 	
 	}
@@ -25,12 +25,12 @@ class ICommand
 	
 	//-----------------------------
 	
-	const enum TypeCommand getCommandType()
+	TypeCommand getCommandType() const
 	{
 		return type;
 	}
 	
-	void setCommandType( const enum TypeCommand t)
+	void setCommandType( TypeCommand t)
 	{
 		type = t;
 	}
@@ -188,30 +188,30 @@ class QuitCommand : public ICommand
 
 };
 
-class RigidBodysCommand : public ICommand
+class RigidBodyCommand : public ICommand
 {
 	private :
-	enum IDJoint joint;
-	enum StateJoint jointState;
+	IDJoint joint;
+	StateJoint jointState;
 		
 	public :
-	RigidBodyCommand()
+	RigidBodyCommand() : ICommand(TCRigidBody)
 	{
 	
 	}
 	
-	~RigidBodyCammand()
+	~RigidBodyCommand()
 	{
 	
 	}	
 	
 	//------------------------------
-	const enum IDJoint getIDJoint() const
+	IDJoint getIDJoint() const
 	{
 		return joint;
 	}
 	
-	const enum StateJoint getStateJoint() const
+	StateJoint getStateJoint() const
 	{
 		return jointState;
 	}

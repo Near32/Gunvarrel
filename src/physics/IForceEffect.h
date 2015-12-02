@@ -1,6 +1,8 @@
 #ifndef IFORCEEFFECT_H
 #define IFORCEEFFECT_H
 
+#include "RigidBody.h"
+
 class IForceEffect
 {
 	protected :
@@ -16,7 +18,7 @@ class IForceEffect
 	
 	virtual ~IForceEffect();
 	
-	virtual void Apply(float dt = 0.001f, RigidBody& RB) = 0;
+	virtual void Apply(float dt, RigidBody& RB) = 0;
 	
 	
 	float getEndTime() const	
@@ -45,11 +47,11 @@ class GravityForceEffect : public IForceEffect
 	
 	//gravityVector is initialized to -z by default :
 	GravityForceEffect();
-	GravityForceEffect(const Mat<float>& g = ZAxis);
+	GravityForceEffect(const Mat<float>& g);
 	
 	~GravityForceEffect();
 	
-	virtual void Apply(float dt = 0.001f, RigidBody& RB) override;
+	virtual void Apply(float dt, RigidBody& RB) override;
 	
 	virtual bool isGravity() override
 	{
@@ -65,8 +67,8 @@ class SpringForceEffect : public IForceEffect
 	Mat<float> connectionPointL;	// has to be specified in the Local frame -> easier to deal we the changes of the pose of that rigid body...
 	Mat<float> otherConnectionPointL;	//idem, but in the one of the other RigidBody :
 	
-	std::shared_ptr<RigidBody> body;
-	std::shared_ptr<RigidBody> other;
+	RigidBody& body;
+	RigidBody& other;
 	
 	float springConstant;
 	float restLength;
@@ -75,11 +77,11 @@ class SpringForceEffect : public IForceEffect
 	//----------------------------------------
 	//----------------------------------------
 	SpringForceEffect();
-	SpringForceEffect( const Mat<float>& p1in1, const Mat<float>& p2in2, RigidBody* body_, RigidBody* other_, float restLength_ = 1.0f, float springConstant_ = 1.0f);
+	SpringForceEffect( const Mat<float>& p1in1, const Mat<float>& p2in2, RigidBody& body_, RigidBody& other_, float restLength_ = 1.0f, float springConstant_ = 1.0f);
 	
 	~SpringForceEffect();
 	
-	virtual void Apply(float dt = 0.001f, RigidBody& RB) override;
+	virtual void Apply(float dt, RigidBody& RB) override;
 	
 	virtual bool isGravity() override
 	{

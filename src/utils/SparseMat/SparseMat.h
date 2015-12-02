@@ -22,6 +22,13 @@ class SparseMat
 	
 	public :
 	
+	SparseMat()
+	{
+		mat[0][0] = (T)0;
+		n = 0;
+		m = 0;
+	}
+	
 	SparseMat(size_t i)
 	{
 		mat[0][0] = (T)0;
@@ -34,6 +41,23 @@ class SparseMat
 		mat[0][0] = (T)0;
 		n = i;
 		m = j;
+	}
+	
+	SparseMat(const Mat<T>& mat)
+	{
+		n = mat.getLine();
+		m = mat.getColumn();
+		
+		for(int i=1;i<=n;i++)
+		{
+			for(int j=1;j<=m;j++)
+			{
+				if(mat.get(i,j) != (T)0)
+				{
+					set( i,j, mat.get(i,j) );
+				}
+			}
+		}
 	}
 	
 	~SparseMat()
@@ -60,6 +84,34 @@ class SparseMat
 		
 		return mat[i][j];	
 	}
+	
+	/*SparseMat<T>& operator=( SparseMat<T>& sm)
+	{
+		n = sm.getLine();
+		m = sm.getColumn();
+		
+		mat.clear();
+		
+		
+		size_t i = 0;
+		size_t lasti = i;
+		size_t j = 0;
+		size_t lastj = j;
+		bool goOn = true;
+		T val;
+	
+		while(goOn)
+		{
+			lasti = i;
+			lastj = j;
+		
+			goOn = sm.parcourir(i,j,val);
+		
+			this->set( val, lasti, lastj);
+		}
+		
+		return *this;
+	}*/
 	
 	inline void set( size_t i, size_t j, T value)
 	{
@@ -296,7 +348,7 @@ class SparseMat
 		}
 	}
 	
-	SparseMat<T> operator=(const SparseMat<T> B)
+	SparseMat<T> operator=(SparseMat<T> B)
 	{
 		n = B.getLine();
 		m = B.getColumn();
@@ -361,7 +413,7 @@ class SparseMat
 		//---------------------------------------
 		//handle the next call :
 		
-		if( ii==mat.end() && jj==mat[i].second.end())	
+		if( ii==mat.end() && jj == mat[i].end())	
 		{
 			//there will be no next call:
 			i = 0;
@@ -372,7 +424,7 @@ class SparseMat
 		else
 		{
 			//let us upgrade the indexes for the next call :
-			if( jj = (*ii).second.end() )
+			if( jj == (*ii).second.end() )
 			{
 				//end of line --> change the line :
 				ii++;
@@ -401,7 +453,7 @@ class SparseMat
 };
 
 template<class T>
-Mat<T> SM2Mat(SparseMat<T>& sm)
+Mat<T> SM2Mat(SparseMat<T> sm)
 {
 	Mat<T> ret((T)0,sm.getLine(),sm.getColumn());
 	
@@ -422,6 +474,6 @@ Mat<T> SM2Mat(SparseMat<T>& sm)
 		ret.set( val, lasti, lastj);
 	}
 	
-	return val;
+	return ret;
 }
 #endif

@@ -25,8 +25,13 @@ typedef struct ConstraintInfo{
 	//anchorW,HJaxis
 	//...
 	//TODO : contact and limit
+	
+	ConstraintInfo(std::string nameEl1_, std::string nameEl2_, ConstraintType ct_, const Mat<float>& data_) : nameEl1(nameEl1_), nameEl2(nameEl2_), ct(ct_), data(data_)
+	{
+	
+	}
 } ConstraintInfo;
 
-typedef std::vector<ConstraintsInfo> ConstraintsList;
+typedef std::vector<ConstraintInfo> ConstraintsList;
 
 #endif

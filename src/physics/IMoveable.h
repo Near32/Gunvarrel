@@ -31,22 +31,22 @@ class IMoveable
 	
 		
 	se3 getPose() const	{ 	return Pose;	}
-	const Mat<float> getPosition()
+	Mat<float> getPosition()
 	{
 		return Pose.getT();
 	}
 		
-	const Quat getOrientation()		{	return Qt_FromMat(Pose.exp());	}
+	Quat getOrientation()		{	return Qt_FromMat(Pose.exp());	}
 	
-	const Mat<float> getMatOrientation()
+	Mat<float> getMatOrientation()
 	{
 		return Qt2Mat<float>( getOrientation() );
 	}
 	
-	const Mat<float> getTransformation() 	{	return Pose.exp();	}
+	Mat<float> getTransformation() 	{	return Pose.exp();	}
 	
-	const Mat<float> getLinearVelocity()	{	return LinearVelocity;	}
-	const Mat<float> getAngularVelocity()	{	return AngularVelocity;	}
+	Mat<float> getLinearVelocity()	{	return LinearVelocity;	}
+	Mat<float> getAngularVelocity()	{	return AngularVelocity;	}
 
 	
 	//---------------------------------------------------------

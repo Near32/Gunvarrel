@@ -11,6 +11,13 @@ IElement::IElement( std::string name_, std::unique_ptr<se3> pose_) : name( name_
 {
 
 }
+
+
+IElement::IElement( std::string name_, se3* pose_) : name( name_ ), pose( pose_)
+{
+
+}
+
 	
 IElement::~IElement()
 {
