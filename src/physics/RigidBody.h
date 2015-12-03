@@ -26,19 +26,21 @@ class RigidBody : public ISimulationObject, public IMoveable
 	Mat<float> iInertiaWorld;
 	
 	
-	std::unique_ptr<IShape> ptrShape;
+	IShape* ptrShape;
 	
 //--------------------------------------------------------
 //--------------------------------------------------------
 	
 	RigidBody();
 	RigidBody(const std::string& name_, int id_, bool isActive_);
+	RigidBody(const se3& Pose_, const std::string& name_, int id_, bool isActive_ = true);
+	RigidBody(const se3& Pose_, const std::string& name_, int id_, ShapeType shtype, bool isActive_ = true);
 	RigidBody(const se3& Pose_, const Mat<float>& Lvel, const Mat<float>& Avel);
 	RigidBody(const std::string& name_, int id_, bool isActive_, const se3& Pose_);
 	RigidBody(const std::string& name_, int id_, bool isActive_, const se3& Pose_, const Mat<float>& Lvel, const Mat<float>& Avel);
 	
-	RigidBody(const std::string& name_, int id_, bool isActive_, const se3& Pose_, std::unique_ptr<IShape> ptrShape_);
-	RigidBody(const std::string& name_, int id_, bool isActive_, const se3& Pose_, const Mat<float>& Lvel, const Mat<float>& Avel, std::unique_ptr<IShape> ptrShape_);
+	//RigidBody(const std::string& name_, int id_, bool isActive_, const se3& Pose_, std::unique_ptr<IShape> ptrShape_);
+	//RigidBody(const std::string& name_, int id_, bool isActive_, const se3& Pose_, const Mat<float>& Lvel, const Mat<float>& Avel, std::unique_ptr<IShape> ptrShape_);
 	
 	~RigidBody();
 	
@@ -110,6 +112,16 @@ class RigidBody : public ISimulationObject, public IMoveable
 	
 	IShape& getShapeReference() const
 	{ 
+		/*if( ptrShape.get())
+		{
+			return *(ptrShape.get());
+		}
+		else
+		{
+			std::cout << "uninitialized shape..." <<std::endl;
+			throw;
+		}*/
+		
 		return *ptrShape;
 	}
 	
@@ -130,8 +142,12 @@ class RigidBody : public ISimulationObject, public IMoveable
 	
 	void setPtrShape( IShape* ptrShape_)
 	{
-		ptrShape.reset();
-		ptrShape = std::unique_ptr<IShape>(ptrShape_);
+		//ptrShape.reset( ptrShape_);
+		if( ptrShape)
+		{
+			delete ptrShape;
+			ptrShape = ptrShape_;
+		}
 		
 		computeInertia();
 	}

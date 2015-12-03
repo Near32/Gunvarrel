@@ -1233,20 +1233,20 @@ Mat<T>& Mat<T>::operator=(const Mat<T>& m)
         {
         	this->~Mat();
         
-		//this->Mat<T>(m);
-		this->copy(m);
-		/*on ne peut pas appeller le constructeur de copie...?*/
-	}
-	else
-	{
-		for(int i=m_line;i--;)
+			//this->Mat<T>(m);
+			this->copy(m);
+			/*on ne peut pas appeller le constructeur de copie...?*/
+		}
+		else
 		{
-			for(int j= m_column;j--;)
+			for(int i=m_line;i--;)
 			{
-				this->mat[i][j] = m.mat[i][j];
+				for(int j= m_column;j--;)
+				{
+					this->mat[i][j] = m.mat[i][j];
+				}
 			}
 		}
-	}
     }
 
     return *this;

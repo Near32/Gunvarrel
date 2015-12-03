@@ -342,6 +342,13 @@ class BoxShape : public IShape
 			}
 		}
 	}
+	
+	void setHWD(const Mat<float>& hwd_)
+	{
+		setHeight(hwd_.get(1,1));
+		setWidth(hwd_.get(2,1));
+		setDepth(hwd_.get(3,1));
+	}
 };
 
 

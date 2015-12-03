@@ -4,11 +4,18 @@
 #include "eval/CollisionDetector.h"
 #include "eval/IIntegrator.h"
 
+#define debug
+
+
 Simulation::Simulation() : updater(new Updater(this, new ExplicitEulerIntegrator(this)) ), constraintsSolver( new SimultaneousImpulseBasedConstraintSolverStrategy(this) ), collisionDetector( new CollisionDetector(this) )
 {
 	Mat<float> g(0.0f,3,1);
 	g.set( -9.81f,3,1);
 	collectionF.insert( collectionF.begin(), std::unique_ptr<IForceEffect>(new GravityForceEffect(g))  );
+	
+#ifdef debug
+	std::cout << "SIMULATION : minimal initialization : OKAY." << std::endl;
+#endif	
 }
 
 Simulation::Simulation(Environnement* env) : Simulation()
@@ -33,20 +40,25 @@ Simulation::Simulation(Environnement* env) : Simulation()
 				//The element is an obstacle :
 				if( !( (*element)->getName() == std::string("ground") ) )
 				{
-					simulatedObjects.insert( simulatedObjects.end(), std::unique_ptr<ISimulationObject>(new RigidBody( (*element)->getName(),id,true) ) );
-					((RigidBody&)(*simulatedObjects[id])).setPose( (*element)->getPoseReference());
-					((RigidBody&)(*simulatedObjects[id])).setPtrShape( new BoxShape( (RigidBody*)simulatedObjects[id].get(), ((IElementFixe&)(*(*element))).hwd) );
+					simulatedObjects.insert( simulatedObjects.end(), std::unique_ptr<ISimulationObject>(new RigidBody( (*element)->getPoseReference(), (*element)->getName(),id, BOX) ) );
+					//((RigidBody&)(*simulatedObjects[id])).setPose( (*element)->getPoseReference());
+					//((RigidBody&)(*simulatedObjects[id])).setPtrShape( (IShape*)(new BoxShape( (RigidBody*)simulatedObjects[id].get(), ((IElementFixe&)(*(*element))).hwd)) );
+					((BoxShape&)((RigidBody&)(*simulatedObjects[id])).getShapeReference()).setHWD( ((IElementFixe&)(*(*element))).hwd );
 				}
 				else
 				{
 					//then it is the ground :
-					simulatedObjects.insert( simulatedObjects.end(), std::unique_ptr<ISimulationObject>(new RigidBody( (*element)->getName(),id,true) ) );
-					((RigidBody&)(*simulatedObjects[id])).setPose( (*element)->getPoseReference());
-					((RigidBody&)(*simulatedObjects[id])).setPtrShape( new BoxShape( (RigidBody*)simulatedObjects[id].get(), ((IElementFixe&)(*(*element))).hwd) );
+					simulatedObjects.insert( simulatedObjects.end(), std::unique_ptr<ISimulationObject>(new RigidBody( (*element)->getPoseReference(), (*element)->getName(),id,true) ) );
+					//((RigidBody&)(*simulatedObjects[id])).setPose( (*element)->getPoseReference());
+					((RigidBody&)(*simulatedObjects[id])).setPtrShape( (IShape*)(new BoxShape( (RigidBody*)simulatedObjects[id].get(), ((IElementFixe&)(*(*element))).hwd)) );
 					
 					//IT IS THE UNMOVEABLE GROUND :
 					((RigidBody&)(*simulatedObjects[id])).isFixed = true;
 					((RigidBody&)(*simulatedObjects[id])).setIMass( 1e-10f );//numeric_limit<float>::epsilon() );
+					
+#ifdef debug
+	std::cout << "SIMULATION : environnement initialization : ground initialization : id = " << id << " : OKAY." << std::endl;
+#endif
 				}
 				
 				
@@ -54,11 +66,11 @@ Simulation::Simulation(Environnement* env) : Simulation()
 				
 				case false :
 				//the element is an OrbeBonus :
-				simulatedObjects.insert( simulatedObjects.end(), std::unique_ptr<ISimulationObject>(new RigidBody( (*element)->getName(),id,true) ) );
-				((RigidBody&)(*simulatedObjects[id])).setPose( (*element)->getPoseReference());
+				simulatedObjects.insert( simulatedObjects.end(), std::unique_ptr<ISimulationObject>(new RigidBody( (*element)->getPoseReference(), (*element)->getName(),id,true) ) );
+				//((RigidBody&)(*simulatedObjects[id])).setPose( (*element)->getPoseReference());
 					
 					//CAREFUL : HANDLE THE RADIUS : with SphereShape
-				((RigidBody&)(*simulatedObjects[id])).setPtrShape( new SphereShape( (RigidBody*)simulatedObjects[id].get(), ((IElementMobile&)(*(*element))).hwd.get(1,1) ) );
+				((RigidBody&)(*simulatedObjects[id])).setPtrShape( (IShape*)(new SphereShape( (RigidBody*)simulatedObjects[id].get(), ((IElementMobile&)(*(*element))).hwd.get(1,1) )) );
 				
 				break;
 			
@@ -87,11 +99,17 @@ Simulation::Simulation(Environnement* env) : Simulation()
 		//TODO : Inertia ...
 		Name2ID[ (*element)->getName() ] = id;
 		id++;
+		
+		element++;
 	}
 	
 	initializedQQdotInvMFext = false;
 	invM = SparseMat<float>( 6*id);
 	S = SparseMat<float>( 7*id, 6*id);
+	
+#ifdef debug
+	std::cout << "SIMULATION : environnement initialization : OKAY." << std::endl;
+#endif	
 }
 
 
@@ -148,6 +166,10 @@ Simulation::Simulation(Environnement* env, ConstraintsList& cl) : Simulation(env
 			break;
 		}	
 	}
+	
+#ifdef debug
+	std::cout << "SIMULATION : constraint on rigidbodies initialization : OKAY." << std::endl;
+#endif	
 }
 	
 
