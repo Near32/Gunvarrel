@@ -2,7 +2,7 @@
 #include "Game.h"
 
 #define debug
-
+//#define debuglvl1
 
 VueEngine::VueEngine(Game* game_, GameState gameState_) : IEngine(game_,gameState_)
 {
@@ -47,7 +47,7 @@ void VueEngine::Dessiner(float angleX, float angleZ)
 	
 	Environnement* env = game->ptrEtat->env;//getEnvironnementFromETATENGINE();
 	
-	std::string pathElement("../res/el10x10x20.obj");
+	std::string pathElement("../res/element.obj");//el10x10x20.obj");
 
 #ifdef debug
 	std::cout << " VUE : " << env->ListeElements.size() << " element(s) to draw." << std::endl;
@@ -87,8 +87,9 @@ void VueEngine::Dessiner(float angleX, float angleZ)
 			glVertex3d(-100,100,-2);
 			glEnd();
 		}
-		
-		std::cout << " VUE : element : " << env->ListeElements[i]->name << " has been drawn." << std::endl;
+#ifdef debuglvl1		
+	std::cout << " VUE : element : " << env->ListeElements[i]->name << " has been drawn." << std::endl;
+#endif
 		//--------------------------------
 		//--------------------------------
 		
