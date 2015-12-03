@@ -42,8 +42,11 @@ Simulation::Simulation(Environnement* env) : Simulation()
 				{
 					simulatedObjects.insert( simulatedObjects.end(), std::unique_ptr<ISimulationObject>(new RigidBody( (*element)->getPoseReference(), (*element)->getName(),id, BOX) ) );
 					//((RigidBody&)(*simulatedObjects[id])).setPose( (*element)->getPoseReference());
-					//((RigidBody&)(*simulatedObjects[id])).setPtrShape( (IShape*)(new BoxShape( (RigidBody*)simulatedObjects[id].get(), ((IElementFixe&)(*(*element))).hwd)) );
+					//((RigidBody&)(*simulatedObjects[id])).setPtrShape( (IShape*)(new BoxShape( (RigidBody*)simulatedObjects[id].get(), ((IElementFixe&)(*(*element))).hwd)) );		
 					((BoxShape&)((RigidBody&)(*simulatedObjects[id])).getShapeReference()).setHWD( ((IElementFixe&)(*(*element))).hwd );
+#ifdef debug
+std::cout << "SIMULATION : environnement initialization : ElementFixe : Obstacle : id = " << id << " : ...." << std::endl;
+#endif					
 				}
 				else
 				{
@@ -57,7 +60,7 @@ Simulation::Simulation(Environnement* env) : Simulation()
 					((RigidBody&)(*simulatedObjects[id])).setIMass( 1e-10f );//numeric_limit<float>::epsilon() );
 					
 #ifdef debug
-	std::cout << "SIMULATION : environnement initialization : ground initialization : id = " << id << " : OKAY." << std::endl;
+	std::cout << "SIMULATION : environnement initialization : GROUND : id = " << id << " : OKAY." << std::endl;
 #endif
 				}
 				
@@ -71,6 +74,9 @@ Simulation::Simulation(Environnement* env) : Simulation()
 					
 					//CAREFUL : HANDLE THE RADIUS : with SphereShape
 				((RigidBody&)(*simulatedObjects[id])).setPtrShape( (IShape*)(new SphereShape( (RigidBody*)simulatedObjects[id].get(), ((IElementMobile&)(*(*element))).hwd.get(1,1) )) );
+#ifdef debug
+std::cout << "SIMULATION : environnement initialization : ElementFixe OrbeBonus : id = " << id << " : ...." << std::endl;
+#endif
 				
 				break;
 			
@@ -86,6 +92,15 @@ Simulation::Simulation(Environnement* env) : Simulation()
 				break;
 				
 				case false:
+				//CAREFUL : HANDLE THE HWD : with BoxShape
+				simulatedObjects.insert( simulatedObjects.end(), std::unique_ptr<ISimulationObject>(new RigidBody( (*element)->getPoseReference(), (*element)->getName(),id, BOX) ) );
+				//((RigidBody&)(*simulatedObjects[id])).setPose( (*element)->getPoseReference());
+				//((RigidBody&)(*simulatedObjects[id])).setPtrShape( (IShape*)(new BoxShape( (RigidBody*)simulatedObjects[id].get(), ((IElementFixe&)(*(*element))).hwd)) );
+#ifdef debug
+std::cout << "SIMULATION : environnement initialization : ElementMobile : id = " << id << " : ...." << std::endl;
+#endif					
+				((BoxShape&)((RigidBody&)(*simulatedObjects[id])).getShapeReference()).setHWD( ((IElementMobile&)(*(*element))).hwd );
+				
 				
 				break;
 				
@@ -99,6 +114,9 @@ Simulation::Simulation(Environnement* env) : Simulation()
 		//TODO : Inertia ...
 		Name2ID[ (*element)->getName() ] = id;
 		id++;
+#ifdef debug
+	std::cout << "SIMULATION : post-increment : id = " << id << " : ...." << std::endl;
+#endif
 		
 		element++;
 	}

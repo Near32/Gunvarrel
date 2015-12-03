@@ -62,7 +62,7 @@ class SparseMat
 	
 	~SparseMat()
 	{
-	
+
 	}
 	
 	inline T operator()(size_t i, size_t j)
@@ -363,6 +363,23 @@ class SparseMat
 			}
 		}
 	}
+	
+	/*SparseMat<T>& operator=(SparseMat<T>& B)
+	{
+		n = B.getLine();
+		m = B.getColumn();
+		
+		for(size_t i=1;i!=n;i++)
+		{
+			for(size_t j=1;j!=m;j++)
+			{
+				T val = B(i,j);
+				
+				if(val != (T)0)	mat[i][j] = val;
+			}
+		}
+	}*/
+	
 	//-----------------------------------------
 	
 	size_t getLine()	const
