@@ -64,7 +64,7 @@ RigidBody::RigidBody(const std::string& name_, int id_, bool isActive_, const se
 
 RigidBody::~RigidBody()
 {
-
+	delete ptrShape;
 }
 
 
