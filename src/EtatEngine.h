@@ -5,7 +5,7 @@
 #include "Environnement.h"
 #include "physics/Simulation.h"
 
-class EtatEngine : IEngine
+class EtatEngine : public IEngine
 {
 	public :
 	

@@ -1,5 +1,7 @@
 #include "Game.h"
 
+#define debug
+
 Game::Game() : gameON(true), gameState( MENUINIT ), ptrEtat( new EtatEngine(this, MENUINIT) ), ptrVue( new VueEngine(this, MENUINIT) )
 {
 	nbrCurrentCommandsHandled = 0;
@@ -44,7 +46,12 @@ void Game::loop()
                 	break;
                 	
                 	case SDLK_SPACE:
-                	
+                	{
+#ifdef debug
+std::cout << "GAME : add command : TCSimulateStride : DEBUG." << std::endl;
+#endif                	
+                	ptrEtat->addCommandToHandle( (const ICommand&)SimulateStrideCommand() );
+                	}
                 	break;
                 	
                 	default:
@@ -118,6 +125,14 @@ void Game::init()
     glLoadIdentity();
     gluPerspective(70,(double)800/600,1,1000);
     glEnable(GL_DEPTH_TEST);
+    
+    //--------------------------------------------
+    //--------------------------------------------
+    //--------------------------------------------
+    //--------------------------------------------
+    
+    //Mise en place des threads :
+    
     
 }
 

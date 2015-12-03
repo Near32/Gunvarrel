@@ -25,6 +25,7 @@ void EtatEngine::loop()
 			//let's verify that it is one of those dedicated commands :
 			switch( commandsToHandle[0].getCommandType())
 			{
+				//DEBUGGING :
 				case TCSimulateStride:
 				{
 				float timestep = 1e-3f;
