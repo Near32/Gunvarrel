@@ -85,6 +85,26 @@ class SparseMat
 		return mat[i][j];	
 	}
 	
+	inline T operator()(size_t i, size_t j)	const
+	{
+		if( !(i>0 && i<=n && j>0 && j<=m) )
+		{
+			throw;
+		}
+		
+		if( mat.count(i) == 0) 
+		{
+			return (T)0;//mat[0][0];
+		}
+		
+		if( mat.at(i).count(j) == 0)
+		{
+			return (T)0;//mat[0][0];
+		}
+		
+		return mat.at(i).at(j);	
+	}
+	
 	/*SparseMat<T>& operator=( SparseMat<T>& sm)
 	{
 		n = sm.getLine();
@@ -123,21 +143,6 @@ class SparseMat
 		mat[i][j] = value;
 		
 	}
-	
-	/*
-	inline T operator()(size_t i, size_t j)
-	{
-		if( !(i>0 && i<=n && j>0 && j<=m) )
-		{
-			throw;
-		}
-		
-		if( mat.count(i) == 0)	return (T)0;
-		if( mat[i].count(j) == 0)	return (T)0;
-		
-		return mat[i][j];
-	}
-	*/
 	
 	void afficher()
 	{
@@ -348,23 +353,7 @@ class SparseMat
 		}
 	}
 	
-	SparseMat<T> operator=(SparseMat<T> B)
-	{
-		n = B.getLine();
-		m = B.getColumn();
-		
-		for(size_t i=1;i!=n;i++)
-		{
-			for(size_t j=1;j!=m;j++)
-			{
-				T val = B(i,j);
-				
-				if(val != (T)0)	mat[i][j] = val;
-			}
-		}
-	}
-	
-	/*SparseMat<T>& operator=(SparseMat<T>& B)
+	/*SparseMat<T> operator=(SparseMat<T> B)
 	{
 		n = B.getLine();
 		m = B.getColumn();
@@ -379,6 +368,22 @@ class SparseMat
 			}
 		}
 	}*/
+	
+	SparseMat<T>& operator=(const SparseMat<T>& B)
+	{
+		n = B.getLine();
+		m = B.getColumn();
+		
+		for(size_t i=1;i!=n;i++)
+		{
+			for(size_t j=1;j!=m;j++)
+			{
+				T val = B(i,j);
+				
+				if(val != (T)0)	mat[i][j] = val;
+			}
+		}
+	}
 	
 	//-----------------------------------------
 	
