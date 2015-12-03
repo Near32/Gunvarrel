@@ -4,7 +4,7 @@
 #include <GL/glu.h>
 #include <cstdlib>
 #include "TrackBallCamera.h"
-#include "common/objloader.h"
+
 
 void Dessiner();
 void stop();
