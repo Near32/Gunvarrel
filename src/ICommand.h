@@ -217,4 +217,22 @@ class RigidBodyCommand : public ICommand
 	}
 };
 
+
+
+//DEBUGGING PURPOSE COMMAND :
+class SimulateStrideCommand : public ICommand
+{
+	public :
+	SimulateStrideCommand() : ICommand(TCSimulateStride)
+	{
+	
+	}
+
+	~SimulateStrideCommand()
+	{
+	
+	}
+
+};
+
 #endif

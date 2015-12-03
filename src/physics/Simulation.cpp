@@ -7,7 +7,7 @@
 #define debug
 
 
-Simulation::Simulation() : updater(new Updater(this, new ExplicitEulerIntegrator(this)) ), constraintsSolver( new SimultaneousImpulseBasedConstraintSolverStrategy(this) ), collisionDetector( new CollisionDetector(this) )
+Simulation::Simulation() : time(0.0f), updater(new Updater(this, new ExplicitEulerIntegrator(this)) ), constraintsSolver( new SimultaneousImpulseBasedConstraintSolverStrategy(this) ), collisionDetector( new CollisionDetector(this) )
 {
 	Mat<float> g(0.0f,3,1);
 	g.set( -9.81f,3,1);
@@ -202,10 +202,9 @@ Simulation::~Simulation()
 
 void Simulation::run(float timeStep, float endTime)
 {
-	float time = 0.0f;
 	if(timeStep <= 0.0f)	timeStep = 1e-2f;
 	
-	if( endTime > 0.0f)
+	if( endTime > time)
 	{
 		while( time < endTime)
 		{
@@ -765,4 +764,20 @@ void Simulation::updateStates()
 		}				
 	}
 	
+}
+
+
+
+
+//---------------------------------------------------
+//---------------------------------------------------
+//---------------------------------------------------
+//---------------------------------------------------
+
+
+
+
+float Simulation::getTime()	const
+{
+	return time;
 }

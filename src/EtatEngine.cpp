@@ -25,9 +25,22 @@ void EtatEngine::loop()
 			//let's verify that it is one of those dedicated commands :
 			switch( commandsToHandle[0].getCommandType())
 			{
-				default :
+				case TCSimulateStride:
+				{
+				float timestep = 1e-3f;
+				float time = sim->getTime();
+				
+				sim->run(timestep,time+timestep);
 				
 				commandsToHandle.erase(commandsToHandle.begin());
+				}
+				break;
+				
+				
+				default :
+				{
+				commandsToHandle.erase(commandsToHandle.begin());
+				}
 				break;
 			}
 		}

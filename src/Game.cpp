@@ -43,6 +43,10 @@ void Game::loop()
                 	exit(0);
                 	break;
                 	
+                	case SDLK_SPACE:
+                	
+                	break;
+                	
                 	default:
                 	camera->onKeyboard(event.key);
                 	break;

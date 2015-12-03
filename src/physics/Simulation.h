@@ -18,6 +18,7 @@ class Simulation
 	public :
 	
 	Environnement *env;
+	float time;
 	std::map<std::string,int> Name2ID;
 	
 	std::vector<std::unique_ptr<ISimulationObject> > simulatedObjects;
@@ -52,7 +53,7 @@ class Simulation
 	//----------------------------------------------------------------
 	//----------------------------------------------------------------
 	
-	void runStride( float timeStep);
+	void runStride( float timeStep = 1e-3f);
 	
 	void constructQ();
 	
@@ -77,6 +78,8 @@ class Simulation
 		qdot += add;
 	}
 	*/
+	
+	float getTime()	const;
 	
 	
 };

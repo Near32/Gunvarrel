@@ -10,7 +10,10 @@ enum TypeCommand {
 	TCGoOn,
 	TCQuit,
 	TCRigidBody,
-	TCCamera
+	TCCamera,
+	
+	//DEBUGGING :
+	TCSimulateStride
 };
 
 #endif
