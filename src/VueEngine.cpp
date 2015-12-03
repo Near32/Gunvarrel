@@ -1,6 +1,9 @@
 #include "VueEngine.h"
 #include "Game.h"
 
+#define debug
+//#define debuglvl1
+
 VueEngine::VueEngine(Game* game_, GameState gameState_) : IEngine(game_,gameState_)
 {
 	
@@ -22,7 +25,7 @@ void VueEngine::loop()
 			{
 				default :
 				
-				commandsToHandle.erase(commandsToHandle.begin(),0);
+				commandsToHandle.erase(commandsToHandle.begin());
 				break;
 			}
 		}
@@ -44,6 +47,12 @@ void VueEngine::Dessiner(float angleX, float angleZ)
 	
 	Environnement* env = game->ptrEtat->env;//getEnvironnementFromETATENGINE();
 	
+	std::string pathElement("../res/element.obj");//el10x10x20.obj");
+
+#ifdef debug
+	std::cout << " VUE : " << env->ListeElements.size() << " element(s) to draw." << std::endl;
+#endif	
+	
 	for(int i=0;i<env->ListeElements.size();i++)
 	{
 		Mat<float> poseElement = env->ListeElements[i]->pose->exp();
@@ -63,7 +72,24 @@ void VueEngine::Dessiner(float angleX, float angleZ)
 		//--------------------------------
 		//--------------------------------
 		//let us draw the element once we have identified it...
-		
+		if( env->ListeElements[i]->name != std::string("ground") )
+		{
+			drawElement( pathElement );
+		}
+		else
+		{
+			//ground...
+			glBegin(GL_QUADS);
+			glColor3ub(230,230,230);
+			glVertex3d(-100,-100,-2);
+			glVertex3d(100,-100,-2);
+			glVertex3d(100,100,-2);
+			glVertex3d(-100,100,-2);
+			glEnd();
+		}
+#ifdef debuglvl1		
+	std::cout << " VUE : element : " << env->ListeElements[i]->name << " has been drawn." << std::endl;
+#endif
 		//--------------------------------
 		//--------------------------------
 		
@@ -182,3 +208,35 @@ void VueEngine::drawGunvarrel()
 	//------------------------
 	//------------------------
 }
+
+void VueEngine::drawElement(const std::string& path)
+{
+	std::vector<glm::vec3> v;
+	std::vector<glm::vec2> uv;
+	std::vector<glm::vec3> n;
+	bool res = loadOBJ(path.c_str(), v,uv,n);
+	
+	if(res)
+	{
+		for(int i=0;i<v.size();i++)
+		{
+			if(i%3 == 0)
+			{
+				glBegin(GL_TRIANGLES);
+				int color = (i)%255;
+				glColor3ub(color,color,color);
+			}
+		
+			glVertex3d( v[i].x, v[i].y, v[i].z);
+		
+			if( (i+1)%3 == 0)
+			{
+				glEnd();
+			}
+		}
+	}
+	else
+	{
+		cerr << "Impossible de charger l'element : " << path << endl;
+	}
+} 

@@ -22,7 +22,8 @@ class Quat
 
 /* Return norm of quaternion, the sum of the squares of the components. */
 #define Qt_Norm(q) ((q).x*(q).x + (q).y*(q).y + (q).z*(q).z + (q).w*(q).w)
-
+Quat operator+(const Quat& q1, const Quat& q2);
+Quat operator*(float val, const Quat& q);
 
 typedef float HMatrix[4][4];
 //#define X 0

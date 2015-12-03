@@ -6,10 +6,10 @@ class IMoveable
 {
 	protected :
 	
-	se3 Pose;
+	se3* Pose;
 	
-	Mat<float> LinearVelocity;
-	Mat<float> AngularVelocity;
+	Mat<float>* LinearVelocity;
+	Mat<float>* AngularVelocity;
 	
 //-----------------------------------------------------
 //-----------------------------------------------------
@@ -22,7 +22,9 @@ class IMoveable
 	
 	~IMoveable()
 	{
-	
+		delete Pose;
+		delete LinearVelocity;
+		delete AngularVelocity;
 	}
 	
 	
@@ -30,34 +32,35 @@ class IMoveable
 	//---------------------------------------------------------
 	
 		
-	se3 getPose() const	{ 	return Pose;	}
-	const Mat<float> getPosition()
+	se3 getPose() const	{ 	return *Pose;	}
+	Mat<float> getPosition()
 	{
-		return Pose.getT();
+		return Pose->getT();
 	}
 		
-	const Quat getOrientation()		{	return Qt_FromMat(Pose.exp());	}
+	Quat getOrientation()		{	return Qt_FromMat(Pose->exp());	}
 	
-	const Mat<float> getMatOrientation()
+	Mat<float> getMatOrientation()
 	{
 		return Qt2Mat<float>( getOrientation() );
 	}
 	
-	const Mat<float> getTransformation() 	{	return Pose.exp();	}
+	Mat<float> getTransformation() 	{	return Pose->exp();	}
 	
-	const Mat<float> getLinearVelocity()	{	return LinearVelocity;	}
-	const Mat<float> getAngularVelocity()	{	return AngularVelocity;	}
+	Mat<float> getLinearVelocity()	{	return *LinearVelocity;	}
+	Mat<float> getAngularVelocity()	{	return *AngularVelocity;	}
 
 	
 	//---------------------------------------------------------
 	//---------------------------------------------------------
 	
-	void setPose( const se3& pose_)	{	Pose = pose_;	}
-	void setPosition( const Mat<float>& t_)	{	Pose.setT(t_);	}
-	void setOrientation( const Quat& q)	{	Pose.setOrientation(q);	}
+	void setPose( const se3& pose_)	{	*Pose = pose_;	}
+	void setPosition( const Mat<float>& t_)	{	Pose->setT(t_);	}
+	void setOrientation( const Quat& q)	{	Pose->setOrientation(q);	}
 	void setMatOrientation( const Mat<float>& q)	{	setOrientation( Mat2Qt<float>(q) );	}
-	void setLinearVelocity( const Mat<float>& lvel)	{	LinearVelocity = lvel;	}
-	void setAngularVelocity( const Mat<float>& avel)	{	AngularVelocity = avel;	}
+	void setLinearVelocity( const Mat<float>& lvel)	{	*LinearVelocity = lvel;	}
+	void setAngularVelocity( const Mat<float>& avel)	{	*AngularVelocity = avel;	}
+	
 };
 
 

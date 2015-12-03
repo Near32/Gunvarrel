@@ -8,6 +8,8 @@ int main(void)
 	int m = 100;
 	SparseMat<float> A(n);
 	SparseMat<float> B(n);
+	SparseMat<float> AA;
+	AA.operator=(A);
 	Mat<float> mA(n,m,(char)1);
 	Mat<float> mB(m,n,(char)1);
 	clock_t t0,tf;

@@ -26,7 +26,7 @@ class Fabricant : public IFabricant
 		return (IElementFixe*)new T(name_,std::move(pose_), hwd_);
 	}
 	
-	virtual IElementFixe* fabriquer( std::string name_, se3* pose_, const Mat<float> hwd_) override
+	virtual IElementFixe* fabriquer( std::string name_, se3* pose_, const Mat<float>& hwd_) override
 	{
 		return (IElementFixe*)new T(name_, std::unique_ptr<se3>(pose_), hwd_ );
 	}

@@ -3,12 +3,25 @@
 
 #include "../RigidBody.h"
 
-typedef struct Contact
+class Contact
 {
-	RigidBody& rbA;
-	RigidBody& rbB;
+	public:
+	
+	RigidBody* rbA;
+	RigidBody* rbB;
 	std::vector<Mat<float> > contactPoint;	//there can be multiple contact points...
 	std::vector<Mat<float> > normal;
-} Contact;
+	
+	//Contact();
+	Contact(Contact& c); 
+	Contact(const Contact& c);
+	
+	Contact(RigidBody* rbA_, RigidBody* rbB_);
+	~Contact();
+	
+	Contact& operator=(Contact& c);
+	Contact operator=(Contact c);
+	
+};
 
-#endif;
+#endif

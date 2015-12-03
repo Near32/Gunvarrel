@@ -27,7 +27,7 @@ IElementFixe* Fabriques::fabriquer(TypeELF typeELF, std::string name_, std::uniq
 	return collectionFabricants[typeELF]->fabriquer(name_, std::move(pose_), hwd );
 }
 
-IElementFixe* Fabriques::fabriquer(TypeELF typeELF, std::string name_, se3* pose_, const Mat<float> hwd)
+IElementFixe* Fabriques::fabriquer(TypeELF typeELF, std::string name_, se3* pose_, const Mat<float>& hwd)
 {
 	return collectionFabricants[typeELF]->fabriquer(name_, pose_, hwd );
 }

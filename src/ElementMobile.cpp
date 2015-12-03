@@ -10,6 +10,16 @@ ElementMobile::ElementMobile(std::string name_, std::unique_ptr<se3> pose_) : IE
 
 }
 
+ElementMobile::ElementMobile(std::string name_, std::unique_ptr <se3> pose_, const Mat<float>& hwd_) : IElementMobile(name_,std::move(pose_),hwd_)
+{
+
+}
+
+ElementMobile::ElementMobile(std::string name_, se3* pose_, const Mat<float>& hwd_)  : IElementMobile(name_,pose_,hwd_)
+{
+
+}
+
 ElementMobile::~ElementMobile()
 {
 
@@ -18,6 +28,11 @@ ElementMobile::~ElementMobile()
 bool ElementMobile::isFixe()
 {
   return false;
+}
+
+bool ElementMobile::isComposit()
+{
+ 	return false;
 }
 
 

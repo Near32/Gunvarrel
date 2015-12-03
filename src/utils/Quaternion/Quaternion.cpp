@@ -24,6 +24,17 @@ Quat operator*(float val,const Quat& q)
 	
 }
 
+Quat operator+(const Quat& q1, const Quat& q2)
+{
+	Quat ret;
+	ret.x=q1.x+q2.x;
+	ret.y=q1.y+q2.y;
+	ret.z=q1.z+q2.z;
+	ret.w=q1.w+q2.w;
+	
+	return ret;
+}
+
 /* Returns the quaternion which correspond to the given euler angles.*/
 Quat Euler2Qt(float roll, float pitch, float yaw)
 {

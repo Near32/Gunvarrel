@@ -8,6 +8,6 @@ enum StateJoint{
 	SJTendre,
 	SJTournerDroite,
 	SJTOurnerGauche
-}
+};
 
 #endif

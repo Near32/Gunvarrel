@@ -14,9 +14,9 @@ class se3
 {
 	private :
 	
-	Mat<float> w;		//rotational tangent values.
-	Mat<float> t;		//translational values.
-	Mat<float> SE3;		// (R | t) matrix.
+	Mat<float>* w;		//rotational tangent values.
+	Mat<float>* t;		//translational values.
+	Mat<float>* SE3;		// (R | t) matrix.
 	bool hasChanged;
 	
 	public :
@@ -29,10 +29,16 @@ class se3
 	~se3();
 	
 	Mat<float> exp();					//compute the (R | t) matrix.
-	Mat<float> getT()	{	return t;	}
+	Mat<float> getT()	const	{	return *t;	}
+	Mat<float> getW()	const	{	return *w;	}
+	Mat<float> getSE3()	const	{	return *SE3;	}
 	void setT(const Mat<float>& t_);
 	void setW(const Mat<float>& w_);
 	void setOrientation( const Quat& q);	
+	
+	se3& operator=(const se3& x);
+	
+	
 
 };
 

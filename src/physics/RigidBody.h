@@ -26,19 +26,21 @@ class RigidBody : public ISimulationObject, public IMoveable
 	Mat<float> iInertiaWorld;
 	
 	
-	std::unique_ptr<IShape> ptrShape;
+	IShape* ptrShape;
 	
 //--------------------------------------------------------
 //--------------------------------------------------------
 	
 	RigidBody();
 	RigidBody(const std::string& name_, int id_, bool isActive_);
+	RigidBody(const se3& Pose_, const std::string& name_, int id_, bool isActive_ = true);
+	RigidBody(const se3& Pose_, const std::string& name_, int id_, ShapeType shtype, bool isActive_ = true);
 	RigidBody(const se3& Pose_, const Mat<float>& Lvel, const Mat<float>& Avel);
 	RigidBody(const std::string& name_, int id_, bool isActive_, const se3& Pose_);
 	RigidBody(const std::string& name_, int id_, bool isActive_, const se3& Pose_, const Mat<float>& Lvel, const Mat<float>& Avel);
 	
-	RigidBody(const std::string& name_, int id_, bool isActive_, const se3& Pose_, std::unique_ptr<IShape> ptrShape_);
-	RigidBody(const std::string& name_, int id_, bool isActive_, const se3& Pose_, const Mat<float>& Lvel, const Mat<float>& Avel, std::unique_ptr<IShape> ptrShape_);
+	//RigidBody(const std::string& name_, int id_, bool isActive_, const se3& Pose_, std::unique_ptr<IShape> ptrShape_);
+	//RigidBody(const std::string& name_, int id_, bool isActive_, const se3& Pose_, const Mat<float>& Lvel, const Mat<float>& Avel, std::unique_ptr<IShape> ptrShape_);
 	
 	~RigidBody();
 	
@@ -74,46 +76,56 @@ class RigidBody : public ISimulationObject, public IMoveable
 		return userTorque;
 	}
 	
-	const float getMass() const
+	float getMass() const
 	{
 	 	return mass;	
 	}
-	const float getInverseMass() const
+	float getIMass() const
 	{
 		return imass;
 	}
 	
-	const Mat<float> getInertialLocal() const
+	Mat<float> getInertialLocal() const
 	{
 		return Inertia;
 	}
 	
-	const Mat<float> getInverseInertialLocal() const
+	Mat<float> getInverseInertialLocal() const
 	{
 		return iInertia;
 	}
 		
-	const Mat<float> getInverseInertialWorld() const
+	Mat<float> getInverseInertialWorld() const
 	{
 		return iInertiaWorld;
 	}
 			
-	const bool getCollisionStatus()	const	
+	bool getCollisionStatus()	const	
 	{	
 		return canCollide;
 	}
 	
-	const bool getFixedStatus()	const	
+	bool getFixedStatus()	const	
 	{	
 		return isFixed;
 	}
 	
-	const IShape& getShapeReference() const
+	IShape& getShapeReference() const
 	{ 
+		/*if( ptrShape.get())
+		{
+			return *(ptrShape.get());
+		}
+		else
+		{
+			std::cout << "uninitialized shape..." <<std::endl;
+			throw;
+		}*/
+		
 		return *ptrShape;
 	}
 	
-	const ShapeType getShapeType() const	
+	ShapeType getShapeType() const	
 	{	
 		return ptrShape->getShapeType();
 	}
@@ -128,10 +140,14 @@ class RigidBody : public ISimulationObject, public IMoveable
 	
 	//------------------------------------------
 	
-	void setPtrShape( const IShape* ptrShape_)
+	void setPtrShape( IShape* ptrShape_)
 	{
-		ptrShape.clear();
-		ptrShape = ptrShape_;
+		//ptrShape.reset( ptrShape_);
+		if( ptrShape)
+		{
+			delete ptrShape;
+			ptrShape = ptrShape_;
+		}
 		
 		computeInertia();
 	}

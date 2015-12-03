@@ -6,6 +6,8 @@ EtatEngine::EtatEngine(Game* game_, GameState gameState_) : IEngine(game_,gameSt
 {
 	env = new Environnement();
 	
+	init();
+	
 }
 
 EtatEngine::~EtatEngine()
@@ -23,9 +25,22 @@ void EtatEngine::loop()
 			//let's verify that it is one of those dedicated commands :
 			switch( commandsToHandle[0].getCommandType())
 			{
-				default :
+				case TCSimulateStride:
+				{
+				float timestep = 1e-3f;
+				float time = sim->getTime();
 				
-				commandsToHandle.erase(commandsToHandle.begin(),0);
+				sim->run(timestep,time+timestep);
+				
+				commandsToHandle.erase(commandsToHandle.begin());
+				}
+				break;
+				
+				
+				default :
+				{
+				commandsToHandle.erase(commandsToHandle.begin());
+				}
 				break;
 			}
 		}
@@ -35,7 +50,7 @@ void EtatEngine::loop()
 void EtatEngine::init()
 {
 	//let's create the Elements that we need.
-	Mat<float> hwd(10.0f,3,1);
+	Mat<float> hwd(100.0f,3,1);
 	Mat<float> t(0.0f,3,1);
 	ConstraintsList cl;
 	
@@ -44,32 +59,44 @@ void EtatEngine::init()
 	//map : ground :
 	//ground :
 	t.set( -hwd.get(3,1)/2,3,1);
-	env->addElement( env->fabriques->fabriquer(ELFObstacle, std::string("ground"), new se3(t) ) );
+	env->addElement( env->fabriques->fabriquer(ELFObstacle, std::string("ground"), new se3(t), hwd ) );
 	//
 	//sa position est bien à l'origine..
 	//resetting :
 	t *= 0.0f;
-	hwd *= 1.0f/10.0f;
+	hwd *= 1.0f/100.0f;
 	//--------------------------------
 	
 	
 	//Gunvarrel :
-	env->addElement( new ElementMobile(
+	hwd *= 10.0f;
+	hwd.set(20.0f,3,1);
+	t.set( hwd.get(3,1)/2+1.0f, 3,1);
+	env->addElement( new ElementMobile(std::string("picBAS"), new se3(t), hwd) );
 	
+	t.set( t.get(3,1)+hwd.get(3,1)+1.0f, 3,1);
+	env->addElement( new ElementMobile(std::string("picHAUT"), new se3(t), hwd) );
+	
+	//constraints :
+	Mat<float> AnchorAL(0.0f,3,1);
+	AnchorAL.set( hwd.get(3,1)/2+1.0f, 3,1);
+	Mat<float> HJAxis(0.0f,3,1);
+	HJAxis.set( 1.0f, 1,1);
+	cl.insert( cl.end(), ConstraintInfo(std::string("picBas"),std::string("picHaut"), CTBallAndSocketJoint, operatorL(AnchorAL,HJAxis) ) ); 
 	
 	//resetting :
 	t = Mat<float>(0.0f,3,1);
-	hwd = Mat<float>(1.0f,3,1);
+	hwd = Mat<float>(10.0f,3,1);
 	//--------------------------------
 	
 	
 	//map : obstacles :
 	int nbrObstacle = 0;
 	//on veut changer sa position avec une hauteur un peu plus grande :
-	t.set(2.0f,3,1);
-	t.set(1.0f,1,1);
-	t.set(3.0f,2,1); 
-	env->addElement( env->fabriques->fabriquer(ELFObstacle, std::string("obstacle")+std::string(nbrObstacle), new se3(t), hwd ) );
+	t.set(20.0f,3,1);
+	t.set(10.0f,1,1);
+	t.set(30.0f,2,1); 
+	env->addElement( env->fabriques->fabriquer(ELFObstacle, std::string("obstacle")+std::to_string(nbrObstacle), new se3(t), hwd ) );
 	nbrObstacle++;
 	//--------------------------------
 	
@@ -78,9 +105,9 @@ void EtatEngine::init()
 	//orbe bonus :
 	int nbrOrbeBonus = 0;
 	//on veut changer sa position avec une hauteur un peu plus grande :
-	t.set(2.0f,3,1);
-	t.set(1.0f,1,1); 
-	env->addElement( env->fabriques->fabriquer(ELFOrbeBonus, std::string("orbebonus")+std::string(nbrOrbeBonus), new se3(t), hwd ) );
+	t.set(20.0f,3,1);
+	t.set(10.0f,1,1); 
+	env->addElement( env->fabriques->fabriquer(ELFOrbeBonus, std::string("orbebonus")+std::to_string(nbrOrbeBonus), new se3(t), hwd ) );
 	nbrOrbeBonus++;
 	//--------------------------------
 	

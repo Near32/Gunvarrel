@@ -20,7 +20,8 @@ class IElement
 	
 	
 	IElement();
-	IElement( std::string name, std::unique_ptr<se3> pose );
+	IElement( std::string name, std::unique_ptr<se3> pose_ );
+	IElement( std::string name, se3* pose_ );
 	
 	~IElement();
 	
@@ -34,6 +35,11 @@ class IElement
 	void setPose( const se3& p)
 	{
 		(*pose) = p;
+	}
+	
+	std::string getName()	const
+	{
+		return name;
 	}
 	
 };

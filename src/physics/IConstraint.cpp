@@ -3,8 +3,8 @@
 IConstraint::IConstraint(RigidBody& rbA_, RigidBody& rbB_) : rbA(rbA_), rbB(rbB_), bodiesCanCollide(true)
 {
 	
-	AnchorAL = rbA.getPointInLocal( extract(rbA->exp(), 1,4, 3,4) );
-	AnchorBL = rbB.getPointInLocal( extract(rbB->exp(), 1,4, 3,4) );
+	AnchorAL = rbA.getPointInLocal( rbA.getPosition() );
+	AnchorBL = rbB.getPointInLocal( rbB.getPosition() );
 	
 	
 	//axises of A in W:
@@ -50,7 +50,10 @@ IConstraint::IConstraint(RigidBody& rbA_, RigidBody& rbB_) : rbA(rbA_), rbB(rbB_
 	
 }
 	
+IConstraint::~IConstraint()
+{
 
+}
 
 //---------------------------------------------
 //---------------------------------------------
@@ -145,6 +148,9 @@ void BallAndSocketJoint::applyPositionCorrection(float dt)
 void BallAndSocketJoint::computeJacobians()
 {
 	//A :
+	Mat<float> Identity(0.0f,3,3);
+	for(int i=3;i--;)	Identity.set(1.0f,i+1,i+1);
+	
 	JacobianA = operatorL( Identity, (-1.0f)*crossProduct(AnchorAL) );
 	
 	//---------------------
@@ -168,22 +174,27 @@ void BallAndSocketJoint::computeJacobians()
 //Penetration depth is initialized to 0, by default.	
 //Anchors can be iniatilized to the center of mass, by default.
 //Axises can be initialized to the local coordinate frame axises.
-HingeJoint::HingeJoint( RigidBody& rbA_, RigidBody& rbB_, const Mat<float>& HJAxisL_, const Mat<float> AnchorL_) : HJAxisL(HJAxisL_), AnchorL(AnchorL_)
+HingeJoint::HingeJoint( RigidBody& rbA_, RigidBody& rbB_, const Mat<float>& HJAxisL_, const Mat<float>& AnchorL_) : IConstraint(rbA_,rbB_)
 {
-	BASJoint = BallAndSocketJoint(rbA_,rbB_, AnchorL, rbB.getAxisInLocal( rbA.getAxisInWorld(AnchorL) ) );
+	HJAxisL = HJAxisL_;
+	AnchorL = AnchorL_;
+	BASJoint = std::unique_ptr<BallAndSocketJoint>(new BallAndSocketJoint( rbA_,rbB_, AnchorL, rbB.getAxisInLocal( rbA.getAxisInWorld(AnchorL) ) ) );
 	
 	//--------------------
 	
 	HJAxisL1 = crossproductV( HJAxisL, Mat<float>(1.0f,3,1) );
 	//default idea, be careful with another use of this physics engine...
-	HJAxisW2 = crossproductV( HJAxisL, HJAxisL1);
+	HJAxisL2 = crossproductV( HJAxisL, HJAxisL1);
 	
 	//TODO : verify the correctness of this use of the axises in World Reference Frame ?...!!
 	
 	//--------------------
 }
 
+HingeJoint::~HingeJoint()
+{
 
+}
 	
 void HingeJoint::addPenaltySpring(float dt)
 {
@@ -203,7 +214,7 @@ void HingeJoint::applyPositionCorrection(float dt)
 
 void HingeJoint::computeJacobians()
 {
-	BASJoint.computeJacobian();
+	BASJoint->computeJacobians();
 	
 	//---------------------------
 	
@@ -213,7 +224,7 @@ void HingeJoint::computeJacobians()
 	
 	JacobianA = operatorC( 
 	
-		operatorC( BASJoint.getJacobianA(),
+		operatorC( BASJoint->getJacobianA(),
 					operatorL( zero, transpose( rbA.getAxisInWorld(HJAxisL1) ) ) ),
 					
 		operatorL( zero, transpose( rbA.getAxisInWorld(HJAxisL2) ) )
@@ -224,10 +235,10 @@ void HingeJoint::computeJacobians()
 	//B :
 	JacobianB = operatorC( 
 	
-		operatorC( BASJoint.getJacobianB(),
-					operatorL( zero, -transpose( rbA.getAxisInWorld( HJAxisL1 ) ) ) ),
+		operatorC( BASJoint->getJacobianB(),
+					operatorL( zero, (-1.0f)*transpose( rbA.getAxisInWorld( HJAxisL1 ) ) ) ),
 					
-		operatorL( zero, -transpose( rbA.getAxisInWorld( HJAxisW2 ) ) )
+		operatorL( zero, (-1.0f)*transpose( rbA.getAxisInWorld( HJAxisL2 ) ) )
 							 );
 	
 }
@@ -251,7 +262,11 @@ ILimitConstraint::ILimitConstraint(RigidBody& rbA_, RigidBody& rbB_, float Min_,
 
 }
 
-	
+ILimitConstraint::~ILimitConstraint()
+{
+
+}
+
 void ILimitConstraint::addPenaltySpring(float dt)
 {
 
@@ -272,7 +287,6 @@ void ILimitConstraint::computeJacobians()
 {
 
 }
-
 
 
 

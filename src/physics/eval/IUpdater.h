@@ -1,15 +1,14 @@
 #ifndef IUPDATER_H
 #define IUPDATER_H
 
-#include "../Simulation.h"
-
 #include "IIntegrator.h"
+class Simulation;
 
 class IUpdater
 {
 	private :
 	
-	std::shared_ptr<Simulation> simulation;	
+	Simulation* sim;	
 	std::unique_ptr<IIntegrator> integrator;
 	
 	
@@ -17,16 +16,9 @@ class IUpdater
 	//----------------------------------------------
 	public :
 	
-	IUpdater(Simulation* sim, IIntegrator* integ) : simulation(sim), integrator( integ )
-	{
+	IUpdater(Simulation* sim_, IIntegrator* integ);
 	
-	}
-	
-	~IUpdater()
-	{
-	
-	}
-	
+	~IUpdater();
 	
 		
 };
@@ -36,16 +28,9 @@ class Updater : public IUpdater
 {
 	public :
 	
-	Updater(Simulation* sim, IIntegrator* integ) : IUpdater(sim,integ)
-	{
+	Updater(Simulation* sim_, IIntegrator* integ);
 	
-	}
-	
-	~Updater()
-	{
-	
-	}
-	
+	~Updater();
 	
 };
 

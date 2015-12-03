@@ -9,7 +9,6 @@ enum IDJoint{
 	IJCoudeDroit,
 	IJEpauleGauche,
 	IJEpauleDroit,
-	IJEpauleGauche,
 	IJNuque,
 	IJBusteRotation,
 	IJAbdominauxLateraDroit,
@@ -21,6 +20,6 @@ enum IDJoint{
 	IJGenouGAuche,
 	IJChevilleDroite,
 	IJChevilleGauche
-}
+};
 
 #endif

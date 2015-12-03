@@ -1,6 +1,6 @@
 #!/bin/bash
 
 cd build
-make
+make -j4
 
 
