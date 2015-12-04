@@ -4,32 +4,91 @@
 #define debug
 //#define debuglvl1
 
+
+extern mutex ressourcesMutex;
+
+
 VueEngine::VueEngine(Game* game_, GameState gameState_) : IEngine(game_,gameState_)
 {
-	
+	init();
 }
 
 VueEngine::~VueEngine()
 {
-
+	delete camera;
+	SDL_Quit();
 }
 	
 void VueEngine::loop()
 {
-	while(game->gameON)
+	ressourcesMutex.lock();
+	bool gameON = game->gameON;
+	ressourcesMutex.unlock();
+		
+	while(gameON)
 	{
 		if( commandsToHandle.size() > 0)
 		{
 			//let's verify that it is one of those dedicated commands :
 			switch( commandsToHandle[0].getCommandType())
 			{
+				case TCCameraOnMouseMotion :
+				{
+				camera->onMouseMotion( ((CameraOnMouseMotionCommand&)commandsToHandle[0]).mmevent);
+				}
+				break;
+				
+				case TCCameraOnMouseButton :
+				{
+				camera->onMouseButton( ((CameraOnMouseButtonCommand&)commandsToHandle[0]).mbevent);
+				}
+				break;
+				
+				case TCCameraOnKeyboard :
+				{
+				camera->onKeyboard( ((CameraOnKeyboardCommand&)commandsToHandle[0]).kevent);
+				}
+				break;
+				
 				default :
+				{
 				
 				commandsToHandle.erase(commandsToHandle.begin());
+				}
 				break;
 			}
 		}
+		
+		//----------------------------------------
+		ressourcesMutex.lock();
+		Dessiner(0.0f,0.0f);
+		ressourcesMutex.unlock();
+		
+		ressourcesMutex.lock();
+		gameON = game->gameON;
+		ressourcesMutex.unlock();
 	}
+}
+
+void VueEngine::init()
+{
+	SDL_Init(SDL_INIT_VIDEO);
+    //atexit(stop);
+    SDL_WM_SetCaption("Gunvarrel", NULL);
+    ecran = SDL_SetVideoMode(800, 600, 32, SDL_OPENGL);
+    
+    
+    //--------------------
+	//Camera 
+	camera = new TrackBallCamera();
+	
+	//-------------------------
+	
+	glClearColor(1.0f,1.0f,1.0f,1.0f);
+    glMatrixMode( GL_PROJECTION );
+    glLoadIdentity();
+    gluPerspective(70,(double)800/600,1,1000);
+    glEnable(GL_DEPTH_TEST);
 }
 
 void VueEngine::Dessiner(float angleX, float angleZ)
@@ -40,7 +99,8 @@ void VueEngine::Dessiner(float angleX, float angleZ)
 
 	//---------------------------
 	//Mise a jour de la position de la caméra.
-	game->camera->look();
+	//game->camera->look();
+	camera->look();
 	//----------------------------
 
 	drawGunvarrel();
@@ -50,12 +110,16 @@ void VueEngine::Dessiner(float angleX, float angleZ)
 	std::string pathElement("../res/element.obj");//el10x10x20.obj");
 
 #ifdef debug
-	std::cout << " VUE : " << env->ListeElements.size() << " element(s) to draw." << std::endl;
+ressourcesMutex.lock();
+std::cout << " VUE : " << env->ListeElements.size() << " element(s) to draw." << std::endl;
+ressourcesMutex.unlock();
 #endif	
 	
 	for(int i=0;i<env->ListeElements.size();i++)
 	{
+		ressourcesMutex.lock();
 		Mat<float> poseElement = env->ListeElements[i]->pose->exp();
+		ressourcesMutex.unlock();
 		Mat<float> SO3( extract( poseElement, 1,1, 3,3) );
 		Mat<float> EulerAngles(3,1);
 		Rot2Euler(SO3, EulerAngles);
@@ -72,12 +136,15 @@ void VueEngine::Dessiner(float angleX, float angleZ)
 		//--------------------------------
 		//--------------------------------
 		//let us draw the element once we have identified it...
+		ressourcesMutex.lock();
 		if( env->ListeElements[i]->name != std::string("ground") )
 		{
+			ressourcesMutex.unlock();
 			drawElement( pathElement );
 		}
 		else
 		{
+			ressourcesMutex.unlock();
 			//ground...
 			glBegin(GL_QUADS);
 			glColor3ub(230,230,230);
@@ -88,7 +155,9 @@ void VueEngine::Dessiner(float angleX, float angleZ)
 			glEnd();
 		}
 #ifdef debuglvl1		
-	std::cout << " VUE : element : " << env->ListeElements[i]->name << " has been drawn." << std::endl;
+ressourcesMutex.lock();
+std::cout << " VUE : element : " << env->ListeElements[i]->name << " has been drawn." << std::endl;
+ressourcesMutex.unlock();
 #endif
 		//--------------------------------
 		//--------------------------------
@@ -166,8 +235,10 @@ void VueEngine::Dessiner(float angleX, float angleZ)
 
     glEnd();
 
-    glFlush();
+    //glFlush();
+ressourcesMutex.lock();    
     SDL_GL_SwapBuffers();
+ressourcesMutex.unlock();    
 }
 
 

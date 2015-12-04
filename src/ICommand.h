@@ -4,6 +4,9 @@
 #include "TypeCommand.h"
 #include "IDJoint.h"
 #include "StateJoint.h"
+#include <SDL/SDL.h>
+#include <GL/gl.h>
+#include <GL/glu.h>
 
 class ICommand
 {
@@ -219,6 +222,67 @@ class RigidBodyCommand : public ICommand
 
 
 
+class CameraOnKeyboardCommand : public ICommand
+{
+	public :
+	
+	SDL_KeyboardEvent kevent;
+	
+	
+	
+	CameraOnKeyboardCommand(const SDL_KeyboardEvent& kevent_) : ICommand(TCCameraOnKeyboard)
+	{
+		kevent = kevent_;
+	}
+
+	~CameraOnKeyboardCommand()
+	{
+	
+	}
+
+};
+
+
+class CameraOnMouseMotionCommand : public ICommand
+{
+	public :
+	
+	SDL_MouseMotionEvent mmevent;
+	
+	CameraOnMouseMotionCommand(const SDL_MouseMotionEvent& mmevent_) : ICommand(TCCameraOnMouseMotion)
+	{
+		mmevent = mmevent_;
+	}
+
+	~CameraOnMouseMotionCommand()
+	{
+	
+	}
+
+};
+
+
+class CameraOnMouseButtonCommand : public ICommand
+{
+	public :
+	
+	
+	SDL_MouseButtonEvent mbevent;
+	
+	
+	
+	CameraOnMouseButtonCommand(const SDL_MouseButtonEvent& mbevent_) : ICommand(TCCameraOnMouseButton)
+	{
+		mbevent = mbevent_;
+	}
+
+	~CameraOnMouseButtonCommand()
+	{
+	
+	}
+
+};
+
 //DEBUGGING PURPOSE COMMAND :
 class SimulateStrideCommand : public ICommand
 {
@@ -234,5 +298,7 @@ class SimulateStrideCommand : public ICommand
 	}
 
 };
+
+
 
 #endif

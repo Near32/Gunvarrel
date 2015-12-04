@@ -1,5 +1,9 @@
 #include "TrackBallCamera.h"
 
+
+
+
+
 TrackBallCamera::TrackBallCamera()
 {
     const char *_hand1[] =
@@ -143,7 +147,8 @@ TrackBallCamera::~TrackBallCamera()
 {
 	//SDL_FreeCursor(hand1);
 	//SDL_FreeCursor(hand2);
-	SDL_SetCursor(NULL);
+	
+	//SDL_SetCursor(NULL);
 }
 
 

@@ -11,6 +11,9 @@ enum TypeCommand {
 	TCQuit,
 	TCRigidBody,
 	TCCamera,
+	TCCameraOnMouseButton,
+	TCCameraOnMouseMotion,
+	TCCameraOnKeyboard,
 	
 	//DEBUGGING :
 	TCSimulateStride

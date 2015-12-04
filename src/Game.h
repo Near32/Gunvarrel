@@ -6,9 +6,11 @@
 #include "GameState.h"
 #include "EtatEngine.h"
 #include "VueEngine.h"
+#include "ControllerEngine.h"
 #include "ICommand.h"
 
-
+#include <thread>
+#include <mutex>
 
 class Game
 {
@@ -16,11 +18,12 @@ class Game
 	
 	EtatEngine* ptrEtat;
 	VueEngine* ptrVue;
+	ControllerEngine* ptrController;
 	
 	GameState gameState;
 	bool gameON;
 	
-	TrackBallCamera* camera;
+	//TrackBallCamera* camera;
 	
 	std::vector<ICommand> currentCommands;
 	std::vector<ICommand> waitingCommands;

@@ -4,6 +4,8 @@
 #include "IEngine.h"
 #include "Environnement.h"
 #include "physics/Simulation.h"
+#include <thread>
+#include <mutex>
 
 class EtatEngine : public IEngine
 {

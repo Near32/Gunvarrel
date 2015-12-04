@@ -2,21 +2,27 @@
 
 #define debug
 
+#define threadUse
+
+mutex ressourcesMutex;
+
 Game::Game() : gameON(true), gameState( MENUINIT ), ptrEtat( new EtatEngine(this, MENUINIT) ), ptrVue( new VueEngine(this, MENUINIT) )
 {
 	nbrCurrentCommandsHandled = 0;
+	init();
 }
 
 Game::~Game()
 {
 	delete ptrEtat;
 	delete ptrVue;
-	delete camera;
+	delete ptrController;
 }
 	
 	
 void Game::loop()
 {
+/*
 	Uint32 last_time = SDL_GetTicks();
     Uint32 current_time,ellapsed_time;
     Uint32 start_time;
@@ -25,6 +31,25 @@ void Game::loop()
     float angleX = 0.0f;
     float angleZ = 0.0f;
     
+    */
+    //--------------------------------------------
+    //--------------------------------------------
+    //--------------------------------------------
+    //--------------------------------------------
+    
+    //Mise en place des threads :
+    
+    
+    
+    thread tEtat( &EtatEngine::loop, *ptrEtat );
+    thread tController( &ControllerEngine::loop, *ptrController);
+    //thread tVue( &VueEngine::loop, *ptrVue );
+    
+    tEtat.join();
+    tController.join();
+    //tVue.join();
+    
+    /*
 	while(gameON)
 	{
 		start_time = SDL_GetTicks();
@@ -55,18 +80,27 @@ std::cout << "GAME : add command : TCSimulateStride : DEBUG." << std::endl;
                 	break;
                 	
                 	default:
-                	camera->onKeyboard(event.key);
+                	{
+                	//camera->onKeyboard(event.key);
+                	ptrVue->addCommandToHandle( (const ICommand&)CameraOnKeyboardCommand(event.key));
+                	}
                 	break;
                 }
                 break;
                 
                 case SDL_MOUSEMOTION:
-                camera->onMouseMotion(event.motion);
+                {
+                //camera->onMouseMotion(event.motion);
+                ptrVue->addCommandToHandle( (const ICommand&)CameraOnMouseMotionCommand(event.motion) );
+                }
                 break;
                 
                 case SDL_MOUSEBUTTONUP:
                 case SDL_MOUSEBUTTONDOWN:
-                camera->onMouseButton(event.button);
+                {
+                //camera->onMouseButton(event.button);
+                ptrVue->addCommandToHandle( (const ICommand&)CameraOnMouseButtonCommand(event.button) );
+                }
                 break;
             }
         }
@@ -90,8 +124,9 @@ std::cout << "GAME : add command : TCSimulateStride : DEBUG." << std::endl;
         
         angleZ += 0.05 * ellapsed_time;
         angleX += 0.05 * ellapsed_time;
+#ifndef threadUse        
         ptrVue->Dessiner(angleX,angleZ);
-        
+#endif        
         
         //--------------------------------------
         //--------------------------------------
@@ -103,36 +138,15 @@ std::cout << "GAME : add command : TCSimulateStride : DEBUG." << std::endl;
             SDL_Delay(20 - ellapsed_time);
         }
 		
-	}
+	}*/
+	
+	
 }
 
 void Game::init()
 {
-    SDL_Init(SDL_INIT_VIDEO);
-    //atexit(stop);
-    SDL_WM_SetCaption("Gunvarrel", NULL);
-    SDL_SetVideoMode(800, 600, 32, SDL_OPENGL);
     
-    
-    //--------------------
-	//Camera 
-	camera = new TrackBallCamera();
-	
-	//-------------------------
-	
-	glClearColor(1.0f,1.0f,1.0f,1.0f);
-    glMatrixMode( GL_PROJECTION );
-    glLoadIdentity();
-    gluPerspective(70,(double)800/600,1,1000);
-    glEnable(GL_DEPTH_TEST);
-    
-    //--------------------------------------------
-    //--------------------------------------------
-    //--------------------------------------------
-    //--------------------------------------------
-    
-    //Mise en place des threads :
-    
+   ptrController = new ControllerEngine(this,ptrEtat,ptrVue, MENUINIT);
     
 }
 

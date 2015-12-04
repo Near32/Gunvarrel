@@ -1,6 +1,8 @@
 #include "EtatEngine.h"
 #include "Game.h"
 
+extern mutex ressourcesMutex;
+
 
 EtatEngine::EtatEngine(Game* game_, GameState gameState_) : IEngine(game_,gameState_)
 {
@@ -18,7 +20,11 @@ EtatEngine::~EtatEngine()
 	
 void EtatEngine::loop()
 {
-	while(game->gameON)
+	ressourcesMutex.lock();
+	bool gameON = game->gameON;
+	ressourcesMutex.unlock();
+	
+	while(gameON)
 	{
 		if( commandsToHandle.size() > 0)
 		{
@@ -30,8 +36,21 @@ void EtatEngine::loop()
 				{
 				float timestep = 1e-3f;
 				float time = sim->getTime();
-				
+#ifdef debug
+std::cout << "SIMULATION : run : ..." << std::endl;
+#endif				
+				ressourcesMutex.lock();
+#ifdef debug
+std::cout << "SIMULATION : run : mutex locked." << std::endl;
+#endif				
 				sim->run(timestep,time+timestep);
+#ifdef debug
+std::cout << "SIMULATION : run : successfully !!" << std::endl;
+#endif				
+				ressourcesMutex.unlock();
+#ifdef debug
+std::cout << "SIMULATION : run : mutex unlocked." << std::endl;
+#endif				
 				
 				commandsToHandle.erase(commandsToHandle.begin());
 				}
@@ -45,6 +64,10 @@ void EtatEngine::loop()
 				break;
 			}
 		}
+		
+		ressourcesMutex.lock();
+		gameON = game->gameON;
+		ressourcesMutex.unlock();
 	}
 }
 

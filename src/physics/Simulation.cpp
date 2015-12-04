@@ -220,23 +220,47 @@ void Simulation::run(float timeStep, float endTime)
 void Simulation::runStride( float timeStep)
 {
 	//check Collisions and create the corresponding entities to deal with those :
+#ifdef debug
+std::cout << "SIMULATION : runStride : collision check : ..." << std::endl;
+#endif	
 	collisionDetector->checkForCollision(timeStep);
-	
+#ifdef debug
+std::cout << "SIMULATION : runStride : collision check : DONE." << std::endl;
+#endif		
 	//apply forces to the RigidBodies:
+#ifdef debug
+std::cout << "SIMULATION : runStride : apply Forces : ..." << std::endl;
+#endif		
 	applyForces(timeStep);
-	
+#ifdef debug
+std::cout << "SIMULATION : runStride : apply Forces : DONE" << std::endl;
+#endif			
 	//construct the system to be solved...
 	if(initializedQQdotInvMFext)
 	{
 		//TODO : update QQdotInvMFext, for now on, we do not care at all about reallocation and optimization, so the matrixes are being reconstructed every time...
+#ifdef debug
+std::cout << "SIMULATION : runStride : updating matrices : ..." << std::endl;
+#endif					
 	}
 	else
 	{
+#ifdef debug
+std::cout << "SIMULATION : runStride : initializing matrices : ..." << std::endl;
+#endif			
 		constructQQdotInvMSFext();
+#ifdef debug
+std::cout << "SIMULATION : runStride : initializing matrices : DONE." << std::endl;
+#endif					
 	}
 	//solve the system and update it :
+#ifdef debug
+std::cout << "SIMULATION : runStride : solving system : ..." << std::endl;
+#endif				
 	constraintsSolver->Solve(timeStep, collectionC, q, qdot, invM,S, Fext);
-	
+#ifdef debug
+std::cout << "SIMULATION : runStride : solving system : DONE." << std::endl;
+#endif					
 	//apply changes in the state :		
 	updateStates();
 	
