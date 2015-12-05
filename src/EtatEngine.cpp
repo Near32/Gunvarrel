@@ -1,7 +1,7 @@
 #include "EtatEngine.h"
 #include "Game.h"
 
-extern mutex ressourcesMutex;
+extern std::mutex ressourcesMutex;
 
 
 EtatEngine::EtatEngine(Game* game_, GameState gameState_) : IEngine(game_,gameState_)

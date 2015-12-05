@@ -1,7 +1,7 @@
 #include "ControllerEngine.h"
 #include "Game.h"
 
-extern mutex ressourcesMutex;
+extern std::mutex ressourcesMutex;
 
 ControllerEngine::ControllerEngine(Game* game_, EtatEngine* ptrEtat_, VueEngine* ptrVue_, const GameState& gameState_) : IEngine(game_,gameState_), ptrEtat(ptrEtat_), ptrVue(ptrVue_)
 {
@@ -24,7 +24,7 @@ void ControllerEngine::loop()
     float angleZ = 0.0f;
     
     ressourcesMutex.lock();
-    bool gameON = true;//game->gameON;
+    bool gameON = game->gameON;
     ressourcesMutex.unlock();
     
 	while(gameON)

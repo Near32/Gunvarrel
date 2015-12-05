@@ -72,6 +72,7 @@ void VueEngine::loop()
 
 void VueEngine::init()
 {
+    XInitThreads();
 	SDL_Init(SDL_INIT_VIDEO);
     //atexit(stop);
     SDL_WM_SetCaption("Gunvarrel", NULL);

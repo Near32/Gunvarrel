@@ -4,7 +4,7 @@
 
 #define threadUse
 
-mutex ressourcesMutex;
+std::mutex ressourcesMutex;
 
 Game::Game() : gameON(true), gameState( MENUINIT ), ptrEtat( new EtatEngine(this, MENUINIT) ), ptrVue( new VueEngine(this, MENUINIT) )
 {
@@ -40,14 +40,18 @@ void Game::loop()
     //Mise en place des threads :
     
     
+    thread tEtat( &EtatEngine::loop, std::ref(*ptrEtat) );
+    thread tController( &ControllerEngine::loop, std::ref(*ptrController) );
+    thread tVue( &VueEngine::loop, *ptrVue );
     
-    thread tEtat( &EtatEngine::loop, *ptrEtat );
-    thread tController( &ControllerEngine::loop, *ptrController);
-    //thread tVue( &VueEngine::loop, *ptrVue );
+    if(tEtat.joinable())
+    	tEtat.join();
+    if( tController.joinable())
+    	tController.join();
+    if( tVue.joinable())
+    	tVue.join();
     
-    tEtat.join();
-    tController.join();
-    //tVue.join();
+    //while(gameON);
     
     /*
 	while(gameON)

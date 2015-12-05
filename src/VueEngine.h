@@ -14,6 +14,8 @@
 #include <thread>
 #include <mutex>
 
+#include <X11/Xlib.h>
+
 class VueEngine : public IEngine
 {
 	public :

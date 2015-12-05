@@ -26,7 +26,6 @@ class ControllerEngine : public IEngine
 	
 	private :
 	
-	Game* game;
 	EtatEngine* ptrEtat;
 	VueEngine* ptrVue;
 	

@@ -155,10 +155,10 @@ Simulation::Simulation(Environnement* env, ConstraintsList& cl) : Simulation(env
 							);
 		break;
 	}
+	itC++;
 	
 	while( itC !=cl.end())
-	{		
-		itC++;
+	{				
 		
 		switch( (*itC).ct)
 		{
@@ -183,11 +183,14 @@ Simulation::Simulation(Environnement* env, ConstraintsList& cl) : Simulation(env
 								);
 			break;
 		}	
+		
+		itC++;
 	}
 	
 #ifdef debug
 	std::cout << "SIMULATION : constraint on rigidbodies initialization : OKAY." << std::endl;
 #endif	
+
 }
 	
 
