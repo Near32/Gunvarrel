@@ -61,7 +61,7 @@ void VueEngine::loop()
 		
 		//----------------------------------------
 		ressourcesMutex.lock();
-		Dessiner(0.0f,0.0f);
+		//Dessiner(0.0f,0.0f);
 		ressourcesMutex.unlock();
 		
 		ressourcesMutex.lock();
@@ -111,16 +111,16 @@ void VueEngine::Dessiner(float angleX, float angleZ)
 	std::string pathElement("../res/element.obj");//el10x10x20.obj");
 
 #ifdef debug
-ressourcesMutex.lock();
+//ressourcesMutex.lock();
 std::cout << " VUE : " << env->ListeElements.size() << " element(s) to draw." << std::endl;
-ressourcesMutex.unlock();
+//ressourcesMutex.unlock();
 #endif	
 	
 	for(int i=0;i<env->ListeElements.size();i++)
 	{
-		ressourcesMutex.lock();
+		//ressourcesMutex.lock();
 		Mat<float> poseElement = env->ListeElements[i]->pose->exp();
-		ressourcesMutex.unlock();
+		//ressourcesMutex.unlock();
 		Mat<float> SO3( extract( poseElement, 1,1, 3,3) );
 		Mat<float> EulerAngles(3,1);
 		Rot2Euler(SO3, EulerAngles);
@@ -137,15 +137,15 @@ ressourcesMutex.unlock();
 		//--------------------------------
 		//--------------------------------
 		//let us draw the element once we have identified it...
-		ressourcesMutex.lock();
+		//ressourcesMutex.lock();
 		if( env->ListeElements[i]->name != std::string("ground") )
 		{
-			ressourcesMutex.unlock();
+			//ressourcesMutex.unlock();
 			drawElement( pathElement );
 		}
 		else
 		{
-			ressourcesMutex.unlock();
+			//ressourcesMutex.unlock();
 			//ground...
 			glBegin(GL_QUADS);
 			glColor3ub(230,230,230);
@@ -156,9 +156,9 @@ ressourcesMutex.unlock();
 			glEnd();
 		}
 #ifdef debuglvl1		
-ressourcesMutex.lock();
+//ressourcesMutex.lock();
 std::cout << " VUE : element : " << env->ListeElements[i]->name << " has been drawn." << std::endl;
-ressourcesMutex.unlock();
+//ressourcesMutex.unlock();
 #endif
 		//--------------------------------
 		//--------------------------------
@@ -237,9 +237,9 @@ ressourcesMutex.unlock();
     glEnd();
 
     //glFlush();
-ressourcesMutex.lock();    
+//ressourcesMutex.lock();    
     SDL_GL_SwapBuffers();
-ressourcesMutex.unlock();    
+//ressourcesMutex.unlock();    
 }
 
 

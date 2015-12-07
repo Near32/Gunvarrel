@@ -45,10 +45,11 @@ void BroadPhaseStrategyA::checkForCollisions(std::vector<Contact>& c)
 				other++;
 			
 				ShapeType typeIt = ((RigidBody&)(*(*it))).getShapeType();
-				ShapeType typeOther = ((RigidBody&)(*(*other))).getShapeType();
+				
 			
 				while( other != sim->simulatedObjects.end())
 				{
+					ShapeType typeOther = ((RigidBody&)(*(*other))).getShapeType();
 					//------------------
 					if( ((RigidBody&)(*(*other))).getType() == TSORigidBody)
 					{

@@ -1,6 +1,8 @@
-#pragma once
+#ifndef IMOVEABLE_H
+#define IMOVEABLE_H
 
 #include "../utils/math.h"
+#include <exception>
 
 class IMoveable
 {
@@ -20,35 +22,47 @@ class IMoveable
 	IMoveable( const se3& Pose_);													//Orientation has to be initialized from Pose.
 	IMoveable( const se3& Pose_, const Mat<float>& Lvel, const Mat<float>& Avel);	//Orientation has to be initialized from Pose.
 	
-	~IMoveable()
-	{
-		delete Pose;
-		delete LinearVelocity;
-		delete AngularVelocity;
-	}
+	virtual ~IMoveable();
 	
 	
 	//---------------------------------------------------------
 	//---------------------------------------------------------
 	
 		
-	se3 getPose() const	{ 	return *Pose;	}
+	se3 getPose() const	
+	{ 
+		return *Pose;
+	}
+	
 	Mat<float> getPosition()
 	{
 		return Pose->getT();
 	}
 		
-	Quat getOrientation()		{	return Qt_FromMat(Pose->exp());	}
+	Quat getOrientation()		
+	{	
+		return Qt_FromMat( this->Pose->exp());
+	}
 	
 	Mat<float> getMatOrientation()
 	{
-		return Qt2Mat<float>( getOrientation() );
+		return Qt2Mat<float>( this->getOrientation() );
 	}
 	
-	Mat<float> getTransformation() 	{	return Pose->exp();	}
+	Mat<float> getTransformation()	const
+	{
+		return this->Pose->exp();	
+	}
 	
-	Mat<float> getLinearVelocity()	{	return *LinearVelocity;	}
-	Mat<float> getAngularVelocity()	{	return *AngularVelocity;	}
+	Mat<float> getLinearVelocity()	const
+	{
+		return *(this->LinearVelocity);
+	}
+	
+	Mat<float> getAngularVelocity()	const
+	{
+		return *(this->AngularVelocity);
+	}
 
 	
 	//---------------------------------------------------------
@@ -63,4 +77,4 @@ class IMoveable
 	
 };
 
-
+#endif

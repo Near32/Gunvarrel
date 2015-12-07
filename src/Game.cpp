@@ -42,7 +42,7 @@ void Game::loop()
     
     thread tEtat( &EtatEngine::loop, std::ref(*ptrEtat) );
     thread tController( &ControllerEngine::loop, std::ref(*ptrController) );
-    thread tVue( &VueEngine::loop, *ptrVue );
+    thread tVue( &VueEngine::loop, std::ref(*ptrVue) );
     
     if(tEtat.joinable())
     	tEtat.join();

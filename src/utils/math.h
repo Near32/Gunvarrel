@@ -7,6 +7,8 @@
 #include "Quaternion/Quaternion.h"
 #include <vector>
 #include <map>
+#include <exception>
+
 
 extern Mat<float> Identity3;
 

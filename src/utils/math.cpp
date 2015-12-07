@@ -26,14 +26,34 @@ float INF = (float)1e100;
 //------------------------------------
 //------------------------------------
 
-se3::se3() : t( new Mat<float>((float)0,3,1) ), w( new Mat<float>((float)0,3,1) ), SE3( new Mat<float>((float)0, 4,4) ), hasChanged(true)	//so that SE3 would be computed on the first access...
+se3::se3() : hasChanged(true)	//so that SE3 would be computed on the first access...
 {
-
+	try
+	{
+		t = new Mat<float>((float)0,3,1);
+		w = new Mat<float>((float)0,3,1);
+		SE3 = new Mat<float>((float)0, 4,4);
+	}
+	catch( std::exception& e)
+	{
+		std::cout << e.what() << std::endl;
+		throw e;
+	}
 }
 
-se3::se3(const Mat<float>& w_, const Mat<float>& t_) : t( new Mat<float>(t_)), w( new Mat<float>(w_)), SE3( new Mat<float>((float)0, 4,4) ), hasChanged(true)	//so that SE3 would be computed on the first access...
+se3::se3(const Mat<float>& w_, const Mat<float>& t_) : hasChanged(true)	//so that SE3 would be computed on the first access...
 {
-
+	try
+	{
+		t = new Mat<float>(t_);
+		w = new Mat<float>(w_);
+		SE3 = new Mat<float>((float)0, 4,4);
+	}
+	catch( std::exception& e)
+	{
+		std::cout << e.what() << std::endl;
+		throw e;
+	}
 }
 
 se3::se3(const Mat<float>& t_) : t( new Mat<float>(t_)),w( new Mat<float>(0.0f,3,1)), SE3( new Mat<float>((float)0, 4,4) ), hasChanged(true)	//so that SE3 would be computed on the first access...
@@ -43,8 +63,16 @@ se3::se3(const Mat<float>& t_) : t( new Mat<float>(t_)),w( new Mat<float>(0.0f,3
 
 se3::se3(const float* w_t_array) : SE3( new Mat<float>((float)0,4,4) ), hasChanged(true)
 {
-	t = new Mat<float>(3,1);
-	w = new Mat<float>(3,1);
+	try
+	{
+		t = new Mat<float>(3,1);
+		w = new Mat<float>(3,1);
+	}
+	catch(std::exception& e)
+	{
+		std::cout << e.what() << std::endl;
+		throw e;
+	}
 	
 	this->w->set( w_t_array[0], 1,1);
 	this->w->set( w_t_array[1], 2,1);
@@ -108,11 +136,19 @@ se3& se3::operator=(const se3& x)
 {
 	this->~se3();
 	
-	this->t = new Mat<float>(x.getT());
-	this->w = new Mat<float>(x.getW());
-	this->SE3 = new Mat<float>(x.getSE3());
+	try
+	{
+		this->t = new Mat<float>(x.getT());
+		this->w = new Mat<float>(x.getW());
+		this->SE3 = new Mat<float>(x.getSE3());
+	}
+	catch(std::exception& e)
+	{
+		std::cout << e.what() << std::endl;
+		throw e;
+	}
 	
-	this->hasChanged = false;
+	this->hasChanged = true;
 	
 	return *this;
 }

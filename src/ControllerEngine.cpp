@@ -55,15 +55,19 @@ void ControllerEngine::loop()
                 	{
 #ifdef debug
 std::cout << "GAME : add command : TCSimulateStride : DEBUG." << std::endl;
-#endif                	
+#endif                
+					ressourcesMutex.lock();	
                 	ptrEtat->addCommandToHandle( (const ICommand&)SimulateStrideCommand() );
+                	ressourcesMutex.unlock();
                 	}
                 	break;
                 	
                 	default:
                 	{
                 	//camera->onKeyboard(event.key);
+                	ressourcesMutex.lock();
                 	ptrVue->addCommandToHandle( (const ICommand&)CameraOnKeyboardCommand(event.key));
+                	ressourcesMutex.unlock();
                 	}
                 	break;
                 }
@@ -72,7 +76,9 @@ std::cout << "GAME : add command : TCSimulateStride : DEBUG." << std::endl;
                 case SDL_MOUSEMOTION:
                 {
                 //camera->onMouseMotion(event.motion);
+                ressourcesMutex.lock();
                 ptrVue->addCommandToHandle( (const ICommand&)CameraOnMouseMotionCommand(event.motion) );
+                ressourcesMutex.unlock();
                 }
                 break;
                 
@@ -80,7 +86,9 @@ std::cout << "GAME : add command : TCSimulateStride : DEBUG." << std::endl;
                 case SDL_MOUSEBUTTONDOWN:
                 {
                 //camera->onMouseButton(event.button);
+                ressourcesMutex.lock();
                 ptrVue->addCommandToHandle( (const ICommand&)CameraOnMouseButtonCommand(event.button) );
+                ressourcesMutex.unlock();
                 }
                 break;
             }
@@ -120,7 +128,7 @@ std::cout << "GAME : add command : TCSimulateStride : DEBUG." << std::endl;
         }
         
         ressourcesMutex.lock();
-        game->gameON = game;
+        game->gameON = gameON;
         ressourcesMutex.unlock();
 		
 	}

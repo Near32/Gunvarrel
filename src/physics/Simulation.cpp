@@ -137,26 +137,7 @@ Simulation::Simulation(Environnement* env, ConstraintsList& cl) : Simulation(env
 {
 	//TODO : handle/enforce constraint list :
 	ConstraintsList::iterator itC = cl.begin();
-	
-	switch( (*itC).ct)
-	{
-		case CTHingeJoint :
-		collectionC.insert( collectionC.end(), std::unique_ptr<IConstraint>( new HingeJoint( (RigidBody&)*simulatedObjects[Name2ID[ (*itC).nameEl1]], (RigidBody&)*simulatedObjects[Name2ID[ (*itC).nameEl2]], extract( (*itC).data,1,1, 3,1), extract( (*itC).data,1,2, 3,2) ) ) );
-		
-		break;
-		
-		case CTBallAndSocketJoint :
-		collectionC.insert( collectionC.end(), 
-							std::unique_ptr<IConstraint>(new BallAndSocketJoint( (RigidBody&)*simulatedObjects[Name2ID[ (*itC).nameEl1]], 
-														(RigidBody&)*simulatedObjects[Name2ID[ (*itC).nameEl2]],
-														extract( (*itC).data,1,1, 3,1),
-														extract( (*itC).data,1,2, 3,2)
-														))
-							);
-		break;
-	}
-	itC++;
-	
+
 	while( itC !=cl.end())
 	{				
 		
@@ -319,10 +300,10 @@ void Simulation::constructQQdotInvMSFext()
 	//------------------------------------------------------------------
 	//------------------------------------------------------------------
 	
-	
 	//there alwas at least one element : the ground :
-	qdot = operatorC( ((RigidBody&)(*o)).getLinearVelocity(), ((RigidBody&)(*o)).getAngularVelocity() );
-	q = operatorC( ((RigidBody&)(*o)).getPosition(), ((RigidBody&)(*o)).getMatOrientation() );
+	//qdot = operatorC( ((IMoveable&)(*o)).getLinearVelocity(), ((IMoveable&)(*o)).getAngularVelocity() );
+	qdot = operatorC( ((RigidBody*)(o->get()))->getLinearVelocity(), ((RigidBody*)(o->get()))->getAngularVelocity() );
+	q = operatorC( ((RigidBody*)(o->get()))->getPosition(), ((RigidBody*)(o->get()))->getMatOrientation() );
 	
 	
 	//------------------------------------------------------------------
@@ -332,7 +313,7 @@ void Simulation::constructQQdotInvMSFext()
 	if(!((RigidBody&)(*o)).getFixedStatus())
 	{
 		//then we can initialize Fext :
-		Fext = operatorL(	((RigidBody&)(*o)).getForceAccumulator(), 
+		Fext = operatorC(	((RigidBody&)(*o)).getForceAccumulator(), 
 							((RigidBody&)(*o)).getTorqueAccumulator() 
 							);
 					
@@ -380,7 +361,7 @@ void Simulation::constructQQdotInvMSFext()
 	{
 		S.set( (nbrB-1)*7+k, (nbrB-1)*6+k, 1.0f );
 	}
-	Quat tempq = ((RigidBody&)(*o)).getOrientation();
+	Quat tempq = ((RigidBody*)(o->get()))->getOrientation();
 	tempq.x *= 0.5f;
 	tempq.y *= 0.5f;
 	tempq.z *= 0.5f;
@@ -411,11 +392,11 @@ void Simulation::constructQQdotInvMSFext()
 	{
 		
 		qdot = operatorC( 	qdot, 
-							operatorC( ((RigidBody&)(*o)).getLinearVelocity(), ((RigidBody&)(*o)).getAngularVelocity())
+							operatorC( ((RigidBody*)(o->get()))->getLinearVelocity(), ((RigidBody*)(o->get()))->getAngularVelocity())
 							);
 		
 		q = operatorC( 	q, 
-						operatorC( ((RigidBody&)(*o)).getPosition(), ((RigidBody&)(*o)).getMatOrientation())
+						operatorC( ((RigidBody*)(o->get()))->getPosition(), ((RigidBody*)(o->get()))->getMatOrientation())
 						);
 		
 		
@@ -424,17 +405,17 @@ void Simulation::constructQQdotInvMSFext()
 		
 		
 		
-		if(! ((RigidBody&)(*o)).getFixedStatus())
+		if( ! ((RigidBody&)(*o)).getFixedStatus())
 		{
-			Fext = operatorL(	Fext,
-								operatorL(	((RigidBody&)(*o)).getForceAccumulator(), 
+			Fext = operatorC(	Fext,
+								operatorC(	((RigidBody&)(*o)).getForceAccumulator(), 
 											((RigidBody&)(*o)).getTorqueAccumulator() 
 											)
 								);
 		}
 		else
 		{
-			Fext = operatorL(Fext, Mat<float>(0.0f, 6,1) );
+			Fext = operatorC(Fext, Mat<float>(0.0f, 6,1) );
 		}
 		
 		
@@ -462,7 +443,7 @@ void Simulation::constructQQdotInvMSFext()
 		{
 			S.set( (nbrB-1)*7+k, (nbrB-1)*6+k, 1.0f );
 		}
-		Quat tempq = ((RigidBody&)(*o)).getOrientation();
+		Quat tempq = ((RigidBody*)(o->get()))->getOrientation();
 		tempq.x *= 0.5f;
 		tempq.y *= 0.5f;
 		tempq.z *= 0.5f;
@@ -692,46 +673,24 @@ void Simulation::applyForces(float timeStep)
 	std::vector<std::unique_ptr<IForceEffect> >::iterator itF = collectionF.begin();
 	
 	RigidBody dummy;
-	
-	if( (*itF)->isGravity())
-	{
-		std::vector<std::unique_ptr<ISimulationObject> >::iterator itRB = simulatedObjects.begin();
-		
-		(*itF)->Apply(timeStep, (RigidBody&)(*(*itRB)) );
-		
-		while(itRB!=simulatedObjects.end())
-		{
-			itRB++;
-			
-			(*itF)->Apply(timeStep,(RigidBody&)(*(*itRB)));
-		}
-	}
-	else
-	{
-		(*itF)->Apply(timeStep,dummy);
-	}
-	
+
 	while(itF != collectionF.end())
 	{
-		itF++;
-		
 		if( (*itF)->isGravity())
 		{
 			std::vector<std::unique_ptr<ISimulationObject> >::iterator itRB = simulatedObjects.begin();
-		
-			(*itF)->Apply(timeStep, (RigidBody&)(*(*itRB)));
-		
 			while(itRB!=simulatedObjects.end())
-			{
-				itRB++;
-			
+			{			
 				(*itF)->Apply(timeStep, (RigidBody&)(*(*itRB)));
+				itRB++;
 			}
 		}
 		else
 		{
 			(*itF)->Apply(timeStep,dummy);
 		}
+		
+		itF++;
 	}
 }
 void Simulation::updateQQdot()
@@ -740,24 +699,17 @@ void Simulation::updateQQdot()
 	
 	int b1 = 0;
 	int b2 = 0;
-	((RigidBody&)(*o)).setPosition( extract(q, b1+1,1, b1+3,1) );
-	((RigidBody&)(*o)).setMatOrientation( extract(q, b1+4,1, b1+7,1) );
-	((RigidBody&)(*o)).setLinearVelocity( extract( qdot, b2+1,1, b2+3,1) );
-	((RigidBody&)(*o)).setAngularVelocity( extract( qdot, b2+4,1, b1+6,1) );
-	b1+=7;
-	b2+=6;
 	
 	while( o!=simulatedObjects.end() )
-	{
-		o++;
-		
-		((RigidBody&)(*o)).setPosition( extract(q, b1+1,1, b1+3,1) );
-		((RigidBody&)(*o)).setMatOrientation( extract(q, b1+4,1, b1+7,1) );
-		((RigidBody&)(*o)).setLinearVelocity( extract( qdot, b2+1,1, b2+3,1) );
-		((RigidBody&)(*o)).setAngularVelocity( extract( qdot, b2+4,1, b1+6,1) );
+	{	
+		((IMoveable&)(*o)).setPosition( extract(q, b1+1,1, b1+3,1) );
+		((IMoveable&)(*o)).setMatOrientation( extract(q, b1+4,1, b1+7,1) );
+		((IMoveable&)(*o)).setLinearVelocity( extract( qdot, b2+1,1, b2+3,1) );
+		((IMoveable&)(*o)).setAngularVelocity( extract( qdot, b2+4,1, b1+6,1) );
 		b1+=7;
 		b2+=6;	
-		
+
+		o++;	
 	}
 	
 }
@@ -771,24 +723,19 @@ void Simulation::updateStates()
 	
 	std::string name( (*itEl)->getName());
 	int id = 0;
-	if( Name2ID.count( name) )
-	{
-		id = Name2ID[name];
-		(*itEl)->setPose( ((RigidBody&)simulatedObjects[id]).getPose() );
-		((RigidBody&)simulatedObjects[id]).clearUser();
-	}
 	
 	while(itEl != env->getIteratorElementsEnd())
 	{
-		itEl++;
 		name = (*itEl)->getName();
 		
 		if( Name2ID.count( name) )
 		{
 			id = Name2ID[name];
-			(*itEl)->setPose( ((RigidBody&)simulatedObjects[id]).getPose() );
+			(*itEl)->setPose( ((IMoveable&)simulatedObjects[id]).getPose() );
 			((RigidBody&)simulatedObjects[id]).clearUser();
-		}				
+		}
+		
+		itEl++;				
 	}
 	
 }

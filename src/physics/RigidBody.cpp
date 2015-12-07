@@ -23,6 +23,7 @@ RigidBody::RigidBody(const se3& Pose_, const std::string& name_, int id_, ShapeT
 	{
 		//ptrShape = std::unique_ptr<IShape>(new BoxShape(this));
 		ptrShape = new BoxShape(this);
+		computeInertia();
 	}
 	else
 	{
@@ -96,12 +97,23 @@ void RigidBody::computeInertia()
 		iInertia.set( 1.0f/iInertia.get(1,1), 1,1);
 		iInertia.set( 1.0f/iInertia.get(2,2), 2,2);
 		iInertia.set( 1.0f/iInertia.get(3,3), 3,3);
+		
+		transformInertiaTensorL2W();
 		}
 		break;
 		
 		case SPHERE :
 		{
-		//TODO....
+			float r = ((SphereShape&)(*ptrShape)).getBRadius();
+			r = 2.0f*mass*r*r/5.0f;
+			
+			Inertia = Mat<float>(0.0f,3,3);
+			Inertia.set( r, 1,1); 
+			Inertia.set( r, 2,2);
+			Inertia.set( r, 3,3);
+			
+			transformInertiaTensorL2W();
+			
 		}
 		break;
 		
@@ -176,5 +188,6 @@ Mat<float> RigidBody::getAxisInLocal( const Mat<float>& aW)
 {
 	return extract(Pose->exp(), 1,1, 3,3) * aW;	
 }
+
 
 
