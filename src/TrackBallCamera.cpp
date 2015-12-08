@@ -71,7 +71,7 @@ TrackBallCamera::TrackBallCamera()
     angleY = 0;
     angleZ = 0;
 
-    distance = 2; //distance initiale de la caméra avec le centre de la scène
+    distance = 20; //distance initiale de la caméra avec le centre de la scène
     motionSensitivity = 0.3;
     scrollSensitivity = 1.0;
 
@@ -95,6 +95,7 @@ void TrackBallCamera::onMouseMotion( const SDL_MouseMotionEvent& mmevent)
 
 void TrackBallCamera::onMouseButton( const SDL_MouseButtonEvent& mbevent)
 {
+	
 	if(mbevent.button == SDL_BUTTON_LEFT)
 	{
 		if((hold)&&(mbevent.type == SDL_MOUSEBUTTONUP))
@@ -108,19 +109,37 @@ void TrackBallCamera::onMouseButton( const SDL_MouseButtonEvent& mbevent)
 			//SDL_SetCursor(hand2);
 		}
 	}
-	else if( (mbevent.button == SDL_BUTTON_WHEELUP)&&(mbevent.type == SDL_MOUSEBUTTONDOWN) )
+	else if( ( (int)mbevent.button == SDL_BUTTON_WHEELUP) ) //&&(mbevent.type == SDL_MOUSEBUTTONDOWN) )
 	{
 		distance -= scrollSensitivity;
 		if(distance < 0.1)
 			distance = 0.1;
 	}
-	else if( (mbevent.button == SDL_BUTTON_WHEELDOWN)&&(mbevent.type == SDL_MOUSEBUTTONDOWN) )
+	else if( ( (int)mbevent.button == SDL_BUTTON_WHEELDOWN) )//&&(mbevent.type == SDL_MOUSEBUTTONDOWN) )
 	{
 		distance += scrollSensitivity;
 	}
-
+	
 }
 
+/*
+void TrackBallCamera::onMouseWheel( const SDL_MouseWheelEvent& mwevent)
+{
+	if( (mwevent.direction == SDL_MOUSEWHEEL_NORMAL) ) //&&(mbevent.type == SDL_MOUSEBUTTONDOWN) )
+	{
+		std::cout << "WHEELUP" << std::endl;
+		distance -= scrollSensitivity;
+		if(distance < 0.1)
+			distance = 0.1;
+	}
+	else if( (mwevent.direction == SDL_MOUSEWHEEL_FLIPPED) )//&&(mbevent.type == SDL_MOUSEBUTTONDOWN) )
+	{
+		std::cout << "WHEELDOWN" << std::endl;
+		distance += scrollSensitivity;
+	}
+	
+}
+*/
 
 void TrackBallCamera::onKeyboard( const SDL_KeyboardEvent& kevent)
 {

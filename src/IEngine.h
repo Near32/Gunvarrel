@@ -15,7 +15,7 @@ class IEngine
 	
 	Game* game;
 	GameState gameState;
-	std::vector<ICommand> commandsToHandle;
+	std::vector<std::unique_ptr<ICommand> > commandsToHandle;
 	
 	//-----------------------------------------------------------
 	//-----------------------------------------------------------
@@ -31,7 +31,7 @@ class IEngine
 	
 	//---------------------------------------
 	
-	void addCommandToHandle(const ICommand& command);
+	void addCommandToHandle(const ICommand* command);
 };
 
 #endif

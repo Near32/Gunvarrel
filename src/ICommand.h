@@ -261,6 +261,26 @@ class CameraOnMouseMotionCommand : public ICommand
 
 };
 
+/*
+class CameraOnMouseWheelCommand : public ICommand
+{
+	public :
+	
+	SDL_MouseWheelEvent mwevent;
+	
+	CameraOnMouseWheelCommand(const SDL_MouseWheelEvent& mwevent_) : ICommand(TCCameraOnMouseWheel)
+	{
+		mwevent = mwevent_;
+	}
+
+	~CameraOnMouseWheelCommand()
+	{
+	
+	}
+
+};
+*/
+
 
 class CameraOnMouseButtonCommand : public ICommand
 {
@@ -268,12 +288,13 @@ class CameraOnMouseButtonCommand : public ICommand
 	
 	
 	SDL_MouseButtonEvent mbevent;
+	int button;
 	
 	
-	
-	CameraOnMouseButtonCommand(const SDL_MouseButtonEvent& mbevent_) : ICommand(TCCameraOnMouseButton)
+	CameraOnMouseButtonCommand(const SDL_MouseButtonEvent& mbevent_, int button_ = 0) : ICommand(TCCameraOnMouseButton), mbevent(mbevent_), button(button_)
 	{
-		mbevent = mbevent_;
+		//mbevent = mbevent_;
+		//button
 	}
 
 	~CameraOnMouseButtonCommand()

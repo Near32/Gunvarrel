@@ -21,7 +21,7 @@ class Simulation
 	float time;
 	std::map<std::string,int> Name2ID;
 	
-	std::vector<std::unique_ptr<ISimulationObject> > simulatedObjects;
+	std::vector< std::unique_ptr< ISimulationObject > > simulatedObjects;
 	std::vector<std::unique_ptr<IConstraint> > collectionC;
 	std::vector<std::unique_ptr<IForceEffect> > collectionF;
 	
@@ -60,6 +60,7 @@ class Simulation
 	void constructQdot();
 	
 	void constructQQdotInvMSFext();
+	void constructQQdotInvMSFextDEBUG();
 	
 	//void updateQQdotInvMSFext();
 	

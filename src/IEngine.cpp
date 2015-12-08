@@ -17,7 +17,7 @@ IEngine::~IEngine()
 
 }
 
-void IEngine::addCommandToHandle(const ICommand& command)
+void IEngine::addCommandToHandle(const ICommand* command)
 {
-	commandsToHandle.insert( commandsToHandle.end(), command);
+	commandsToHandle.insert( commandsToHandle.end(), std::unique_ptr<ICommand>( (ICommand*)command) );
 }

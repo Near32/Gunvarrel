@@ -1,6 +1,8 @@
 #include "EtatEngine.h"
 #include "Game.h"
 
+#undef NDEBUG
+
 extern std::mutex ressourcesMutex;
 
 
@@ -29,7 +31,7 @@ void EtatEngine::loop()
 		if( commandsToHandle.size() > 0)
 		{
 			//let's verify that it is one of those dedicated commands :
-			switch( commandsToHandle[0].getCommandType())
+			switch( (commandsToHandle[0].get())->getCommandType())
 			{
 				//DEBUGGING :
 				case TCSimulateStride:
@@ -38,18 +40,10 @@ void EtatEngine::loop()
 				float time = sim->getTime();
 #ifdef debug
 std::cout << "SIMULATION : run : ..." << std::endl;
-#endif				
-				//ressourcesMutex.lock();
-#ifdef debug
-std::cout << "SIMULATION : run : mutex locked." << std::endl;
-#endif				
+#endif					
 				sim->run(timestep,time+timestep);
 #ifdef debug
 std::cout << "SIMULATION : run : successfully !!" << std::endl;
-#endif				
-				//ressourcesMutex.unlock();
-#ifdef debug
-std::cout << "SIMULATION : run : mutex unlocked." << std::endl;
 #endif				
 				
 				commandsToHandle.erase(commandsToHandle.begin());

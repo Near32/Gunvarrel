@@ -348,7 +348,12 @@ Mat<T>::Mat(const Mat<T>& m)
 {
     m_line = m.getLine();
     m_column = m.getColumn();
-    
+   
+   	if(m_line<=0)
+   		m_line = 1;
+   	if(m_column<=0)
+   		m_column = 1;
+   		
     mat = new T*[m_line];
 
     for(int i=m_line;i--;)

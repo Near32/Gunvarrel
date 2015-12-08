@@ -47,6 +47,29 @@ void SimultaneousImpulseBasedConstraintSolverStrategy::computeConstraintsJacobia
 {
 	size_t size = c.size();
 	int n = sim->simulatedObjects.size();
+	
+	c[0]->computeJacobians();
+		
+	Mat<float> tJA(c[0]->getJacobianA());
+	Mat<float> tJB(c[0]->getJacobianB());
+	size_t sl = tJA.getLine();
+	int idA = 6 * ( c[0]->rbA.getID() );
+	int idB = 6 * ( c[0]->rbB.getID() );
+	
+	Mat<float> temp((float)0,sl, 6*n );
+	
+	for(int i=1;i<=sl;i++)
+	{
+		for(int j=1;j<=6;j++)
+		{
+			temp.set( i, idA+j, tJA.get(i,j) );
+			temp.set( i, idB+j, tJB.get(i,j) );
+		}
+	}
+	
+	constraintsJacobian = temp;
+	
+	
 	for(int i=1;i<size;i++)
 	{
 		c[i]->computeJacobians();
@@ -57,7 +80,7 @@ void SimultaneousImpulseBasedConstraintSolverStrategy::computeConstraintsJacobia
 		int idA = 6 * ( c[i]->rbA.getID() );
 		int idB = 6 * ( c[i]->rbB.getID() );
 		
-		SparseMat<float> temp(sl, 6*n );
+		temp = Mat<float>((float)0,sl, 6*n );
 		
 		for(int i=1;i<=sl;i++)
 		{
@@ -68,7 +91,7 @@ void SimultaneousImpulseBasedConstraintSolverStrategy::computeConstraintsJacobia
 			}
 		}
 		
-		constraintsJacobian = operatorC(constraintsJacobian, SM2Mat<float>(temp) );
+		constraintsJacobian = operatorC(constraintsJacobian, temp );
 	}
 }
 	
@@ -77,7 +100,7 @@ void SimultaneousImpulseBasedConstraintSolverStrategy::Solve(float dt, std::vect
 	computeConstraintsJacobian(c);
 	
 	SparseMat<float> tConstraintsJacobian( transpose(constraintsJacobian) );
-	Mat<float> temp( invGJ( constraintsJacobian * SM2Mat<float>( invM*tConstraintsJacobian ) ) * constraintsJacobian );//invM*tConstraintsJacobian ) * constraintsJacobian );
+	Mat<float> temp( invGJ( constraintsJacobian * ( invM*tConstraintsJacobian ).SM2mat() ) * constraintsJacobian );//invM*tConstraintsJacobian ) * constraintsJacobian );
 	
 	Mat<float> tempInvMFext( invM *(dt * Fext) ) ;//SM2Mat<float>( invM * Fext ) );
 	//lambda = (-1.0f) * ( temp * tempInvMFext + (1.0f/dt) * ( temp * qdot) ) ;
@@ -90,5 +113,7 @@ void SimultaneousImpulseBasedConstraintSolverStrategy::Solve(float dt, std::vect
 	qdot += tempInvMFext + invM * constraintsImpulse;//SM2Mat<float>(  );
 	
 	q += dt*( S*qdot );
+	
+	q.afficher();
 	
 }

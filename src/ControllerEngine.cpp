@@ -1,6 +1,9 @@
 #include "ControllerEngine.h"
 #include "Game.h"
 
+#define debug
+//#define debuglvl1
+
 extern std::mutex ressourcesMutex;
 
 ControllerEngine::ControllerEngine(Game* game_, EtatEngine* ptrEtat_, VueEngine* ptrVue_, const GameState& gameState_) : IEngine(game_,gameState_), ptrEtat(ptrEtat_), ptrVue(ptrVue_)
@@ -53,11 +56,11 @@ void ControllerEngine::loop()
                 	
                 	case SDLK_SPACE:
                 	{
-#ifdef debug
+#ifdef debuglvl1
 std::cout << "GAME : add command : TCSimulateStride : DEBUG." << std::endl;
 #endif                
 					ressourcesMutex.lock();	
-                	ptrEtat->addCommandToHandle( (const ICommand&)SimulateStrideCommand() );
+                	ptrEtat->addCommandToHandle( (const ICommand*) new SimulateStrideCommand() );
                 	ressourcesMutex.unlock();
                 	}
                 	break;
@@ -66,7 +69,7 @@ std::cout << "GAME : add command : TCSimulateStride : DEBUG." << std::endl;
                 	{
                 	//camera->onKeyboard(event.key);
                 	ressourcesMutex.lock();
-                	ptrVue->addCommandToHandle( (const ICommand&)CameraOnKeyboardCommand(event.key));
+                	ptrVue->addCommandToHandle( (const ICommand*) new CameraOnKeyboardCommand(event.key));
                 	ressourcesMutex.unlock();
                 	}
                 	break;
@@ -77,7 +80,7 @@ std::cout << "GAME : add command : TCSimulateStride : DEBUG." << std::endl;
                 {
                 //camera->onMouseMotion(event.motion);
                 ressourcesMutex.lock();
-                ptrVue->addCommandToHandle( (const ICommand&)CameraOnMouseMotionCommand(event.motion) );
+                ptrVue->addCommandToHandle( (const ICommand*) new CameraOnMouseMotionCommand(event.motion) );                    
                 ressourcesMutex.unlock();
                 }
                 break;
@@ -87,7 +90,10 @@ std::cout << "GAME : add command : TCSimulateStride : DEBUG." << std::endl;
                 {
                 //camera->onMouseButton(event.button);
                 ressourcesMutex.lock();
-                ptrVue->addCommandToHandle( (const ICommand&)CameraOnMouseButtonCommand(event.button) );
+                ptrVue->addCommandToHandle( (const ICommand*) new CameraOnMouseButtonCommand(event.button, event.button.button) );
+#ifdef debuglvl1
+std::cout << "GAME : add command : TCCameraMouseButton : DEBUG." << std::endl;
+#endif                                           
                 ressourcesMutex.unlock();
                 }
                 break;

@@ -150,9 +150,7 @@ std::cout << "GAME : add command : TCSimulateStride : DEBUG." << std::endl;
 
 void Game::init()
 {
-    
-   ptrController = new ControllerEngine(this,ptrEtat,ptrVue, MENUINIT);
-    
+   ptrController = new ControllerEngine(this,ptrEtat,ptrVue, MENUINIT); 
 }
 
 

@@ -21,6 +21,118 @@ Simulation::Simulation() : time(0.0f), updater(new Updater(this, new ExplicitEul
 #endif	
 }
 
+
+Simulation::Simulation(Environnement* env_) : Simulation()
+{
+	int id = 0;
+	env = env_; 
+	
+	for( auto& element : env->ListeElements )
+	{
+		// let us create the RigidBody that ought to be created given the Environnement :
+		
+		switch( element->isFixe() )
+		{
+			case true :
+			//the element is an IElementFixe :					
+			switch( ((IElementFixe*)element.get())->isObstacle())
+			{
+				case true:
+				//CAREFUL : HANDLE THE HWD : with BoxShape
+				//The element is an obstacle :
+				if( !( element->getName() == std::string("ground") ) )
+				{
+					simulatedObjects.insert( simulatedObjects.end(), std::unique_ptr<ISimulationObject>(new RigidBody( element->getPoseReference(), element->getName(),id, BOX) ) );
+					//((RigidBody&)(*simulatedObjects[id])).setPose( (*element)->getPoseReference());
+					//((RigidBody&)(*simulatedObjects[id])).setPtrShape( (IShape*)(new BoxShape( (RigidBody*)simulatedObjects[id].get(), ((IElementFixe&)(*(*element))).hwd)) );		
+					((BoxShape&)((RigidBody&)(*simulatedObjects[id])).getShapeReference()).setHWD( ((IElementFixe*)(element.get()))->hwd );
+#ifdef debug
+std::cout << "SIMULATION : environnement initialization : ElementFixe : Obstacle : id = " << id << " : ...." << std::endl;
+#endif					
+				}
+				else
+				{
+					//then it is the ground :
+					simulatedObjects.insert( simulatedObjects.end(), std::unique_ptr<ISimulationObject>(new RigidBody( element->getPoseReference(), element->getName(),id,true) ) );
+					//((RigidBody&)(*simulatedObjects[id])).setPose( (*element)->getPoseReference());
+					((RigidBody&)(*simulatedObjects[id])).setPtrShape( (IShape*)(new BoxShape( (RigidBody*)simulatedObjects[id].get(), ((IElementFixe*)(element.get()))->hwd)) );
+					
+					//IT IS THE UNMOVEABLE GROUND :
+					((RigidBody*)(simulatedObjects[id].get()))->isFixed = true;
+					((RigidBody*)(simulatedObjects[id].get()))->setIMass( 1e-10f );//numeric_limit<float>::epsilon() );
+					
+#ifdef debug
+	std::cout << "SIMULATION : environnement initialization : GROUND : id = " << id << " : OKAY." << std::endl;
+#endif
+				}
+				
+				
+				break;
+				
+				case false :
+				//the element is an OrbeBonus :
+				simulatedObjects.insert( simulatedObjects.end(), std::unique_ptr<ISimulationObject>(new RigidBody( element->getPoseReference(), element->getName(),id,true) ) );
+				//((RigidBody&)(*simulatedObjects[id])).setPose( (*element)->getPoseReference());
+					
+					//CAREFUL : HANDLE THE RADIUS : with SphereShape
+				((RigidBody*)(simulatedObjects[id].get()))->setPtrShape( (IShape*)(new SphereShape( (RigidBody*)simulatedObjects[id].get(), ((IElementMobile*)(element.get()))->hwd.get(1,1) )) );
+#ifdef debug
+std::cout << "SIMULATION : environnement initialization : ElementFixe OrbeBonus : id = " << id << " : ...." << std::endl;
+#endif
+				
+				break;
+			
+			}
+			break;
+			
+			case false :
+			//the element is an IElementMobile :
+			switch( ((IElementMobile*)(element.get()))->isComposit() )
+			{
+				case true :
+				
+				break;
+				
+				case false:
+				//CAREFUL : HANDLE THE HWD : with BoxShape
+				simulatedObjects.insert( simulatedObjects.end(), std::unique_ptr<ISimulationObject>(new RigidBody( element->getPoseReference(), element->getName(),id, BOX) ) );
+				//((RigidBody&)(*simulatedObjects[id])).setPose( (*element)->getPoseReference());
+				//((RigidBody&)(*simulatedObjects[id])).setPtrShape( (IShape*)(new BoxShape( (RigidBody*)simulatedObjects[id].get(), ((IElementFixe&)(*(*element))).hwd)) );
+#ifdef debug
+std::cout << "SIMULATION : environnement initialization : ElementMobile : id = " << id << " : ...." << std::endl;
+#endif					
+				((BoxShape&)((RigidBody&)(*simulatedObjects[id])).getShapeReference()).setHWD( ((IElementMobile*)(element.get()))->hwd );
+				
+				
+				break;
+				
+				
+			}
+			break;
+			
+		}
+		
+		//TODO : set mass : okay 1.0f by default...
+		//TODO : Inertia ...
+		Name2ID[ element->getName() ] = id;
+		id++;
+#ifdef debug
+	std::cout << "SIMULATION : post-increment : id = " << id << " : ...." << std::endl;
+#endif
+		
+	}
+	
+	initializedQQdotInvMFext = false;
+	invM = SparseMat<float>( 6*id);
+	S = SparseMat<float>( 7*id, 6*id);
+	
+#ifdef debug
+	std::cout << "SIMULATION : environnement initialization : OKAY." << std::endl;
+#endif	
+}
+
+
+/*
 Simulation::Simulation(Environnement* env) : Simulation()
 {
 	int id = 0;
@@ -131,7 +243,7 @@ std::cout << "SIMULATION : environnement initialization : ElementMobile : id = "
 #ifdef debug
 	std::cout << "SIMULATION : environnement initialization : OKAY." << std::endl;
 #endif	
-}
+}*/
 
 
 
@@ -292,12 +404,12 @@ void Simulation::constructQdot()
 	}
 }
 
-void Simulation::constructQQdotInvMSFext()
+void Simulation::constructQQdotInvMSFextDEBUG()
 {
 	//TODO : uncomment once the other strategy is set on track...
 	//initializedQQdotInvMFext = true;
 	
-	std::vector<std::unique_ptr<ISimulationObject> >::iterator o = simulatedObjects.begin();
+	std::vector< std::unique_ptr< ISimulationObject> >::const_iterator o = simulatedObjects.cbegin();
 	
 	
 	//------------------------------------------------------------------
@@ -399,7 +511,7 @@ std::cout << "SIMULATION : simulated object : " << nbrB << " : DONE." << std::en
 	o++;
 	
 	
-	while( o != simulatedObjects.end() )
+	while( o != simulatedObjects.cend() )
 	{
 		ressourcesMutex.lock();
 		qdot = operatorC( 	qdot, 
@@ -428,7 +540,7 @@ std::cout << "SIMULATION : simulated object : " << nbrB << " : Q." << std::endl;
 			std::cout << temp1.getLine() << " " << temp1.getColumn() << std::endl;
 			std::cout << temp2.getLine() << " " << temp2.getColumn() << std::endl;
 			
-			exit(1);
+			//exit(1);
 #ifdef debug
 std::cout << "SIMULATION : simulated object : " << nbrB << " : Q." << std::endl;
 #endif			
@@ -466,7 +578,8 @@ std::cout << "SIMULATION : simulated object : " << nbrB << " : Fext." << std::en
 			{
 				invM.set( (nbrB-1)*6+3+i, (nbrB-1)*6+3+j,  tempIIW.get(i,j) );
 			}
-		}			
+		}	
+				
 		
 #ifdef debug
 std::cout << "SIMULATION : simulated object : " << nbrB << " : InvM." << std::endl;
@@ -514,6 +627,216 @@ std::cout << "SIMULATION : simulated object : " << nbrB << " : DONE." << std::en
 		
 	}
 }
+
+
+void Simulation::constructQQdotInvMSFext()
+{
+	//TODO : uncomment once the other strategy is set on track...
+	//initializedQQdotInvMFext = true;
+	
+	//------------------------------------------------------------------
+	//------------------------------------------------------------------	
+	//there alwas at least one element : the ground :
+	//qdot = operatorC( ((IMoveable&)(*o)).getLinearVelocity(), ((IMoveable&)(*o)).getAngularVelocity() );
+	ressourcesMutex.lock();
+	qdot = operatorC( ((RigidBody*)simulatedObjects[0].get())->getLinearVelocity(), ((RigidBody*)simulatedObjects[0].get())->getAngularVelocity() );
+	q = operatorC( ((RigidBody*)simulatedObjects[0].get())->getPosition(), ((RigidBody*)simulatedObjects[0].get())->getMatOrientation() );
+	ressourcesMutex.unlock();
+
+	//------------------------------------------------------------------
+	//------------------------------------------------------------------
+
+	ressourcesMutex.lock();
+	if(! ((RigidBody*)simulatedObjects[0].get())->getFixedStatus())
+	{
+		//then we can initialize Fext :
+		Fext = operatorC(	((RigidBody*)simulatedObjects[0].get())->getForceAccumulator(), 
+							((RigidBody*)simulatedObjects[0].get())->getTorqueAccumulator() 
+							);
+				
+	}
+	else
+	{
+		//then we can initialize Fext :
+		Fext = Mat<float>(0.0f, 6,1);
+	}
+	ressourcesMutex.unlock();
+
+	//------------------------------------------------------------------
+	//------------------------------------------------------------------
+
+	//Mat<float> Identity3(0.0f,3,3);
+	//for(int i=1;i<=3;i++)	Identity3.set( 1.0f, i,i);
+	//Mat<float> Zero3(0.0f,3,3);
+	//Mat<float> Zero
+
+	//------------------------------------------------------------------
+	size_t nbrB = 1;
+	//invM.addLine(6);
+	//invM.addColumn(6);
+	//the size of those matrixes has been deduced in the constructor...
+	ressourcesMutex.lock();
+	for(int k=1;k<=3;k++)
+	{
+		invM.set( (nbrB-1)*6+k, (nbrB-1)*6+k, ((RigidBody*)simulatedObjects[0].get())->getIMass() );
+	}
+	Mat<float> tempIIW( ((RigidBody*)simulatedObjects[0].get())->getInverseInertialWorld() );
+	for(int i=1;i<=3;i++)
+	{
+		for(int j=1;j<=3;j++)
+		{
+			invM.set( (nbrB-1)*6+3+i, (nbrB-1)*6+3+j,  tempIIW.get(i,j) );
+		}
+	}
+
+	/*invM = operatorC( 	operatorL( ((RigidBody*)o->getIMass())*Identity, Zero3),
+						operatorL( Zero3, (RigidBody*)o->getInverseInertiaWorld() )
+						);*/
+	ressourcesMutex.unlock();
+	//------------------------------------------------------------------
+
+	for(int k=1;k<=3;k++)
+	{
+		S.set( (nbrB-1)*7+k, (nbrB-1)*6+k, 1.0f );
+	}
+	ressourcesMutex.lock();
+	Quat tempq = ((RigidBody*)simulatedObjects[0].get())->getOrientation();
+	ressourcesMutex.unlock();
+	tempq.x *= 0.5f;
+	tempq.y *= 0.5f;
+	tempq.z *= 0.5f;
+	tempq.w *= 0.5f;
+	S.set( (nbrB-1)*7+4, (nbrB-1)*6+4, -tempq.x );
+	S.set( (nbrB-1)*7+4, (nbrB-1)*6+5, -tempq.y );
+	S.set( (nbrB-1)*7+4, (nbrB-1)*6+6, -tempq.z );
+
+	S.set( (nbrB-1)*7+5, (nbrB-1)*6+4, tempq.w );
+	S.set( (nbrB-1)*7+5, (nbrB-1)*6+5, tempq.z );
+	S.set( (nbrB-1)*7+5, (nbrB-1)*6+6, -tempq.y);
+
+	S.set( (nbrB-1)*7+6, (nbrB-1)*6+4, -tempq.z );
+	S.set( (nbrB-1)*7+6, (nbrB-1)*6+5, tempq.w );
+	S.set( (nbrB-1)*7+6, (nbrB-1)*6+6, tempq.x );
+
+	S.set( (nbrB-1)*7+7, (nbrB-1)*6+4, tempq.y );
+	S.set( (nbrB-1)*7+7, (nbrB-1)*6+5, -tempq.x );
+	S.set( (nbrB-1)*7+7, (nbrB-1)*6+6, tempq.w );
+
+	//---------------------------------------------------
+	//---------------------------------------------------------------------
+#ifdef debug
+std::cout << "SIMULATION : simulated object : " << nbrB << " : DONE." << std::endl;
+#endif
+
+	nbrB++;
+	
+	for(int i=1;i<simulatedObjects.size();i++)
+	{
+		ressourcesMutex.lock();
+		qdot = operatorC( 	qdot, 
+							operatorC( ((RigidBody*)simulatedObjects[i].get())->getLinearVelocity(), ((RigidBody*)simulatedObjects[i].get())->getAngularVelocity())
+							);
+		
+		q = operatorC( 	q, 
+						operatorC( ((RigidBody*)simulatedObjects[i].get())->getPosition(), ((RigidBody*)simulatedObjects[i].get())->getMatOrientation())
+						);
+		ressourcesMutex.unlock();						
+		
+#ifdef debug
+std::cout << "SIMULATION : simulated object : " << nbrB << " : Q." << std::endl;
+#endif
+		
+		//------------------------------------------------------------------
+		//------------------------------------------------------------------
+		
+		
+		ressourcesMutex.lock();
+		if( ! ((RigidBody*)simulatedObjects[i].get())->getFixedStatus())
+		{
+			Mat<float> temp1( ((RigidBody*)simulatedObjects[i].get())->getForceAccumulator() ); 
+			Mat<float> temp2( ((RigidBody*)simulatedObjects[i].get())->getTorqueAccumulator() );
+		
+			Fext = operatorC(	&Fext,
+								operatorC(	temp1,
+											temp2 
+											)
+								);
+		}
+		else
+		{
+			Fext = operatorC(&Fext, Mat<float>(0.0f, 6,1) );
+		}
+		ressourcesMutex.unlock();
+#ifdef debug
+std::cout << "SIMULATION : simulated object : " << nbrB << " : Fext." << std::endl;
+#endif
+		
+		//------------------------------------------------------------------
+		//------------------------------------------------------------------
+		
+		//invM.addLine(6);
+		//invM.addColumn(6);
+		ressourcesMutex.lock();
+		for(int k=1;k<=3;k++)
+		{
+			invM.set( (nbrB-1)*6+k, (nbrB-1)*6+k, ((RigidBody*)simulatedObjects[i].get())->getIMass() );
+		}
+		
+		tempIIW = ((RigidBody*)simulatedObjects[i].get())->getInverseInertialWorld() ;
+		ressourcesMutex.unlock();
+		for(int i=1;i<=3;i++)
+		{
+			for(int j=1;j<=3;j++)
+			{
+				invM.set( (nbrB-1)*6+3+i, (nbrB-1)*6+3+j,  tempIIW.get(i,j) );
+			}
+		}			
+		
+#ifdef debug
+std::cout << "SIMULATION : simulated object : " << nbrB << " : InvM." << std::endl;
+#endif
+		
+		//------------------------------------------------------------------
+		//------------------------------------------------------------------
+	
+		for(int k=1;k<=3;k++)
+		{
+			S.set( (nbrB-1)*7+k, (nbrB-1)*6+k, 1.0f );
+		}
+		ressourcesMutex.lock();
+		Quat tempq = ((RigidBody*)simulatedObjects[i].get())->getOrientation();
+		ressourcesMutex.unlock();
+		tempq.x *= 0.5f;
+		tempq.y *= 0.5f;
+		tempq.z *= 0.5f;
+		tempq.w *= 0.5f;
+		S.set( (nbrB-1)*7+4, (nbrB-1)*6+4, -tempq.x );
+		S.set( (nbrB-1)*7+4, (nbrB-1)*6+5, -tempq.y );
+		S.set( (nbrB-1)*7+4, (nbrB-1)*6+6, -tempq.z );
+
+		S.set( (nbrB-1)*7+5, (nbrB-1)*6+4, tempq.w );
+		S.set( (nbrB-1)*7+5, (nbrB-1)*6+5, tempq.z );
+		S.set( (nbrB-1)*7+5, (nbrB-1)*6+6, -tempq.y);
+
+		S.set( (nbrB-1)*7+6, (nbrB-1)*6+4, -tempq.z );
+		S.set( (nbrB-1)*7+6, (nbrB-1)*6+5, tempq.w );
+		S.set( (nbrB-1)*7+6, (nbrB-1)*6+6, tempq.x );
+
+		S.set( (nbrB-1)*7+7, (nbrB-1)*6+4, tempq.y );
+		S.set( (nbrB-1)*7+7, (nbrB-1)*6+5, -tempq.x );
+		S.set( (nbrB-1)*7+7, (nbrB-1)*6+6, tempq.w );
+
+		//---------------------------------------------------------------------
+		//---------------------------------------------------------------------
+		
+		nbrB++;
+		
+#ifdef debug
+std::cout << "SIMULATION : simulated object : " << nbrB << " : DONE." << std::endl;
+#endif
+	}
+}
+
 
 /*
 void Simulation::updateQQdotInvMSFext()
@@ -738,21 +1061,18 @@ void Simulation::applyForces(float timeStep)
 }
 void Simulation::updateQQdot()
 {
-	std::vector<std::unique_ptr<ISimulationObject> >::iterator o = simulatedObjects.begin();
 	
 	int b1 = 0;
 	int b2 = 0;
 	
-	while( o!=simulatedObjects.end() )
+	for( auto& o : simulatedObjects ) 
 	{	
-		((IMoveable&)(*o)).setPosition( extract(q, b1+1,1, b1+3,1) );
-		((IMoveable&)(*o)).setMatOrientation( extract(q, b1+4,1, b1+7,1) );
-		((IMoveable&)(*o)).setLinearVelocity( extract( qdot, b2+1,1, b2+3,1) );
-		((IMoveable&)(*o)).setAngularVelocity( extract( qdot, b2+4,1, b1+6,1) );
+		((RigidBody&)(*o)).setPosition( extract(q, b1+1,1, b1+3,1) );
+		((RigidBody&)(*o)).setMatOrientation( extract(q, b1+4,1, b1+7,1) );
+		((RigidBody&)(*o)).setLinearVelocity( extract( qdot, b2+1,1, b2+3,1) );
+		((RigidBody&)(*o)).setAngularVelocity( extract( qdot, b2+4,1, b1+6,1) );
 		b1+=7;
 		b2+=6;	
-
-		o++;	
 	}
 	
 }
@@ -762,23 +1082,19 @@ void Simulation::updateStates()
 {
 	updateQQdot();
 	
-	std::vector<std::unique_ptr<IElement> >::iterator itEl = env->getIteratorElementsBegin();
-	
-	std::string name( (*itEl)->getName());
+	std::string name;
 	int id = 0;
 	
-	while(itEl != env->getIteratorElementsEnd())
+	for( const auto& itEl : env->ListeElements)
 	{
-		name = (*itEl)->getName();
+		name = itEl->getName();
 		
 		if( Name2ID.count( name) )
 		{
 			id = Name2ID[name];
-			(*itEl)->setPose( ((IMoveable&)simulatedObjects[id]).getPose() );
-			((RigidBody&)simulatedObjects[id]).clearUser();
+			itEl->setPose( ((RigidBody*)simulatedObjects[id].get())->getPose() );
+			((RigidBody*)simulatedObjects[id].get())->clearUser();
 		}
-		
-		itEl++;				
 	}
 	
 }

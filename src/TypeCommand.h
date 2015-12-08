@@ -13,6 +13,7 @@ enum TypeCommand {
 	TCCamera,
 	TCCameraOnMouseButton,
 	TCCameraOnMouseMotion,
+//	TCCameraOnMouseWheel,
 	TCCameraOnKeyboard,
 	
 	//DEBUGGING :

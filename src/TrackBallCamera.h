@@ -4,6 +4,7 @@
 #include <SDL/SDL.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
+#include <iostream>
 
 
 class TrackBallCamera
@@ -28,6 +29,7 @@ class TrackBallCamera
 	
 	void onMouseMotion( const SDL_MouseMotionEvent& mmevent);
 	void onMouseButton( const SDL_MouseButtonEvent& mbevent);
+//	void onMouseWheel( const SDL_MouseWheelEvent& mwevent);
 	void onKeyboard(const SDL_KeyboardEvent& kevent);
 	
 	void look();

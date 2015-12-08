@@ -15,6 +15,8 @@ class SparseMat
 	typedef typename mat_t::iterator row_iter;
 	typedef std::map<size_t, T> col_t;
 	typedef typename col_t::iterator col_iter;
+	typedef typename mat_t::const_iterator row_citer;
+	typedef typename col_t::const_iterator col_citer;
 	
 	mat_t mat;
 	size_t n;
@@ -435,7 +437,7 @@ class SparseMat
 		//---------------------------------------
 		//handle the next call :
 		
-		if( ii==mat.end() && jj == mat[i].end())	
+		if( (ii==mat.end() && jj == mat[i].end()) || (i==n && j==m))	
 		{
 			//there will be no next call:
 			i = 0;
@@ -446,7 +448,8 @@ class SparseMat
 		else
 		{
 			//let us upgrade the indexes for the next call :
-			if( jj == (*ii).second.end() )
+			//if( jj == (*ii).second.end())
+			if(j==m)
 			{
 				//end of line --> change the line :
 				ii++;
@@ -463,11 +466,30 @@ class SparseMat
 			//set the indexes values :
 			i = (*ii).first;
 			j = (*jj).first;
+			
+			std::cout << i << " " << j << std::endl;
 		}
 		
 		//-------------------------------------------
 		//-------------------------------------------
 		
+		
+		return ret;
+	}
+	
+	Mat<T> SM2mat()
+	{
+		Mat<T> ret((T)0, this->n, m);
+		row_citer ii;
+		col_citer jj;
+		
+		for(ii=mat.cbegin();ii!=mat.cend();ii++)
+		{
+			for(jj=(*ii).second.cbegin();jj!=(*ii).second.cend();jj++)
+			{
+				ret.set( (*jj).second, (*ii).first, (*jj).first);
+			}
+		}
 		
 		return ret;
 	}
@@ -498,4 +520,6 @@ Mat<T> SM2Mat(SparseMat<T> sm)
 	
 	return ret;
 }
+
+
 #endif

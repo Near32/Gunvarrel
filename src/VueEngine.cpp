@@ -1,9 +1,9 @@
 #include "VueEngine.h"
 #include "Game.h"
 
-#define debug
+//#define debug
 //#define debuglvl1
-
+#define debuglvl2
 
 extern mutex ressourcesMutex;
 
@@ -34,35 +34,64 @@ void VueEngine::loop()
 	while(gameON)
 	{
 		if( commandsToHandle.size() > 0)
-		{
+		{		
 			//let's verify that it is one of those dedicated commands :
-			switch( commandsToHandle[0].getCommandType())
+			ressourcesMutex.lock();
+			switch( (commandsToHandle[0].get())->getCommandType())
 			{
 				case TCCameraOnMouseMotion :
 				{
-				camera->onMouseMotion( ((CameraOnMouseMotionCommand&)commandsToHandle[0]).mmevent);
+				ressourcesMutex.unlock();
+				ressourcesMutex.lock();
+				camera->onMouseMotion( ((CameraOnMouseMotionCommand*)(commandsToHandle[0].get()))->mmevent);
+				commandsToHandle.erase(commandsToHandle.begin());
+				ressourcesMutex.unlock();
 				}
 				break;
 				
 				case TCCameraOnMouseButton :
 				{
-				camera->onMouseButton( ((CameraOnMouseButtonCommand&)commandsToHandle[0]).mbevent);
+				ressourcesMutex.unlock();
+				ressourcesMutex.lock();
+				camera->onMouseButton( ((CameraOnMouseButtonCommand*)(commandsToHandle[0].get()))->mbevent);
+				commandsToHandle.erase(commandsToHandle.begin());
+				ressourcesMutex.unlock();
 				}
 				break;
 				
+				/*
+				case TCCameraOnMouseWheel :
+				{
+#ifdef debuglvl2
+std::cout << " VUE : command handled..." << std::endl;
+#endif					
+			//((CameraOnMouseButtonCommand&)commandsToHandle[0]).mbevent.type = SDL_MOUSEBUTTONDOWN; 
+				camera->onMouseWheel( ((CameraOnMouseWheelCommand&)commandsToHandle[0]).mwevent);
+				commandsToHandle.erase(commandsToHandle.begin());
+				}
+				break;
+				*/
+				
 				case TCCameraOnKeyboard :
 				{
-				camera->onKeyboard( ((CameraOnKeyboardCommand&)commandsToHandle[0]).kevent);
+				ressourcesMutex.unlock();
+				ressourcesMutex.lock();
+				camera->onKeyboard( ((CameraOnKeyboardCommand*)(commandsToHandle[0].get()))->kevent);
+				commandsToHandle.erase(commandsToHandle.begin());
+				ressourcesMutex.unlock();
 				}
 				break;
 				
 				default :
 				{
-				
+				ressourcesMutex.unlock();
+				ressourcesMutex.lock();
 				commandsToHandle.erase(commandsToHandle.begin());
+				ressourcesMutex.unlock();
 				}
 				break;
 			}
+			
 		}
 		
 		//----------------------------------------
@@ -81,8 +110,11 @@ void VueEngine::init()
     XInitThreads();
 	SDL_Init(SDL_INIT_VIDEO);
     //atexit(stop);
+    
     SDL_WM_SetCaption("Gunvarrel", NULL);
     ecran = SDL_SetVideoMode(800, 600, 32, SDL_OPENGL);
+    //ecran = SDL_CreateWindow("Gunvarrel", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 800, 600,SDL_WINDOW_OPENGL);
+
     
     
     //--------------------
@@ -102,6 +134,7 @@ void VueEngine::init()
     //---------------------------------
     
     std::string pathElement("../res/element.obj");
+    //std::string pathElement("./element.obj");
     std::string gunvarrel("../res/gunvarrel_scaled.obj");
     loadElement(pathElement);
     loadElement(gunvarrel);
@@ -131,7 +164,7 @@ void VueEngine::Dessiner(float angleX, float angleZ)
 std::cout << " VUE : " << env->ListeElements.size() << " element(s) to draw." << std::endl;
 //ressourcesMutex.unlock();
 #endif	
-	
+	/*
 	for(int i=0;i<env->ListeElements.size();i++)
 	{
 		//ressourcesMutex.lock();
@@ -189,6 +222,7 @@ std::cout << " VUE : element : " << env->ListeElements[i]->name << " has been dr
 		
 		
 	}
+	*/
 	
 	/*-----------------------------------*/	
 	/*test code that will be deleted....*/
