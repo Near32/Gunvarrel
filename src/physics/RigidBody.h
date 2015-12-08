@@ -66,15 +66,9 @@ class RigidBody : public ISimulationObject, public IMoveable
 	//------------------------------------------------------
 	//------------------------------------------------------
 	
-	Mat<float> getForceAccumulator() const
-	{
-		return userForce;
-	}
+	Mat<float> getForceAccumulator() const;
 	
-	Mat<float> getTorqueAccumulator() const
-	{ 	
-		return userTorque;
-	}
+	Mat<float> getTorqueAccumulator() const;
 	
 	float getMass() const
 	{

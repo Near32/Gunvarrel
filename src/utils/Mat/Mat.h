@@ -373,15 +373,15 @@ Mat<T>::Mat(const Mat<T>& m, T oValue, int d_line, int d_column, int line, int c
         
     mat = new T*[m_line];
 
-    for(int i=m_line;i--;)
-        mat[i] = new T[m_column];
+    //for(int i=m_line;i--;)
+    //    mat[i] = new T[m_column];
 
 
     if( m.getColumn()+d_column-1<=m_column && m.getLine()+d_line-1<=m_line )
     {
         for(int i=1;i<=m_line;i++)
         {
-       	    //mat[i] = new T[m_column];
+       	    mat[i-1] = new T[m_column];
        	    
             for(int j=1;j<=m_column;j++)
             {
@@ -1276,8 +1276,8 @@ Mat<T> operatorC(const Mat<T>& a, const Mat<T>& b)
         {
             for(int j=1;j<=r.getColumn();j++)
             {
-                r.set(b.get(i-a.getLine(),j),i,j);
-                //r.mat[i][j] = b.mat[(i-a.getLine())][j] ;
+                //r.set(b.get(i-a.getLine(),j),i,j);
+                r.mat[i-1][j-1] = b.mat[(i-a.getLine())-1][j-1] ;
             }
         }
 
@@ -1305,8 +1305,8 @@ Mat<T> operatorC(const Mat<T>* a, const Mat<T>& b)
         {
             for(int j=1;j<=r.getColumn();j++)
             {
-                r.set( b.get(i-a->getLine(),j),i,j);
-                //r.mat[i][j] = b.mat[(i-a->getLine())][j] ;
+                //r.set( b.get(i-a->getLine(),j),i,j);
+                r.mat[i-1][j-1] = b.mat[(i-a->getLine())-1][j-1] ;
             }
         }
 

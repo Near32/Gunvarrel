@@ -10,7 +10,7 @@ extern mutex ressourcesMutex;
 
 VueEngine::VueEngine(Game* game_, GameState gameState_) : IEngine(game_,gameState_)
 {
-	init();
+	
 }
 
 VueEngine::~VueEngine()
@@ -21,6 +21,12 @@ VueEngine::~VueEngine()
 	
 void VueEngine::loop()
 {
+	//THE INITIALIZATION PHASE HAS TO BE PUT IN THE SAME THREAD IN ORDER TO HAVE ACCESS TO THE INITIALIZING HEAP SINCE
+	//OPENGL DOES USE THIS HEAP TO INITIALIZE THINGS AND THEN TO RENDER THINGS. 
+	
+	init();
+	
+	
 	ressourcesMutex.lock();
 	bool gameON = game->gameON;
 	ressourcesMutex.unlock();
@@ -96,7 +102,9 @@ void VueEngine::init()
     //---------------------------------
     
     std::string pathElement("../res/element.obj");
+    std::string gunvarrel("../res/gunvarrel_scaled.obj");
     loadElement(pathElement);
+    loadElement(gunvarrel);
     
 }
 
@@ -255,10 +263,11 @@ std::cout << " VUE : element : " << env->ListeElements[i]->name << " has been dr
 
 void VueEngine::drawGunvarrel()
 {
-	std::vector<glm::vec3> v;
-	std::vector<glm::vec2> uv;
-	std::vector<glm::vec3> n;
-	bool res = loadOBJ("../res/gunvarrel_scaled.obj", v,uv,n);
+	std::string gunvarrel("../res/gunvarrel_scaled.obj");
+	std::vector<glm::vec3> v = containerV[gunvarrel];
+	std::vector<glm::vec2> uv = containerUV[gunvarrel];
+	std::vector<glm::vec3> n = containerN[gunvarrel];
+	//bool res = loadOBJ("../res/gunvarrel_scaled.obj", v,uv,n);
 	
 	
 	//glBegin(GL_TRIANGLES);

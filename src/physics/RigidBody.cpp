@@ -190,4 +190,14 @@ Mat<float> RigidBody::getAxisInLocal( const Mat<float>& aW)
 }
 
 
+Mat<float> RigidBody::getForceAccumulator() const
+{
+	return userForce;
+}
+
+Mat<float> RigidBody::getTorqueAccumulator() const
+{ 	
+	return userTorque;
+}
+
 

@@ -36,7 +36,6 @@ void GravityForceEffect::Apply(float dt, RigidBody& RB)
 {
 	// this force is applied to the center of mass of the rigid body so it does not involve the creation of any torque.
 	RB.addForce( RB.getMass()*gravityVector);
-	 
 }
 
 

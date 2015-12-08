@@ -425,6 +425,10 @@ std::cout << "SIMULATION : simulated object : " << nbrB << " : Q." << std::endl;
 			Mat<float> temp1( ((RigidBody&)(*o)).getForceAccumulator() ); 
 			Mat<float> temp2( ((RigidBody&)(*o)).getTorqueAccumulator() );
 			
+			std::cout << temp1.getLine() << " " << temp1.getColumn() << std::endl;
+			std::cout << temp2.getLine() << " " << temp2.getColumn() << std::endl;
+			
+			exit(1);
 #ifdef debug
 std::cout << "SIMULATION : simulated object : " << nbrB << " : Q." << std::endl;
 #endif			
