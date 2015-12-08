@@ -39,7 +39,7 @@ void EtatEngine::loop()
 #ifdef debug
 std::cout << "SIMULATION : run : ..." << std::endl;
 #endif				
-				ressourcesMutex.lock();
+				//ressourcesMutex.lock();
 #ifdef debug
 std::cout << "SIMULATION : run : mutex locked." << std::endl;
 #endif				
@@ -47,7 +47,7 @@ std::cout << "SIMULATION : run : mutex locked." << std::endl;
 #ifdef debug
 std::cout << "SIMULATION : run : successfully !!" << std::endl;
 #endif				
-				ressourcesMutex.unlock();
+				//ressourcesMutex.unlock();
 #ifdef debug
 std::cout << "SIMULATION : run : mutex unlocked." << std::endl;
 #endif				

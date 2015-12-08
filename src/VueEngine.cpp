@@ -61,7 +61,7 @@ void VueEngine::loop()
 		
 		//----------------------------------------
 		ressourcesMutex.lock();
-		//Dessiner(0.0f,0.0f);
+		Dessiner(0.0f,0.0f);
 		ressourcesMutex.unlock();
 		
 		ressourcesMutex.lock();
@@ -90,6 +90,14 @@ void VueEngine::init()
     glLoadIdentity();
     gluPerspective(70,(double)800/600,1,1000);
     glEnable(GL_DEPTH_TEST);
+    
+    
+    //---------------------------------
+    //---------------------------------
+    
+    std::string pathElement("../res/element.obj");
+    loadElement(pathElement);
+    
 }
 
 void VueEngine::Dessiner(float angleX, float angleZ)
@@ -141,7 +149,8 @@ std::cout << " VUE : " << env->ListeElements.size() << " element(s) to draw." <<
 		if( env->ListeElements[i]->name != std::string("ground") )
 		{
 			//ressourcesMutex.unlock();
-			drawElement( pathElement );
+			//drawElement( pathElement );
+			drawElement( containerV[pathElement], containerUV[pathElement], containerN[pathElement] );
 		}
 		else
 		{
@@ -311,4 +320,44 @@ void VueEngine::drawElement(const std::string& path)
 	{
 		cerr << "Impossible de charger l'element : " << path << endl;
 	}
+}
+
+void VueEngine::drawElement(const std::vector<glm::vec3>& v, const std::vector<glm::vec2>& uv, const std::vector<glm::vec3>& n)
+{	
+	for(int i=0;i<v.size();i++)
+	{
+		if(i%3 == 0)
+		{
+			glBegin(GL_TRIANGLES);
+			int color = (i)%255;
+			glColor3ub(color,color,color);
+		}
+	
+		glVertex3d( v[i].x, v[i].y, v[i].z);
+	
+		if( (i+1)%3 == 0)
+		{
+			glEnd();
+		}
+	}
 } 
+
+void VueEngine::loadElement( const std::string& path)
+{
+	std::vector<glm::vec3> v;
+	std::vector<glm::vec2> uv;
+	std::vector<glm::vec3> n;
+	bool res = loadOBJ(path.c_str(), v,uv,n);
+	
+	if( res)
+	{
+		std::cout << "SUCCESSFULL LOADING : " << path << endl;
+		containerV[path] = v;
+		containerUV[path] = uv;
+		containerN[path] = n;
+	}
+	else
+	{
+		std::cout << "ERROR WHILE LOADING : " << path << endl;
+	}
+}

@@ -175,6 +175,8 @@ Mat<T> Line( const Mat<T>& a, int ind);
 template<typename T>	/*pas de point virgule en fin de ligne...*/
 Mat<T> operatorC(const Mat<T>& a, const Mat<T>& b);
 template<typename T>	/*pas de point virgule en fin de ligne...*/
+Mat<T> operatorC(const Mat<T>* a, const Mat<T>& b);
+template<typename T>	/*pas de point virgule en fin de ligne...*/
 Mat<T> Col( const Mat<T>& a, int ind);
 template<typename T>	/*pas de point virgule en fin de ligne...*/
 Mat<T> Cola( const Mat<T> a, int ind);
@@ -379,6 +381,8 @@ Mat<T>::Mat(const Mat<T>& m, T oValue, int d_line, int d_column, int line, int c
     {
         for(int i=1;i<=m_line;i++)
         {
+       	    //mat[i] = new T[m_column];
+       	    
             for(int j=1;j<=m_column;j++)
             {
                 if( i>=d_line && i<=d_line+m.getLine()-1 && j>=d_column && j<=d_column+m.getColumn()-1)
@@ -1273,6 +1277,7 @@ Mat<T> operatorC(const Mat<T>& a, const Mat<T>& b)
             for(int j=1;j<=r.getColumn();j++)
             {
                 r.set(b.get(i-a.getLine(),j),i,j);
+                //r.mat[i][j] = b.mat[(i-a.getLine())][j] ;
             }
         }
 
@@ -1286,6 +1291,34 @@ Mat<T> operatorC(const Mat<T>& a, const Mat<T>& b)
 
 }
 
+
+
+
+template<typename T>	/*pas de point virgule en fin de ligne...*/
+Mat<T> operatorC(const Mat<T>* a, const Mat<T>& b)
+{
+    if(a->getColumn()==b.getColumn())
+    {
+        Mat<T> r(*a, (T)0, (int)1, (int)1, a->getLine()+b.getLine(), a->getColumn());
+
+        for(int i=a->getLine()+1;i<=r.getLine();i++)
+        {
+            for(int j=1;j<=r.getColumn();j++)
+            {
+                r.set( b.get(i-a->getLine(),j),i,j);
+                //r.mat[i][j] = b.mat[(i-a->getLine())][j] ;
+            }
+        }
+
+        return r;
+    }
+    else
+    {
+        cout << "Erreur : impossible de concatener les deux matrices sur les colonnes." << endl;
+        return Mat<T>( 1, 1);
+    }
+
+}
 
 
 /*---------------------------------------------*/

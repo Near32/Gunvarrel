@@ -44,14 +44,15 @@ void Game::loop()
     thread tController( &ControllerEngine::loop, std::ref(*ptrController) );
     thread tVue( &VueEngine::loop, std::ref(*ptrVue) );
     
+    
     if(tEtat.joinable())
     	tEtat.join();
     if( tController.joinable())
     	tController.join();
     if( tVue.joinable())
     	tVue.join();
-    
-    //while(gameON);
+    	
+
     
     /*
 	while(gameON)

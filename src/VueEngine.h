@@ -23,6 +23,10 @@ class VueEngine : public IEngine
 	SDL_Surface* ecran;
 	TrackBallCamera* camera;
 	
+	std::map< std::string, std::vector<glm::vec3> > containerV;
+	std::map< std::string, std::vector<glm::vec2> > containerUV;
+	std::map< std::string, std::vector<glm::vec3> > containerN;
+	
 	
 	VueEngine(Game* game_, GameState gameState_);
 	~VueEngine();
@@ -34,6 +38,8 @@ class VueEngine : public IEngine
 	
 	void drawGunvarrel();
 	void drawElement(const std::string& path);
+	void drawElement(const std::vector<glm::vec3>& v, const std::vector<glm::vec2>& uv, const std::vector<glm::vec3>& n);
+	void loadElement( const std::string& path);
 };
 
 #endif

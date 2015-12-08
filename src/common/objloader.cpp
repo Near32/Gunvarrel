@@ -11,7 +11,7 @@ bool loadOBJ( const char* path, std::vector<glm::vec3>& out_vertices, std::vecto
 	
 	if(file == NULL)
 	{
-		std::cerr << "Impossible d'ouvrire le fichier obj : " << std::string(path) << std::endl;
+		std::cerr << "Impossible d'ouvrir le fichier obj : " << std::string(path) << std::endl;
 		return false;
 	}
 	

@@ -4,8 +4,11 @@
 #include "eval/CollisionDetector.h"
 #include "eval/IIntegrator.h"
 
+#include <mutex>
+
 #define debug
 
+extern mutex ressourcesMutex;
 
 Simulation::Simulation() : time(0.0f), updater(new Updater(this, new ExplicitEulerIntegrator(this)) ), constraintsSolver( new SimultaneousImpulseBasedConstraintSolverStrategy(this) ), collisionDetector( new CollisionDetector(this) )
 {
@@ -302,14 +305,15 @@ void Simulation::constructQQdotInvMSFext()
 	
 	//there alwas at least one element : the ground :
 	//qdot = operatorC( ((IMoveable&)(*o)).getLinearVelocity(), ((IMoveable&)(*o)).getAngularVelocity() );
+	ressourcesMutex.lock();
 	qdot = operatorC( ((RigidBody*)(o->get()))->getLinearVelocity(), ((RigidBody*)(o->get()))->getAngularVelocity() );
 	q = operatorC( ((RigidBody*)(o->get()))->getPosition(), ((RigidBody*)(o->get()))->getMatOrientation() );
-	
+	ressourcesMutex.unlock();
 	
 	//------------------------------------------------------------------
 	//------------------------------------------------------------------
 	
-	
+	ressourcesMutex.lock();
 	if(!((RigidBody&)(*o)).getFixedStatus())
 	{
 		//then we can initialize Fext :
@@ -323,7 +327,7 @@ void Simulation::constructQQdotInvMSFext()
 		//then we can initialize Fext :
 		Fext = Mat<float>(0.0f, 6,1);
 	}
-	
+	ressourcesMutex.unlock();
 	
 	//------------------------------------------------------------------
 	//------------------------------------------------------------------
@@ -338,6 +342,7 @@ void Simulation::constructQQdotInvMSFext()
 	//invM.addLine(6);
 	//invM.addColumn(6);
 	//the size of those matrixes has been deduced in the constructor...
+	ressourcesMutex.lock();
 	for(int k=1;k<=3;k++)
 	{
 		invM.set( (nbrB-1)*6+k, (nbrB-1)*6+k, ((RigidBody&)(*o)).getIMass() );
@@ -354,14 +359,16 @@ void Simulation::constructQQdotInvMSFext()
 	/*invM = operatorC( 	operatorL( ((RigidBody*)o->getIMass())*Identity, Zero3),
 						operatorL( Zero3, (RigidBody*)o->getInverseInertiaWorld() )
 						);*/
-	
+	ressourcesMutex.unlock();
 	//------------------------------------------------------------------
 	
 	for(int k=1;k<=3;k++)
 	{
 		S.set( (nbrB-1)*7+k, (nbrB-1)*6+k, 1.0f );
 	}
+	ressourcesMutex.lock();
 	Quat tempq = ((RigidBody*)(o->get()))->getOrientation();
+	ressourcesMutex.unlock();
 	tempq.x *= 0.5f;
 	tempq.y *= 0.5f;
 	tempq.z *= 0.5f;
@@ -384,13 +391,17 @@ void Simulation::constructQQdotInvMSFext()
 	
 	//---------------------------------------------------
 	//---------------------------------------------------------------------
+#ifdef debug
+std::cout << "SIMULATION : simulated object : " << nbrB << " : DONE." << std::endl;
+#endif
+
 	nbrB++;
 	o++;
 	
 	
 	while( o != simulatedObjects.end() )
 	{
-		
+		ressourcesMutex.lock();
 		qdot = operatorC( 	qdot, 
 							operatorC( ((RigidBody*)(o->get()))->getLinearVelocity(), ((RigidBody*)(o->get()))->getAngularVelocity())
 							);
@@ -398,37 +409,53 @@ void Simulation::constructQQdotInvMSFext()
 		q = operatorC( 	q, 
 						operatorC( ((RigidBody*)(o->get()))->getPosition(), ((RigidBody*)(o->get()))->getMatOrientation())
 						);
+		ressourcesMutex.unlock();						
 		
+#ifdef debug
+std::cout << "SIMULATION : simulated object : " << nbrB << " : Q." << std::endl;
+#endif
 		
 		//------------------------------------------------------------------
 		//------------------------------------------------------------------
 		
 		
-		
+		ressourcesMutex.lock();
 		if( ! ((RigidBody&)(*o)).getFixedStatus())
 		{
-			Fext = operatorC(	Fext,
-								operatorC(	((RigidBody&)(*o)).getForceAccumulator(), 
-											((RigidBody&)(*o)).getTorqueAccumulator() 
+			Mat<float> temp1( ((RigidBody&)(*o)).getForceAccumulator() ); 
+			Mat<float> temp2( ((RigidBody&)(*o)).getTorqueAccumulator() );
+			
+#ifdef debug
+std::cout << "SIMULATION : simulated object : " << nbrB << " : Q." << std::endl;
+#endif			
+			Fext = operatorC(	&Fext,
+								operatorC(	temp1,
+											temp2 
 											)
 								);
 		}
 		else
 		{
-			Fext = operatorC(Fext, Mat<float>(0.0f, 6,1) );
+			Fext = operatorC(&Fext, Mat<float>(0.0f, 6,1) );
 		}
-		
+		ressourcesMutex.unlock();
+#ifdef debug
+std::cout << "SIMULATION : simulated object : " << nbrB << " : Fext." << std::endl;
+#endif
 		
 		//------------------------------------------------------------------
 		//------------------------------------------------------------------
 		
 		//invM.addLine(6);
 		//invM.addColumn(6);
+		ressourcesMutex.lock();
 		for(int k=1;k<=3;k++)
 		{
-			invM.set( (nbrB-1)*6+k, (nbrB-1)*6+k, ((RigidBody&)(*o)).getIMass() );
+			invM.set( (nbrB-1)*6+k, (nbrB-1)*6+k, ((RigidBody*)(o->get()))->getIMass() );
 		}
-		tempIIW = ((RigidBody&)(*o)).getInverseInertialWorld() ;
+		
+		tempIIW = ((RigidBody*)(o->get()))->getInverseInertialWorld() ;
+		ressourcesMutex.unlock();
 		for(int i=1;i<=3;i++)
 		{
 			for(int j=1;j<=3;j++)
@@ -436,6 +463,11 @@ void Simulation::constructQQdotInvMSFext()
 				invM.set( (nbrB-1)*6+3+i, (nbrB-1)*6+3+j,  tempIIW.get(i,j) );
 			}
 		}			
+		
+#ifdef debug
+std::cout << "SIMULATION : simulated object : " << nbrB << " : InvM." << std::endl;
+#endif
+		
 		//------------------------------------------------------------------
 		//------------------------------------------------------------------
 	
@@ -443,7 +475,9 @@ void Simulation::constructQQdotInvMSFext()
 		{
 			S.set( (nbrB-1)*7+k, (nbrB-1)*6+k, 1.0f );
 		}
+		ressourcesMutex.lock();
 		Quat tempq = ((RigidBody*)(o->get()))->getOrientation();
+		ressourcesMutex.unlock();
 		tempq.x *= 0.5f;
 		tempq.y *= 0.5f;
 		tempq.z *= 0.5f;
@@ -469,6 +503,11 @@ void Simulation::constructQQdotInvMSFext()
 		
 		nbrB++;
 		o++;
+		
+#ifdef debug
+std::cout << "SIMULATION : simulated object : " << nbrB << " : DONE." << std::endl;
+#endif
+		
 	}
 }
 
