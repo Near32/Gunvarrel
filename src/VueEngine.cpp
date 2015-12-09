@@ -112,7 +112,7 @@ void VueEngine::init()
     //atexit(stop);
     
     SDL_WM_SetCaption("Gunvarrel", NULL);
-    ecran = SDL_SetVideoMode(800, 600, 32, SDL_OPENGL);
+    ecran = SDL_SetVideoMode(1280, 800, 32, SDL_OPENGL);
     //ecran = SDL_CreateWindow("Gunvarrel", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 800, 600,SDL_WINDOW_OPENGL);
 
     
@@ -164,7 +164,7 @@ void VueEngine::Dessiner(float angleX, float angleZ)
 std::cout << " VUE : " << env->ListeElements.size() << " element(s) to draw." << std::endl;
 //ressourcesMutex.unlock();
 #endif	
-	/*
+	
 	for(int i=0;i<env->ListeElements.size();i++)
 	{
 		//ressourcesMutex.lock();
@@ -174,6 +174,12 @@ std::cout << " VUE : " << env->ListeElements.size() << " element(s) to draw." <<
 		Mat<float> EulerAngles(3,1);
 		Rot2Euler(SO3, EulerAngles);
 		
+		for(int i = 1;i<=3;i++)
+		{
+			if( isnan( EulerAngles.get(i,1) ) )
+				EulerAngles.set((float)0,i,1);
+		}
+		//EulerAngles.afficher();
 		
 		//let us go in the correct configuration to draw the Element :
 		glTranslated( poseElement.get(1,4), poseElement.get(2,4), poseElement.get(3,4));
@@ -222,7 +228,7 @@ std::cout << " VUE : element : " << env->ListeElements[i]->name << " has been dr
 		
 		
 	}
-	*/
+	
 	
 	/*-----------------------------------*/	
 	/*test code that will be deleted....*/

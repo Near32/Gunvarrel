@@ -349,11 +349,11 @@ Mat<T>::Mat(const Mat<T>& m)
     m_line = m.getLine();
     m_column = m.getColumn();
    
-   	if(m_line<=0)
-   		m_line = 1;
-   	if(m_column<=0)
-   		m_column = 1;
-   		
+	if((m_line>1000)||(m_column>1000))
+    	throw;
+    if((m_line<=0)||(m_column<=0))
+    	throw;
+	
     mat = new T*[m_line];
 
     for(int i=m_line;i--;)
@@ -481,6 +481,14 @@ Mat<T>::Mat(const Mat<T>& m, int delLine[], int cLine, int delColumn[], int cCol
 template<typename T>	/*pas de point virgule en fin de ligne...*/
 Mat<T>::Mat( int line, int column)
 {
+	m_line = line;
+    m_column = column;
+
+	if((m_line>1000)||(m_column>1000))
+    	throw;
+    if((m_line<=0)||(m_column<=0))
+    	throw;
+
     assert(line>0 && column>0);
     
     mat = new T*[line];
@@ -488,8 +496,6 @@ Mat<T>::Mat( int line, int column)
     for(int i=line;i--;)
         mat[i] = new T[column];
 
-    m_line = line;
-    m_column = column;
 }
 
 /*---------------------------------------------*/
@@ -498,13 +504,19 @@ Mat<T>::Mat( int line, int column)
 template<typename T>	/*pas de point virgule en fin de ligne...*/
 Mat<T>::Mat( int line, int column, char mode)
 {
+    m_line = line;
+    m_column = column;
+
+	if((m_line>1000)||(m_column>1000))
+    	throw;
+    if((m_line<=0)||(m_column<=0))
+    	throw;
+    	
     mat = new T*[line];
 
     for(int i=line;i--;)
         mat[i] = new T[column];
 
-    m_line = line;
-    m_column = column;
 
     if(mode == 1)	//random
     {        
@@ -532,6 +544,14 @@ Mat<T>::Mat( int line, int column, char mode)
 template<typename T>	/*pas de point virgule en fin de ligne...*/
 Mat<T>::Mat( T value, int line, int column)
 {
+	m_line = line;
+    m_column = column;
+    
+    if((m_line>1000)||(m_column>1000))
+    	throw;
+    if((m_line<=0)||(m_column<=0))
+    	throw;
+    
     mat = new T*[line];
 
     for(int i=line;i--;)
@@ -543,8 +563,7 @@ Mat<T>::Mat( T value, int line, int column)
     	for(int j=column;j--;)
             mat[i][j] = value;
 
-    m_line = line;
-    m_column = column;
+    
 }
 
 
@@ -554,6 +573,9 @@ Mat<T>::Mat( T value, int line, int column)
 template<typename T>	/*pas de point virgule en fin de ligne...*/
 Mat<T>::Mat( const T* val_array, int line, int column)
 {
+	m_line = line;
+    m_column = column;
+    
     mat = new T*[line];
 
     for(int i=line;i--;)
@@ -565,8 +587,7 @@ Mat<T>::Mat( const T* val_array, int line, int column)
     	for(int j=column;j--;)
             mat[i][j] = val_array[ i*column+j];
 
-    m_line = line;
-    m_column = column;
+    
 }
 
 

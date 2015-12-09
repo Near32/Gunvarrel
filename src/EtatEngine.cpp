@@ -36,7 +36,7 @@ void EtatEngine::loop()
 				//DEBUGGING :
 				case TCSimulateStride:
 				{
-				float timestep = 1e-3f;
+				float timestep = 8e-1f;
 				float time = sim->getTime();
 #ifdef debug
 std::cout << "SIMULATION : run : ..." << std::endl;
@@ -100,7 +100,7 @@ void EtatEngine::init()
 	AnchorAL.set( hwd.get(3,1)/2+1.0f, 3,1);
 	Mat<float> HJAxis(0.0f,3,1);
 	HJAxis.set( 1.0f, 1,1);
-	cl.insert( cl.end(), ConstraintInfo(std::string("picBas"),std::string("picHaut"), CTBallAndSocketJoint, operatorL(AnchorAL,HJAxis) ) ); 
+	cl.insert( cl.end(), ConstraintInfo(std::string("picBAS"),std::string("picHAUT"), CTBallAndSocketJoint, operatorL(AnchorAL,HJAxis) ) ); 
 	
 	//resetting :
 	t = Mat<float>(0.0f,3,1);

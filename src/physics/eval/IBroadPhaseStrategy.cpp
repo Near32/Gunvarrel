@@ -29,6 +29,7 @@ BroadPhaseStrategyA::~BroadPhaseStrategyA()
 
 }
 
+/*
 void BroadPhaseStrategyA::checkForCollisions(std::vector<Contact>& c)
 {
 	//let us access all the RigidBodys in the Simulation and check if they are in contact broadly via the boundingRadius of their Shape :
@@ -79,5 +80,57 @@ void BroadPhaseStrategyA::checkForCollisions(std::vector<Contact>& c)
 		}
 	
 		it++;
+	}
+}
+*/
+
+
+void BroadPhaseStrategyA::checkForCollisions(std::vector<Contact>& c)
+{
+	//let us access all the RigidBodys in the Simulation and check if they are in contact broadly via the boundingRadius of their Shape :
+	std::vector<std::unique_ptr<ISimulationObject> >::iterator it = sim->simulatedObjects.begin();
+	
+	for( ;it !=sim->simulatedObjects.end();it++)
+	{
+		if( (it->get())->getType() == TSORigidBody)
+		{
+			if( ((RigidBody*)(it->get()))->getCollisionStatus() )
+			{
+				//let us access to all of the RigidBody that haven't already been checked with regards to this one :
+				std::vector<std::unique_ptr<ISimulationObject> >::iterator other = it;
+				other++;
+			
+				ShapeType typeIt = ((RigidBody*)(it->get()))->getShapeType();
+				
+			
+				for(;other!=sim->simulatedObjects.end();other++)
+				{
+					ShapeType typeOther = ((RigidBody*)(other->get()))->getShapeType();
+					//------------------
+					if( ((other->get()))->getType() == TSORigidBody)
+					{
+						if( ((RigidBody*)(other->get()))->getCollisionStatus() )
+						{
+							Mat<float> midline( ((RigidBody*)(it->get()))->getPosition()-((RigidBody*)(other->get()))->getPosition());
+							float magnitude = norme2(midline);
+					
+							if(magnitude < ((RigidBody*)(it->get()))->getShapeReference().getBRadius() + ((RigidBody*)(other->get()))->getShapeReference().getBRadius() )
+							{
+								// then there is a potentiel contact :
+								Contact contact( (RigidBody*)(it->get()), (RigidBody*)(other->get()) );
+								contact.contactPoint.insert( contact.contactPoint.end(), ((RigidBody*)(other->get()))->getPosition()+(1.0f/2.0f)*midline);
+								contact.normal.insert( contact.normal.end(), (1.0f/magnitude)*midline);
+						
+								c.insert(c.end(), contact );
+							}
+						}
+						 
+				
+					}
+
+				}
+			}
+		
+		}
 	}
 }

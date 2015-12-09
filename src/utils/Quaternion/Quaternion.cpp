@@ -90,9 +90,9 @@ Mat<float> Euler2Rot( const float& roll, const float& pitch, const float& yaw)
 /* Returns the corresponding roll pitch yaw euler angles from SO(3) matrix.*/
 void Rot2Euler( const Mat<float>& R, Mat<float>& angles)
 {
-	float epsilon = (float)1e-10;
+	float epsilon = (float)1e-5;
 	float R31 = R.get(3,1);
-	 
+	
 	if(  (R31 < 1+epsilon && R31 > 1-epsilon) || ( R31 > -1-epsilon && R31 < -1+epsilon ) )
 	{
 		angles.set( 0.0f, 3,1);	//yaw = 0;
@@ -110,10 +110,29 @@ void Rot2Euler( const Mat<float>& R, Mat<float>& angles)
 	}
 	else
 	{
-		angles.set( -asin(R31), 2,1);	//pitch = -asin(R31)
-		float cTheta1 = cos(angles.get(2,1));
-		angles.set( atan21( R.get(3,2)/cTheta1, R.get(3,3)/cTheta1 ), 1,1);	//roll = atan2( R32/cos(pitch), R33/cos(pitch) )
-		angles.set( atan21( R.get(2,1)/cTheta1, R.get(1,1)/cTheta1 ), 3,1);	//yaw = atan2( R21/cos(pitch), R11/cos(pitch) )
+		if( (R31 < epsilon && R31 > 0.0f-epsilon) || ( R31 > 0.0f-epsilon && R31 < epsilon ) )
+			R31 = 0.0f;
+			
+		float R32 = R.get(3,2);
+		if( (R32 < epsilon && R32 > 0.0f-epsilon) || ( R32 > 0.0f-epsilon && R32 < epsilon ) )
+			R32 = 0.0f;
+		float R33 = R.get(3,3);
+		if( (R33 < epsilon && R33 > 0.0f-epsilon) || ( R33 > 0.0f-epsilon && R33 < epsilon ) )
+			R33 = 0.0f;
+		float R21 = R.get(2,1);
+		if( (R21 < epsilon && R21 > 0.0f-epsilon) || ( R21 > 0.0f-epsilon && R21 < epsilon ) )
+			R21 = 0.0f;
+		float R11 = R.get(1,1);
+		if( (R11 < epsilon && R11 > 0.0f-epsilon) || ( R11 > 0.0f-epsilon && R11 < epsilon ) )
+			R11 = 0.0f;
+			
+			
+		angles.set( -asin(R31), 2,1);	//pitch = -asin(R31)		
+		
+		float cTheta1 = cos( angles.get(2,1) );
+		
+		angles.set( atan21( R32/cTheta1, R33/cTheta1 ), 1,1);	//roll = atan2( R32/cos(pitch), R33/cos(pitch) )
+		angles.set( atan21( R21/cTheta1, R11/cTheta1 ), 3,1);	//yaw = atan2( R21/cos(pitch), R11/cos(pitch) )
 		
 	}
 }

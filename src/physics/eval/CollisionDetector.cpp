@@ -4,7 +4,7 @@
 #define debug
 
 
-CollisionDetector::CollisionDetector(Simulation* sim_, float eps) : sim(sim_), epsilon(eps), broadPhase(new BroadPhaseStrategyA( sim)), midNarrowPhase(new MidNarrowPhaseStrategyA( sim)), contactGenerator( new ContactGeneratorA( sim))
+CollisionDetector::CollisionDetector(Simulation* sim_, float eps) : sim(sim_), epsilon(eps), broadPhase(new BroadPhaseStrategyA( sim_)), midNarrowPhase(new MidNarrowPhaseStrategyA( sim_)), contactGenerator( new ContactGeneratorA( sim_))
 {
 
 }

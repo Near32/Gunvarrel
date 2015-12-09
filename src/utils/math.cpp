@@ -1,5 +1,8 @@
 #include "math.h"
 
+
+//#define debuglvl1
+
 //------------------------------------
 //		Identity Matrix 3x3 :
 //------------------------------------
@@ -94,7 +97,11 @@ Mat<float> se3::exp()					//compute the (R | t) matrix.
 {
 	if(hasChanged)
 	{
+		std::cout << " EXP : w et t : " << std::endl;
+		w->afficher();
+		t->afficher();
 		*SE3 = expM( operatorC( *w, *t) );
+		hasChanged = false;
 	}
 	
 	return *SE3;
@@ -128,6 +135,12 @@ void se3::setOrientation( const Quat& q)
 	w->set( wX.get(1,3), 2,1);
 	w->set( -wX.get(1,2), 3,1);
 	
+#ifdef debuglvl1
+	std::cout << " SE3 : TEST APRES MODIF : " << std::endl;
+	w->afficher();
+	wX.afficher();
+#endif	
+	
 	hasChanged = true;
 }
 
@@ -152,6 +165,23 @@ se3& se3::operator=(const se3& x)
 	
 	return *this;
 }
+
+Mat<float> se3::getT()	const
+{	
+	return *t;	
+}
+
+Mat<float> se3::getW()	const
+{	
+	return *w;
+}
+
+Mat<float> se3::getSE3()	const
+{	
+	return *SE3;
+}
+
+
 
 	//---------------------------------------------------------
 	//---------------------------------------------------------

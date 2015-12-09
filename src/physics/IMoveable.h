@@ -29,51 +29,30 @@ class IMoveable
 	//---------------------------------------------------------
 	
 		
-	se3 getPose() const	
-	{ 
-		return *Pose;
-	}
+	se3 getPose() const	;
 	
-	Mat<float> getPosition()
-	{
-		return Pose->getT();
-	}
+	Mat<float> getPosition();
 		
-	Quat getOrientation()		
-	{	
-		return Qt_FromMat( this->Pose->exp());
-	}
+	Quat getOrientation();
 	
-	Mat<float> getMatOrientation()
-	{
-		return Qt2Mat<float>( this->getOrientation() );
-	}
+	Mat<float> getMatOrientation();
 	
-	Mat<float> getTransformation()	const
-	{
-		return this->Pose->exp();	
-	}
+	Mat<float> getTransformation()	const;
 	
-	Mat<float> getLinearVelocity()	const
-	{
-		return *(this->LinearVelocity);
-	}
+	Mat<float> getLinearVelocity()	const;
 	
-	Mat<float> getAngularVelocity()	const
-	{
-		return *(this->AngularVelocity);
-	}
+	Mat<float> getAngularVelocity()	const;
 
 	
 	//---------------------------------------------------------
 	//---------------------------------------------------------
 	
-	void setPose( const se3& pose_)	{	*Pose = pose_;	}
-	void setPosition( const Mat<float>& t_)	{	Pose->setT(t_);	}
-	void setOrientation( const Quat& q)	{	Pose->setOrientation(q);	}
-	void setMatOrientation( const Mat<float>& q)	{	setOrientation( Mat2Qt<float>(q) );	}
-	void setLinearVelocity( const Mat<float>& lvel)	{	*LinearVelocity = lvel;	}
-	void setAngularVelocity( const Mat<float>& avel)	{	*AngularVelocity = avel;	}
+	void setPose( const se3& pose_);
+	void setPosition( const Mat<float>& t_);
+	void setOrientation( const Quat& q);
+	void setMatOrientation( const Mat<float>& q);
+	void setLinearVelocity( const Mat<float>& lvel);
+	void setAngularVelocity( const Mat<float>& avel);
 	
 };
 

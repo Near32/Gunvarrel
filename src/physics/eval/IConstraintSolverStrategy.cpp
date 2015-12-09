@@ -52,7 +52,11 @@ void SimultaneousImpulseBasedConstraintSolverStrategy::computeConstraintsJacobia
 		
 	Mat<float> tJA(c[0]->getJacobianA());
 	Mat<float> tJB(c[0]->getJacobianB());
-	size_t sl = tJA.getLine();
+	
+	//tJA.afficher();
+	//tJB.afficher();
+		
+	int sl = tJA.getLine();
 	int idA = 6 * ( c[0]->rbA.getID() );
 	int idB = 6 * ( c[0]->rbB.getID() );
 	
@@ -62,13 +66,12 @@ void SimultaneousImpulseBasedConstraintSolverStrategy::computeConstraintsJacobia
 	{
 		for(int j=1;j<=6;j++)
 		{
-			temp.set( i, idA+j, tJA.get(i,j) );
-			temp.set( i, idB+j, tJB.get(i,j) );
+			temp.set( tJA.get(i,j) , i, idA+j);
+			temp.set( tJB.get(i,j), i, idB+j  );
 		}
 	}
 	
 	constraintsJacobian = temp;
-	
 	
 	for(int i=1;i<size;i++)
 	{
@@ -76,6 +79,10 @@ void SimultaneousImpulseBasedConstraintSolverStrategy::computeConstraintsJacobia
 		
 		Mat<float> tJA(c[i]->getJacobianA());
 		Mat<float> tJB(c[i]->getJacobianB());
+		
+		tJA.afficher();
+		tJB.afficher();
+		
 		size_t sl = tJA.getLine();
 		int idA = 6 * ( c[i]->rbA.getID() );
 		int idB = 6 * ( c[i]->rbB.getID() );
@@ -86,8 +93,8 @@ void SimultaneousImpulseBasedConstraintSolverStrategy::computeConstraintsJacobia
 		{
 			for(int j=1;j<=6;j++)
 			{
-				temp.set( i, idA+j, tJA.get(i,j) );
-				temp.set( i, idB+j, tJB.get(i,j) );
+				temp.set( tJA.get(i,j) , i, idA+j);
+				temp.set( tJB.get(i,j), i, idB+j  );
 			}
 		}
 		
@@ -109,11 +116,23 @@ void SimultaneousImpulseBasedConstraintSolverStrategy::Solve(float dt, std::vect
 	
 	constraintsImpulse =  tConstraintsJacobian * lambda;
 	
-	//qdot += dt * tempInvMFext + dt*SM2Mat<float>( invM * constraintsImpulse );
-	qdot += tempInvMFext + invM * constraintsImpulse;//SM2Mat<float>(  );
+	Mat<float> tdot( tempInvMFext + invM * constraintsImpulse );
+	qdot += tdot;//SM2Mat<float>(  );
 	
-	q += dt*( S*qdot );
 	
+	Mat<float> t( dt*( S*qdot ) );
+	q += t;
+	
+	//S.print();
+	//constraintsJacobian.afficher();
+	//tempInvMFext.afficher();
+	//temp.afficher();
+	//lambda.afficher();
+	//constraintsImpulse.afficher();
+	//tempInvMFext.afficher();
+	tdot.afficher();
+	//qdot.afficher();
+	t.afficher();
 	q.afficher();
 	
 }

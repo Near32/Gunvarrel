@@ -43,8 +43,8 @@ class Simulation
 	
 	Simulation();
 	//Simulation(IConstraintsSolver* cs, IUpdater* u, CollisionDetector* cd);
-	Simulation(Environnement* env);
-	Simulation(Environnement* env, ConstraintsList& cl);
+	Simulation(Environnement* env_);
+	Simulation(Environnement* env_, ConstraintsList& cl);
 	
 	~Simulation();
 	

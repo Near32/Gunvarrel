@@ -1,5 +1,7 @@
 #include "IMoveable.h"
 
+//#define debuglvl1
+
 IMoveable::IMoveable()
 {	
 	try
@@ -47,6 +49,81 @@ IMoveable::~IMoveable()
 		delete Pose;
 		delete LinearVelocity;
 		delete AngularVelocity;
+}
+
+
+se3 IMoveable::getPose() const	
+{ 
+	return *Pose;
+}
+
+Mat<float> IMoveable::getPosition()
+{
+	return Pose->getT();
+}
+	
+Quat IMoveable::getOrientation()		
+{	
+	Pose->exp().afficher();
+	
+	return Qt_FromMat( this->Pose->exp());
+}
+
+Mat<float> IMoveable::getMatOrientation()
+{
+	return Qt2Mat<float>( this->getOrientation() );
+}
+
+Mat<float> IMoveable::getTransformation()	const
+{
+	return this->Pose->exp();	
+}
+
+Mat<float> IMoveable::getLinearVelocity()	const
+{
+	return *(this->LinearVelocity);
+}
+
+Mat<float> IMoveable::getAngularVelocity()	const
+{
+	return *(this->AngularVelocity);
+}
+
+void IMoveable::setPose( const se3& pose_)	
+{	
+	*Pose = pose_;
+}
+
+void IMoveable::setPosition( const Mat<float>& t_)
+{
+	Pose->setT(t_);
+}
+
+void IMoveable::setOrientation( const Quat& q)	
+{
+	Pose->setOrientation(q);	
+}
+
+void IMoveable::setMatOrientation( const Mat<float>& q)	
+{	
+	
+#ifdef debuglvl1		
+	std::cout << " IMOVEABLE : TEST AVANT MODIF : " << std::endl;
+	Quat tempq = Mat2Qt<float>(q);
+	std::cout << tempq.x << " ; " << tempq.y << " ; " << tempq.z << " ; " << tempq.w << std::endl;
+#endif
+
+	this->setOrientation( Mat2Qt<float>(q) );	
+}
+
+void IMoveable::setLinearVelocity( const Mat<float>& lvel)	
+{	
+	*LinearVelocity = lvel;	
+}
+
+void IMoveable::setAngularVelocity( const Mat<float>& avel)	
+{	
+	*AngularVelocity = avel;	
 }
 
 

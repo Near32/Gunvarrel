@@ -7,6 +7,7 @@
 #include <mutex>
 
 #define debug
+//#define debuglvl1
 
 extern mutex ressourcesMutex;
 
@@ -45,7 +46,7 @@ Simulation::Simulation(Environnement* env_) : Simulation()
 					simulatedObjects.insert( simulatedObjects.end(), std::unique_ptr<ISimulationObject>(new RigidBody( element->getPoseReference(), element->getName(),id, BOX) ) );
 					//((RigidBody&)(*simulatedObjects[id])).setPose( (*element)->getPoseReference());
 					//((RigidBody&)(*simulatedObjects[id])).setPtrShape( (IShape*)(new BoxShape( (RigidBody*)simulatedObjects[id].get(), ((IElementFixe&)(*(*element))).hwd)) );		
-					((BoxShape&)((RigidBody&)(*simulatedObjects[id])).getShapeReference()).setHWD( ((IElementFixe*)(element.get()))->hwd );
+					((BoxShape&)((RigidBody*)(simulatedObjects[id].get()))->getShapeReference()).setHWD( ((IElementFixe*)(element.get()))->hwd );
 #ifdef debug
 std::cout << "SIMULATION : environnement initialization : ElementFixe : Obstacle : id = " << id << " : ...." << std::endl;
 #endif					
@@ -55,7 +56,7 @@ std::cout << "SIMULATION : environnement initialization : ElementFixe : Obstacle
 					//then it is the ground :
 					simulatedObjects.insert( simulatedObjects.end(), std::unique_ptr<ISimulationObject>(new RigidBody( element->getPoseReference(), element->getName(),id,true) ) );
 					//((RigidBody&)(*simulatedObjects[id])).setPose( (*element)->getPoseReference());
-					((RigidBody&)(*simulatedObjects[id])).setPtrShape( (IShape*)(new BoxShape( (RigidBody*)simulatedObjects[id].get(), ((IElementFixe*)(element.get()))->hwd)) );
+					((RigidBody*)(simulatedObjects[id].get()))->setPtrShape( (IShape*)(new BoxShape( (RigidBody*)simulatedObjects[id].get(), ((IElementFixe*)(element.get()))->hwd)) );
 					
 					//IT IS THE UNMOVEABLE GROUND :
 					((RigidBody*)(simulatedObjects[id].get()))->isFixed = true;
@@ -101,8 +102,13 @@ std::cout << "SIMULATION : environnement initialization : ElementFixe OrbeBonus 
 #ifdef debug
 std::cout << "SIMULATION : environnement initialization : ElementMobile : id = " << id << " : ...." << std::endl;
 #endif					
-				((BoxShape&)((RigidBody&)(*simulatedObjects[id])).getShapeReference()).setHWD( ((IElementMobile*)(element.get()))->hwd );
+				((BoxShape&)((RigidBody*)(simulatedObjects[id].get()))->getShapeReference()).setHWD( ((IElementMobile*)(element.get()))->hwd );
 				
+				if(element->getName() == std::string("picHAUT"))
+				{
+					//let us put an initial velocity :
+					((RigidBody*)(simulatedObjects[id].get()))->setLinearVelocity( Mat<float>(-10.0f,3,1) );
+				}
 				
 				break;
 				
@@ -115,6 +121,7 @@ std::cout << "SIMULATION : environnement initialization : ElementMobile : id = "
 		//TODO : set mass : okay 1.0f by default...
 		//TODO : Inertia ...
 		Name2ID[ element->getName() ] = id;
+		//std::cout << id << " : " << element->getName() << " == " << Name2ID[element->getName()] << std::endl;
 		id++;
 #ifdef debug
 	std::cout << "SIMULATION : post-increment : id = " << id << " : ...." << std::endl;
@@ -248,22 +255,22 @@ std::cout << "SIMULATION : environnement initialization : ElementMobile : id = "
 
 
 
-Simulation::Simulation(Environnement* env, ConstraintsList& cl) : Simulation(env)
+Simulation::Simulation(Environnement* env_, ConstraintsList& cl) : Simulation(env_)
 {
 	//TODO : handle/enforce constraint list :
-	ConstraintsList::iterator itC = cl.begin();
+	//ConstraintsList::iterator itC = cl.begin();
 
-	while( itC !=cl.end())
+	for( auto& itC : cl)
 	{				
 		
-		switch( (*itC).ct)
+		switch( itC.ct)
 		{
 			case CTHingeJoint :
 			collectionC.insert( collectionC.end(), 
-								std::unique_ptr<IConstraint>(new HingeJoint( (RigidBody&)*simulatedObjects[Name2ID[ (*itC).nameEl1]], 
-															(RigidBody&)*simulatedObjects[Name2ID[ (*itC).nameEl2]],
-															extract( (*itC).data,1,1, 3,1),
-															extract( (*itC).data,1,2, 3,2)
+								std::unique_ptr<IConstraint>(new HingeJoint( *((RigidBody*)simulatedObjects[Name2ID[ itC.nameEl1]].get()), 
+															*((RigidBody*)simulatedObjects[Name2ID[ itC.nameEl2]].get()),
+															extract( itC.data,1,1, 3,1),
+															extract( itC.data,1,2, 3,2)
 															))
 								);
 		
@@ -271,16 +278,14 @@ Simulation::Simulation(Environnement* env, ConstraintsList& cl) : Simulation(env
 		
 			case CTBallAndSocketJoint :
 			collectionC.insert( collectionC.end(), 
-								std::unique_ptr<IConstraint>(new BallAndSocketJoint( (RigidBody&)*simulatedObjects[Name2ID[ (*itC).nameEl1]], 
-															(RigidBody&)*simulatedObjects[Name2ID[ (*itC).nameEl2]],
-															extract( (*itC).data,1,1, 3,1),
-															extract( (*itC).data,1,2, 3,2)
+								std::unique_ptr<IConstraint>(new BallAndSocketJoint( *((RigidBody*)simulatedObjects[Name2ID[ itC.nameEl1]].get()), 
+															*((RigidBody*)simulatedObjects[Name2ID[ itC.nameEl2]].get()),
+															extract( itC.data,1,1, 3,1),
+															extract( itC.data,1,2, 3,2)
 															))
 								);
 			break;
 		}	
-		
-		itC++;
 	}
 	
 #ifdef debug
@@ -1065,12 +1070,25 @@ void Simulation::updateQQdot()
 	int b1 = 0;
 	int b2 = 0;
 	
+	q.afficher();
+	
+	
 	for( auto& o : simulatedObjects ) 
 	{	
-		((RigidBody&)(*o)).setPosition( extract(q, b1+1,1, b1+3,1) );
-		((RigidBody&)(*o)).setMatOrientation( extract(q, b1+4,1, b1+7,1) );
-		((RigidBody&)(*o)).setLinearVelocity( extract( qdot, b2+1,1, b2+3,1) );
-		((RigidBody&)(*o)).setAngularVelocity( extract( qdot, b2+4,1, b1+6,1) );
+		((RigidBody*)(o.get()))->setPosition( extract(q, b1+1,1, b1+3,1) );
+		
+#ifdef debuglvl1		
+		std::cout << " SIM : TEST AVANT MODIF : " << std::endl;
+		((RigidBody*)(o.get()))->getMatOrientation().afficher();
+#endif		
+		((RigidBody*)(o.get()))->setMatOrientation( extract(q, b1+4,1, b1+7,1) );
+		((RigidBody*)(o.get()))->setLinearVelocity( extract( qdot, b2+1,1, b2+3,1) );
+		((RigidBody*)(o.get()))->setAngularVelocity( extract( qdot, b2+4,1, b1+6,1) );
+		
+#ifdef debuglvl1		
+		std::cout << " SIM : APRES MODIF : " << std::endl;
+		((RigidBody*)(o.get()))->getMatOrientation().afficher();
+#endif		
 		b1+=7;
 		b2+=6;	
 	}
@@ -1085,14 +1103,22 @@ void Simulation::updateStates()
 	std::string name;
 	int id = 0;
 	
+	ressourcesMutex.lock();
 	for( const auto& itEl : env->ListeElements)
 	{
+		ressourcesMutex.unlock();
+		ressourcesMutex.lock();
 		name = itEl->getName();
+		ressourcesMutex.unlock();
+		
 		
 		if( Name2ID.count( name) )
 		{
 			id = Name2ID[name];
+			ressourcesMutex.lock();
 			itEl->setPose( ((RigidBody*)simulatedObjects[id].get())->getPose() );
+			ressourcesMutex.unlock();
+			
 			((RigidBody*)simulatedObjects[id].get())->clearUser();
 		}
 	}

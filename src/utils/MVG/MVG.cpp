@@ -1,5 +1,7 @@
 #include "MVG.h"
 
+//#define debuglvl1
+
 float trace(const Mat<float>& m)
 {
 	float sum = 0.0f;
@@ -12,8 +14,12 @@ Mat<float> logM( const Mat<float>& m)
 {
 	float ctheta = (trace(m)-1.0f)/2.0f;
 	
-	float precision = (float)1e-20;
-	if( ctheta < precision && ctheta > -ctheta)
+#ifdef debuglvl1
+	std::cout << " LOGM : COS THETA ROTATION  = " << ctheta << std::endl; 
+#endif	
+
+	float precision = (float)1e-10;
+	if( ctheta <= 1.0f+precision && ctheta >= 1.0f-precision)
 	{
 		return Mat<float>(0.0f,3,3); 
 	}
@@ -68,7 +74,28 @@ Mat<float> logMEuler( const Mat<float>& m)
 	cout << " Angles Euler : " << endl;
 	angles.afficher();
 	
-	return logM( rotation(angles.get(1,1),1) ) + logM( rotation(angles.get(2,1),2) ) + logM( rotation(angles.get(3,1),3) ) ;
+	Mat<float> r1( rotation(angles.get(1,1),1) );
+	Mat<float> r2( rotation(angles.get(2,1),2) );
+	Mat<float> r3( rotation(angles.get(3,1),3) );
+	
+#ifdef debuglvl1
+	std::cout << " LOGMEULERs : ROTATIONS" << std::endl;
+	r1.afficher();
+	r2.afficher();
+	r3.afficher();
+#endif	
+
+	r1 = logM(r1);
+	r2 = logM(r2);
+	r3 = logM(r3);
+
+#ifdef debuglvl1
+	std::cout << " LOGMEULERs : " << std::endl;
+	r1.afficher();
+	r2.afficher();
+	r3.afficher();
+#endif	
+	return r1+r2+r3 ;
 }
 
 Mat<float> expW3( const Mat<float>& w)
