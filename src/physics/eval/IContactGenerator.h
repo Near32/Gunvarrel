@@ -9,7 +9,7 @@ class Simulation;
 
 class IContactGenerator
 {
-	private :
+	protected :
 	
 	Simulation* sim;
 	
@@ -32,10 +32,7 @@ class IContactGenerator
 
 class ContactGeneratorA : public IContactGenerator
 {
-	private :
-	
-	Simulation* sim;
-	
+	private :	
 	
 	//----------------------------------------
 	//----------------------------------------	

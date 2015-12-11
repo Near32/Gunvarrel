@@ -70,9 +70,11 @@ Mat<float> logMEuler( const Mat<float>& m)
 {
 	Mat<float> angles(3,1);
 	Rot2Euler( m, angles);
-	
+
+#ifdef debuglvl1	
 	cout << " Angles Euler : " << endl;
 	angles.afficher();
+#endif	
 	
 	Mat<float> r1( rotation(angles.get(1,1),1) );
 	Mat<float> r2( rotation(angles.get(2,1),2) );

@@ -692,7 +692,7 @@ Mat<T> operator*(const Mat<T>& a, const Mat<T>& b)
     {
         cerr << "Impossible d'operer la multiplication : mauvais formats de matrices.\n" << endl;
         cerr << "Format m1 : " << a.getLine() << " x " << a.getColumn() << "\t Fromat m2 : " << b.getLine() << " x " << b.getColumn() << endl;
-        exit(EXIT_FAILURE);        
+        throw;      
         return Mat<T>(1,1);
     }
 
@@ -747,7 +747,7 @@ Mat<T> operator*=( Mat<T>& a, const Mat<T>& b)
     {
         cerr << "Impossible d'operer la multiplication : mauvais formats de matrices.\n" << endl;
         cerr << "Format m1 : " << a.getLine() << " x " << a.getColumn() << "\t Fromat m2 : " << b.getLine() << " x " << b.getColumn() << endl;
-        exit(EXIT_FAILURE);        
+        throw;       
         return Mat<T>(1,1);
     }
 

@@ -23,7 +23,7 @@ IContactGenerator::~IContactGenerator()
 //----------------------------
 
 
-ContactGeneratorA::ContactGeneratorA(Simulation *sim_) : IContactGenerator(sim_)
+ContactGeneratorA::ContactGeneratorA(Simulation* sim_) : IContactGenerator(sim_)
 {
 
 }
@@ -55,8 +55,9 @@ std::cout << "COLLISION DETECTOR : CONTACT GENERATOR : penetration depths comput
 	while(contact != c.end() )
 	{
 		//TODO : retrieve the penetration depths...
-		//in the mean time :
-		pD[i] = 1.0f;
+		//in the mean time : we assume that we want the body's origin to be separated of the sum of the BRadius.
+		//pD[i] = 1.0f;
+		pD[i] = contact->rbA->getShapeReference().getBRadius()+contact->rbB->getShapeReference().getBRadius();
 				
 		contact++;
 		i++;
@@ -67,12 +68,14 @@ std::cout << "COLLISION DETECTOR : CONTACT GENERATOR : contact forces creations 
 #endif	
 	//--------------------------------------
 	//let us create the SpringForceEffect required into the simulation with endTime being the next simulation step time :
-	/*
-	for(int i=size;i--;)
+	
+	for(;i--;)
 	{
-		sim->collectionF.insert( sim->collectionF.end(), std::unique_ptr<IForceEffect>( new SpringForceEffect(c[i].contactPoint[0], c[i].contactPoint[1], *(c[i].rbA), *(c[i].rbB), pD[i] ) ) );
+		sim->collectionF.insert( sim->collectionF.begin(), std::unique_ptr<IForceEffect>( new SpringForceEffect( /*in LOCAL : c[i].rbA->getPosition()*/Mat<float>((float)0,3,1), /*in LOCAL : c[i].rbB->getPosition()*/Mat<float>((float)0,3,1), *(c[i].rbA), *(c[i].rbB), pD[i] ) ) );
+		//sim->collectionF[sim->collectionF.size()-1]->setEndTime( sim->getTime()+sim->getTimeStep());
+		sim->collectionF[0]->setEndTime( sim->getTime()+sim->getTimeStep());
+		//this collision force is only here for one timestep and it will be recreated if needed on the next time step.
 	}
-	*/
 
 	
 }

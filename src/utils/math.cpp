@@ -57,6 +57,7 @@ se3::se3(const Mat<float>& w_, const Mat<float>& t_) : hasChanged(true)	//so tha
 		std::cout << e.what() << std::endl;
 		throw e;
 	}
+	
 }
 
 se3::se3(const Mat<float>& t_) : t( new Mat<float>(t_)),w( new Mat<float>(0.0f,3,1)), SE3( new Mat<float>((float)0, 4,4) ), hasChanged(true)	//so that SE3 would be computed on the first access...
@@ -86,6 +87,21 @@ se3::se3(const float* w_t_array) : SE3( new Mat<float>((float)0,4,4) ), hasChang
 	this->t->set( w_t_array[5], 3,1);
 }
 	
+se3::se3(const se3& x) : hasChanged(true)
+{
+	try
+	{
+		t = new Mat<float>(x.getT());
+		w = new Mat<float>(x.getW());
+		SE3 = new Mat<float>(x.getSE3());
+	}
+	catch( std::exception& e)
+	{
+		std::cout << e.what() << std::endl;
+		throw e;
+	}
+}
+
 se3::~se3()
 {
 	delete t;
@@ -97,9 +113,11 @@ Mat<float> se3::exp()					//compute the (R | t) matrix.
 {
 	if(hasChanged)
 	{
+#ifdef debuglvl1	
 		std::cout << " EXP : w et t : " << std::endl;
 		w->afficher();
 		t->afficher();
+#endif		
 		*SE3 = expM( operatorC( *w, *t) );
 		hasChanged = false;
 	}
@@ -111,7 +129,7 @@ void se3::setT(const Mat<float>& t_)
 {
 	if(t_.getLine() == 3 && t_.getColumn() == 1)
 	{
-		*(this->t) = t_;
+		*t = t_;
 		hasChanged = true;
 	}
 }

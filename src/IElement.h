@@ -29,12 +29,13 @@ class IElement
 	
 	se3& getPoseReference() const
 	{
-		return *pose;
+		return *((se3*)(pose.get()));
 	}
 	
 	void setPose( const se3& p)
 	{
-		(*pose) = p;
+		pose.reset( new se3(p) );
+		//(*pose) = p;
 	}
 	
 	std::string getName()	const

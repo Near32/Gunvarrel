@@ -1,5 +1,9 @@
 #include "RigidBody.h"
 
+
+//#define debuglvl1
+
+
 RigidBody::RigidBody() : ISimulationObject(), IMoveable(), userForce( Mat<float>((float)0,3,1) ), userTorque(Mat<float>((float)0,3,1)), isFixed(false), canCollide(true), mass(1.0f), imass(1.0f), Inertia(Identity3), iInertia(Identity3), ptrShape(new SphereShape(this))
 {
 	type = TSORigidBody;
@@ -141,12 +145,13 @@ void RigidBody::addForce(const Mat<float>& force)
 void RigidBody::addForceAtWorldPoint(const Mat<float>& force, const Mat<float>& pointW)
 {
 	addForce(force);
-	addTorque( crossproductV( pointW-extract(Pose->exp(), 1,4, 3,4), force) );	
+	addTorque( crossproductV( pointW-extract(Pose->exp(), 1,4, 3,4), force) );		
 }
 
 void RigidBody::addForceAtBodyPoint(const Mat<float>& force, const Mat<float>& pointL)
 {
-	addForceAtWorldPoint( force, getPointInWorld(pointL) );
+	addForce(force);
+	addTorque( crossproductV( pointL, force) );	
 }
 
 
@@ -171,7 +176,11 @@ void RigidBody::calculateDerivedData()
 
 Mat<float> RigidBody::getPointInWorld( const Mat<float>& pointL)
 {
-	return transpose( extract(Pose->exp(), 1,1, 3,3))* (pointL-extract(Pose->exp(), 1,4, 3,4) );	
+#ifdef debuglvl1
+std::cout << "RGB : get point in world : pose :" << std::endl;	
+Pose->exp().afficher();
+#endif
+	return transpose( extract(Pose->exp(), 1,1, 3,3)) * (pointL-extract(Pose->exp(), 1,4, 3,4) );	
 }
 
 Mat<float> RigidBody::getPointInLocal( const Mat<float>& pointW)

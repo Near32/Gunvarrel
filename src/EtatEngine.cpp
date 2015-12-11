@@ -36,12 +36,12 @@ void EtatEngine::loop()
 				//DEBUGGING :
 				case TCSimulateStride:
 				{
-				float timestep = 8e-1f;
+				float timestep = 5e-2f;
 				float time = sim->getTime();
 #ifdef debug
 std::cout << "SIMULATION : run : ..." << std::endl;
 #endif					
-				sim->run(timestep,time+timestep);
+				sim->run(timestep,time+10*timestep);
 #ifdef debug
 std::cout << "SIMULATION : run : successfully !!" << std::endl;
 #endif				
@@ -124,7 +124,8 @@ void EtatEngine::init()
 	int nbrOrbeBonus = 0;
 	//on veut changer sa position avec une hauteur un peu plus grande :
 	t.set(20.0f,3,1);
-	t.set(10.0f,1,1); 
+	t.set(30.0f,1,1);
+	t.set(30.0f,2,1); 
 	env->addElement( env->fabriques->fabriquer(ELFOrbeBonus, std::string("orbebonus")+std::to_string(nbrOrbeBonus), new se3(t), hwd ) );
 	nbrOrbeBonus++;
 	//--------------------------------

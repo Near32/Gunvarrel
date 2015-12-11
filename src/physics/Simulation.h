@@ -37,6 +37,8 @@ class Simulation
 	SparseMat<float> invM;
 	SparseMat<float> S;
 	
+	float SimulationTimeStep;
+	
 	//-------------------------------------------------------------
 	//-------------------------------------------------------------
 	
@@ -61,6 +63,7 @@ class Simulation
 	
 	void constructQQdotInvMSFext();
 	void constructQQdotInvMSFextDEBUG();
+	void updateInvMSFext();
 	
 	//void updateQQdotInvMSFext();
 	
@@ -81,6 +84,7 @@ class Simulation
 	*/
 	
 	float getTime()	const;
+	float getTimeStep()	const;
 	
 	
 };

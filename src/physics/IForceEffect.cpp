@@ -1,6 +1,7 @@
 #include "IForceEffect.h"
 
 #define INF numeric_limits<float>::epsilon()
+//#define debuglvl1
 
 IForceEffect::IForceEffect() : endTime(INF)
 {
@@ -62,9 +63,17 @@ void SpringForceEffect::Apply(float dt, RigidBody& RB)
 	Mat<float> p1W( body.getPointInWorld(connectionPointL) );
 	Mat<float> p2W( other.getPointInWorld(otherConnectionPointL));
 	
+#ifdef debuglvl1
+std::cout << "SPRING FORCE : pinW" << std::endl;
+body.getPosition().afficher();
+other.getPosition().afficher();
+#endif
 	Mat<float> force(p1W-p2W);
 	
 	float magnitude = norme2(force);
+	if(magnitude < numeric_limits<float>::epsilon())
+		magnitude = 1e-10f;
+		
 	force *= 1.0f/magnitude;
 	
 	magnitude = springConstant*fabs_(magnitude-restLength);
