@@ -71,7 +71,7 @@ std::cout << "COLLISION DETECTOR : CONTACT GENERATOR : contact forces creations 
 	
 	for(;i--;)
 	{
-		sim->collectionF.insert( sim->collectionF.begin(), std::unique_ptr<IForceEffect>( new SpringForceEffect( /*in LOCAL : c[i].rbA->getPosition()*/Mat<float>((float)0,3,1), /*in LOCAL : c[i].rbB->getPosition()*/Mat<float>((float)0,3,1), *(c[i].rbA), *(c[i].rbB), pD[i] ) ) );
+		sim->collectionF.insert( sim->collectionF.begin(), std::unique_ptr<IForceEffect>( new SpringForceEffect( /*in LOCAL : c[i].rbA->getPosition()*/c[i].rbA->getPointInLocal(c[i].contactPoint[0]), /*in LOCAL : c[i].rbB->getPosition()*/c[i].rbB->getPointInLocal(c[i].contactPoint[0]), *(c[i].rbA), *(c[i].rbB), pD[i] ) ) );
 		//sim->collectionF[sim->collectionF.size()-1]->setEndTime( sim->getTime()+sim->getTimeStep());
 		sim->collectionF[0]->setEndTime( sim->getTime()+sim->getTimeStep());
 		//this collision force is only here for one timestep and it will be recreated if needed on the next time step.

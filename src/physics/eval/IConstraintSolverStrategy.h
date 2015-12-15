@@ -68,6 +68,7 @@ class SimultaneousImpulseBasedConstraintSolverStrategy : public IConstraintSolve
 	
 	
 	void computeConstraintsJacobian(std::vector<std::unique_ptr<IConstraint> >& c);
+	void computeConstraintsJacobian(std::vector<std::unique_ptr<IConstraint> >& c, const Mat<float>& q, const Mat<float>& qdot);
 		
 	virtual void Solve(float dt, std::vector<std::unique_ptr<IConstraint> >& c, Mat<float>& q, Mat<float>& qdot, SparseMat<float>& invM, SparseMat<float>& S, const Mat<float>& Fext ) override;
 

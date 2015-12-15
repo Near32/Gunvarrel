@@ -153,7 +153,7 @@ void VueEngine::Dessiner(float angleX, float angleZ)
 	camera->look();
 	//----------------------------
 
-	drawGunvarrel();
+	//drawGunvarrel();
 	
 	Environnement* env = game->ptrEtat->env;//getEnvironnementFromETATENGINE();
 	
@@ -205,10 +205,10 @@ std::cout << " VUE : " << env->ListeElements.size() << " element(s) to draw." <<
 			//ground...
 			glBegin(GL_QUADS);
 			glColor3ub(230,230,230);
-			glVertex3d(-100,-100,-2);
-			glVertex3d(100,-100,-2);
-			glVertex3d(100,100,-2);
-			glVertex3d(-100,100,-2);
+			glVertex3d(-200,-200,-0);
+			glVertex3d(200,-200,-0);
+			glVertex3d(200,200,-0);
+			glVertex3d(-200,200,-0);
 			glEnd();
 		}
 #ifdef debuglvl1		
@@ -233,7 +233,7 @@ std::cout << " VUE : element : " << env->ListeElements[i]->name << " has been dr
 	/*-----------------------------------*/	
 	/*test code that will be deleted....*/
 	/*-----------------------------------*/
-	
+	/*
 	//ground...
 	glBegin(GL_QUADS);
 	glColor3ub(230,230,230);
@@ -286,7 +286,7 @@ std::cout << " VUE : element : " << env->ListeElements[i]->name << " has been dr
     glVertex3d(1,1,1);
     glVertex3d(-1,1,1);
     glVertex3d(-1,-1,1);
-    
+    */
     /*--------------------------------------------*/	
 	/*END OF : test code that will be deleted....*/
 	/*------------------------------------------*/

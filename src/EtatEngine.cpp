@@ -36,7 +36,7 @@ void EtatEngine::loop()
 				//DEBUGGING :
 				case TCSimulateStride:
 				{
-				float timestep = 5e-2f;
+				float timestep = 1e-1f;
 				float time = sim->getTime();
 #ifdef debug
 std::cout << "SIMULATION : run : ..." << std::endl;
@@ -97,17 +97,19 @@ void EtatEngine::init()
 	
 	//constraints :
 	Mat<float> AnchorAL(0.0f,3,1);
-	AnchorAL.set( hwd.get(3,1)/2+1.0f, 3,1);
-	Mat<float> HJAxis(0.0f,3,1);
-	HJAxis.set( 1.0f, 1,1);
-	cl.insert( cl.end(), ConstraintInfo(std::string("picBAS"),std::string("picHAUT"), CTBallAndSocketJoint, operatorL(AnchorAL,HJAxis) ) ); 
+	AnchorAL.set( -hwd.get(3,1)/2-1.0f, 3,1);
+	//Mat<float> HJAxis(0.0f,3,1);
+	//HJAxis.set( 1.0f, 1,1);
+	Mat<float> AnchorBL(0.0f,3,1);
+	AnchorBL.set( hwd.get(3,1)/2+1.0f, 3,1);
+	cl.insert( cl.end(), ConstraintInfo(std::string("picBAS"),std::string("picHAUT"), CTBallAndSocketJoint, operatorL(AnchorAL,AnchorBL) ) ); 
 	
 	//resetting :
 	t = Mat<float>(0.0f,3,1);
 	hwd = Mat<float>(10.0f,3,1);
 	//--------------------------------
 	
-	
+	/*
 	//map : obstacles :
 	int nbrObstacle = 0;
 	//on veut changer sa position avec une hauteur un peu plus grande :
@@ -128,6 +130,7 @@ void EtatEngine::init()
 	t.set(30.0f,2,1); 
 	env->addElement( env->fabriques->fabriquer(ELFOrbeBonus, std::string("orbebonus")+std::to_string(nbrOrbeBonus), new se3(t), hwd ) );
 	nbrOrbeBonus++;
+	*/
 	//--------------------------------
 	
 	//-------------------------------

@@ -6,7 +6,7 @@
 
 #include <mutex>
 
-#define debug
+//#define debug
 //#define debuglvl1
 //#define debuglvl2
 
@@ -110,6 +110,7 @@ std::cout << "SIMULATION : environnement initialization : ElementMobile : id = "
 				{
 					//let us put an initial velocity :
 					((RigidBody*)(simulatedObjects[id].get()))->setLinearVelocity( Mat<float>(-10.0f,3,1) );
+					//((RigidBody*)(simulatedObjects[id].get()))->setMass( 1e-2f );
 				}
 				
 				break;
@@ -316,8 +317,16 @@ void Simulation::run(float timeStep, float endTime)
 	{
 		while( time < endTime)
 		{
+			ressourcesMutex.lock();
+			//clock_t time = clock();
+			ressourcesMutex.unlock();
+			
 			runStride( timeStep);
 			time += timeStep;
+			
+			ressourcesMutex.lock();
+			//std::cout << "SIMULATION : " << timeStep << "seconds took : " << (float)(clock()-time)/CLOCKS_PER_SEC << " seconds of computation. " << std::endl;
+			ressourcesMutex.unlock();
 		}
 	}
 }
@@ -1296,8 +1305,6 @@ void Simulation::updateQQdot()
 	
 	int b1 = 0;
 	int b2 = 0;
-	
-	q.afficher();
 	
 	
 	for( auto& o : simulatedObjects ) 
