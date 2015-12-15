@@ -396,8 +396,8 @@ void SimultaneousImpulseBasedConstraintSolverStrategy::Solve(float dt, std::vect
 	c[0]->AnchorBL.afficher();
 	((RigidBody*)(sim->simulatedObjects[2].get()))->getPointInWorld(c[0]->AnchorBL ).afficher();
 	
-
-	Mat<float> A( (-1.0f)*transpose(constraintsJacobian) );
+	Mat<float> tConstraintsJacobian( transpose(constraintsJacobian) );
+	Mat<float> A( (-1.0f)*tConstraintsJacobian );
 	Mat<float> M( invGJ( invM.SM2mat() ) );
 	A = operatorL( M, A);
 	A = operatorC( A , operatorL( constraintsJacobian, Mat<float>((float)0,constraintsJacobian.getLine(), constraintsJacobian.getLine()) ) );
@@ -407,14 +407,15 @@ void SimultaneousImpulseBasedConstraintSolverStrategy::Solve(float dt, std::vect
 	Mat<float> tempLambda( invA * operatorC( Mat<float>((float)0,invA.getLine()-3,1) , constraintsJacobian*(invM*Fext)+offset ) );
 	lambda = extract( &tempLambda, qdot.getLine()+1, 1, tempLambda.getLine(), 1);
 	
-	qdot = extract(  &tempLambda, 1,1, qdot.getLine(), 1);
+	qdot = extract(  &tempLambda, 1,1, qdot.getLine(), 1)+tempInvMFext;
 	
 	
 	Mat<float> t( dt*( S*qdot ) );
 	q += t;
 	
 	//S.print();
-	//constraintsJacobian.afficher();
+	std::cout << " computed Pc : " << std::endl;
+	(tConstraintsJacobian*lambda).afficher();
 	//tempInvMFext.afficher();
 	//temp.afficher();
 	//(constraintsJacobian*(invM*Fext)).afficher();

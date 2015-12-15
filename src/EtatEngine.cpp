@@ -36,7 +36,7 @@ void EtatEngine::loop()
 				//DEBUGGING :
 				case TCSimulateStride:
 				{
-				float timestep = 1e-1f;
+				float timestep = 5e-1f;
 				float time = sim->getTime();
 #ifdef debug
 std::cout << "SIMULATION : run : ..." << std::endl;

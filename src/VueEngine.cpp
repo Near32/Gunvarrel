@@ -99,6 +99,8 @@ std::cout << " VUE : command handled..." << std::endl;
 		Dessiner(0.0f,0.0f);
 		ressourcesMutex.unlock();
 		
+		//DESSINERSDL();
+		
 		ressourcesMutex.lock();
 		gameON = game->gameON;
 		ressourcesMutex.unlock();
