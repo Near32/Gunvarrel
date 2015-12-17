@@ -77,7 +77,7 @@ class SpringForceEffect : public IForceEffect
 	//----------------------------------------
 	//----------------------------------------
 	SpringForceEffect();
-	SpringForceEffect( const Mat<float>& p1in1, const Mat<float>& p2in2, RigidBody& body_, RigidBody& other_, float restLength_ = 1.0f, float springConstant_ = 2.0f);
+	SpringForceEffect( const Mat<float>& p1in1, const Mat<float>& p2in2, RigidBody& body_, RigidBody& other_, float restLength_ = 1.0f, float springConstant_ = 1e-1f);
 	
 	~SpringForceEffect();
 	

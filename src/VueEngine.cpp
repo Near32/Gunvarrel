@@ -207,10 +207,10 @@ std::cout << " VUE : " << env->ListeElements.size() << " element(s) to draw." <<
 			//ground...
 			glBegin(GL_QUADS);
 			glColor3ub(230,230,230);
-			glVertex3d(-200,-200,-0);
-			glVertex3d(200,-200,-0);
-			glVertex3d(200,200,-0);
-			glVertex3d(-200,200,-0);
+			glVertex3d(-500,-500,250);
+			glVertex3d(500,-500,250);
+			glVertex3d(500,500,250);
+			glVertex3d(-500,500,250);
 			glEnd();
 		}
 #ifdef debuglvl1		

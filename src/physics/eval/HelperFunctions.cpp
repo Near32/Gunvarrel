@@ -1,5 +1,8 @@
 #include "HelperFunctions.h"
 
+
+#define debug 
+
 Mat<float> closestPointLOfBOXGivenPointL(RigidBody& rb, const Mat<float>& pointL)
 {
 	BoxShape& box = (BoxShape&)rb.getShapeReference();
@@ -63,10 +66,11 @@ bool testOBBPlane( RigidBody& box, RigidBody& plane)
 */
 Mat<float> testOBBOBB( RigidBody& b1, RigidBody& b2, bool& intersect)
 {
-	Mat<float> ret;
+	float precision = 1e-1f;
+	Mat<float> ret((float)0,3,1);
 	bool initialized = false;
-	BoxShape& box1 = (BoxShape&)b1.getShapeReference();
-	BoxShape& box2 = (BoxShape&)b2.getShapeReference();
+	BoxShape& box1 = (BoxShape&)(b1.getShapeReference());
+	BoxShape& box2 = (BoxShape&)(b2.getShapeReference());
 	
 	Mat<float> pointsB1((float)0,3,8);
 	//register the position of the 8 points composing b1:
@@ -90,14 +94,15 @@ Mat<float> testOBBOBB( RigidBody& b1, RigidBody& b2, bool& intersect)
 		{
 			for(int pm3=2;pm3--;)
 			{
-				temp.set( pm1*( min1.get(1,1) ) + (1-pm1)*( max1.get(1,1) ), 1,1);
-				temp.set( pm2*( min1.get(2,1) ) + (1-pm2)*( max1.get(2,1) ), 2,1);
-				temp.set( pm3*( min1.get(3,1) ) + (1-pm3)*( max1.get(3,1) ), 3,1);
+				Mat<float> tempL(3,1);
+				tempL.set( pm1*( min1.get(1,1) ) + (1-pm1)*( max1.get(1,1) ), 1,1);
+				tempL.set( pm2*( min1.get(2,1) ) + (1-pm2)*( max1.get(2,1) ), 2,1);
+				tempL.set( pm3*( min1.get(3,1) ) + (1-pm3)*( max1.get(3,1) ), 3,1);
 				
 				
 				//--------------------
 				//let us compute its coordinate in the world frame :
-				temp = b1.getPointInWorld( temp);
+				temp = b1.getPointInWorld( tempL);
 				
 				//----------------------
 				//let us find its associated projected point :
@@ -106,7 +111,7 @@ Mat<float> testOBBOBB( RigidBody& b1, RigidBody& b2, bool& intersect)
 				//----------------------
 				//let us find out if there was an intersection
 				// <==> voronoiTemp = temp, because it would means that the projected point is already the closest to b2 for it is within it.
-				if( voronoiTemp == temp)
+				if( equals(voronoiTemp,temp,precision) )
 				{
 					//let us refill pointsB1 with it :
 					pointsB1.set( temp.get(1,1), 1,col);
@@ -123,6 +128,18 @@ Mat<float> testOBBOBB( RigidBody& b1, RigidBody& b2, bool& intersect)
 						ret = temp;
 					}
 					intersect = true;
+					
+#ifdef debug
+std::cout << "COLLISION DETECTOR : midnarrowphase : testOBBOBB : voronoi and temp : " << std::endl;
+std::cout << " ids : b1 = " << b1.getID() << " ; b2 = " << b2.getID() << std::endl;
+voronoiTemp.afficher();
+temp.afficher();
+//tempL.afficher();
+#endif				
+				}
+				else
+				{
+
 				}
 				
 				
@@ -133,4 +150,31 @@ Mat<float> testOBBOBB( RigidBody& b1, RigidBody& b2, bool& intersect)
 	
 	return ret;
 }
+
+bool equals(const Mat<float>& a, const Mat<float>& b, float precision)
+{
+	if(a.getLine() == b.getLine() && a.getColumn() == b.getColumn())
+	{
+		for(int i=a.getLine();i--;)
+		{
+			for(int j=a.getColumn();j--;)
+			{
+				float vala = a.get(i+1,j+1);
+				float valb = b.get(i+1,j+1);
+				if( vala+precision < valb || vala-precision > valb)
+				{
+					return false;
+				}
+			}
+		}
+	}
+	else
+	{
+		std::cerr << "EQUALS : matrices a and b are not of the same sizes." << std::endl;
+		return false;
+	}
+		
+	return true;
+}
+
 

@@ -36,7 +36,7 @@ void EtatEngine::loop()
 				//DEBUGGING :
 				case TCSimulateStride:
 				{
-				float timestep = 5e-1f;
+				float timestep = 1e-1f;
 				float time = sim->getTime();
 #ifdef debug
 std::cout << "SIMULATION : run : ..." << std::endl;
@@ -68,8 +68,9 @@ std::cout << "SIMULATION : run : successfully !!" << std::endl;
 void EtatEngine::init()
 {
 	//let's create the Elements that we need.
-	Mat<float> hwd(100.0f,3,1);
-	Mat<float> t(0.0f,3,1);
+	Mat<float> hwd(500.0f,3,1);
+	Mat<float> t((float)0,3,1);
+	
 	ConstraintsList cl;
 	
 	//--------------------------------
@@ -82,26 +83,29 @@ void EtatEngine::init()
 	//sa position est bien à l'origine..
 	//resetting :
 	t *= 0.0f;
-	hwd *= 1.0f/100.0f;
+	hwd = Mat<float>(1.0f,3,1);
 	//--------------------------------
 	
 	
 	//Gunvarrel :
 	hwd *= 10.0f;
 	hwd.set(20.0f,3,1);
-	t.set( hwd.get(3,1)/2+1.0f, 3,1);
+	t.set( hwd.get(3,1)/2+1.0f, 3,1);	
 	env->addElement( new ElementMobile(std::string("picBAS"), new se3(t), hwd) );
 	
-	t.set( t.get(3,1)+hwd.get(3,1)+1.0f, 3,1);
+	t.set( t.get(3,1)+hwd.get(3,1)+2.0f, 3,1);
+	
+	t.set( t.get(2,1)+0.0f, 2,1);
+		
 	env->addElement( new ElementMobile(std::string("picHAUT"), new se3(t), hwd) );
 	
 	//constraints :
 	Mat<float> AnchorAL(0.0f,3,1);
-	AnchorAL.set( -hwd.get(3,1)/2-1.0f, 3,1);
+	AnchorAL.set( -hwd.get(3,1)/2-2.0f, 3,1);
 	//Mat<float> HJAxis(0.0f,3,1);
 	//HJAxis.set( 1.0f, 1,1);
 	Mat<float> AnchorBL(0.0f,3,1);
-	AnchorBL.set( hwd.get(3,1)/2+1.0f, 3,1);
+	AnchorBL.set( hwd.get(3,1)/2+2.0f, 3,1);
 	cl.insert( cl.end(), ConstraintInfo(std::string("picBAS"),std::string("picHAUT"), CTBallAndSocketJoint, operatorL(AnchorAL,AnchorBL) ) ); 
 	
 	//resetting :

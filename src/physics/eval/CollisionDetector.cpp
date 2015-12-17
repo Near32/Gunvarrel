@@ -26,7 +26,9 @@ std::cout << "COLLISION DETECTOR : broadPhase : ..." << std::endl;
 	
 	broadPhase->checkForCollisions(contacts);
 	
+	
 #ifdef debug
+std::cout << "COLLISION DETECTOR : nbrContacts : " << contacts.size() << std::endl;
 std::cout << "COLLISION DETECTOR : midNarrowPhase : ..." << std::endl;
 #endif
 
@@ -35,12 +37,14 @@ std::cout << "COLLISION DETECTOR : midNarrowPhase : ..." << std::endl;
 	
 	
 #ifdef debug
+std::cout << "COLLISION DETECTOR : nbrContacts : " << contacts.size() << std::endl;
 std::cout << "COLLISION DETECTOR : constraints generation : ..." << std::endl;
 #endif
 	
 	contactGenerator->generateContactConstraints(contacts);
 	
 #ifdef debug
+std::cout << "COLLISION DETECTOR : nbrContacts : " << contacts.size() << std::endl;
 std::cout << "COLLISION DETECTOR : all set : OKAY." << std::endl;
 #endif	
 }

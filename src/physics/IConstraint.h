@@ -71,12 +71,10 @@ class ContactConstraint : public IConstraint
 	//Anchors can be iniatilized to the center of mass, by default.
 	//Axises can be initialized to the local coordinate frame axises.
 	ContactConstraint(RigidBody& rbA_, RigidBody& rbB_, float penetrationDepth_ = 0.0f);
+	ContactConstraint(RigidBody& rbA_, RigidBody& rbB_, const Mat<float>& cPointAL, const Mat<float>& cPointBL, float penetrationDepth_=0.0f);
 	
 	
-	~ContactConstraint()	
-	{
-	
-	}	
+	~ContactConstraint();	
 		
 	virtual void addPenaltySpring(float dt = 0.001f) override;
 	virtual void applyConstraintImpulse(float dt = 0.001f) override;
@@ -102,10 +100,7 @@ class BallAndSocketJoint : public IConstraint
 	BallAndSocketJoint(RigidBody& rbA_, RigidBody& rbB_, const Mat<float>& AnchorAL, const Mat<float>& AnchorBL);
 	
 	
-	~BallAndSocketJoint()	
-	{
-	
-	}
+	~BallAndSocketJoint();
 	
 	virtual void addPenaltySpring(float dt = 0.001f) override;
 	virtual void applyConstraintImpulse(float dt = 0.001f) override;

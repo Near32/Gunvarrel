@@ -10,6 +10,8 @@
 //#define debuglvl1
 //#define debuglvl2
 
+#define benchmark
+
 extern mutex ressourcesMutex;
 
 Simulation::Simulation() : time(0.0f), updater(new Updater(this, new ExplicitEulerIntegrator(this)) ), constraintsSolver( new SimultaneousImpulseBasedConstraintSolverStrategy(this) ), collisionDetector( new CollisionDetector(this) )
@@ -21,7 +23,7 @@ Simulation::Simulation() : time(0.0f), updater(new Updater(this, new ExplicitEul
 #ifdef debug
 	std::cout << "SIMULATION : minimal initialization : OKAY." << std::endl;
 #endif	
-	SimulationTimeStep = 1e-1f;
+	SimulationTimeStep = 5e-1f;
 }
 
 
@@ -64,6 +66,7 @@ std::cout << "SIMULATION : environnement initialization : ElementFixe : Obstacle
 					((RigidBody*)(simulatedObjects[id].get()))->isFixed = true;
 					((RigidBody*)(simulatedObjects[id].get()))->setIMass( 1e-1f );//numeric_limit<float>::epsilon() );
 					
+					
 #ifdef debug
 	std::cout << "SIMULATION : environnement initialization : GROUND : id = " << id << " : OKAY." << std::endl;
 #endif
@@ -105,13 +108,17 @@ std::cout << "SIMULATION : environnement initialization : ElementFixe OrbeBonus 
 std::cout << "SIMULATION : environnement initialization : ElementMobile : id = " << id << " : ...." << std::endl;
 #endif					
 				((BoxShape&)((RigidBody*)(simulatedObjects[id].get()))->getShapeReference()).setHWD( ((IElementMobile*)(element.get()))->hwd );
-				
+			
+#ifdef benchmark			
+					
 				if(element->getName() == std::string("picHAUT"))
 				{
 					//let us put an initial velocity :
 					((RigidBody*)(simulatedObjects[id].get()))->setLinearVelocity( Mat<float>(-100.0f,3,1) );
+					((RigidBody*)(simulatedObjects[id].get()))->setIMass( 1e2f );
 					//((RigidBody*)(simulatedObjects[id].get()))->setMass( 1e-2f );
 				}
+#endif
 				
 				break;
 				

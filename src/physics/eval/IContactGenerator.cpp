@@ -56,8 +56,8 @@ std::cout << "COLLISION DETECTOR : CONTACT GENERATOR : penetration depths comput
 	{
 		//TODO : retrieve the penetration depths...
 		//in the mean time : we assume that we want the body's origin to be separated of the sum of the BRadius.
-		//pD[i] = 1.0f;
-		pD[i] = contact->rbA->getShapeReference().getBRadius()+contact->rbB->getShapeReference().getBRadius();
+		pD[i] = 1.0f;
+		//pD[i] = contact->rbA->getShapeReference().getBRadius()+contact->rbB->getShapeReference().getBRadius();
 				
 		contact++;
 		i++;

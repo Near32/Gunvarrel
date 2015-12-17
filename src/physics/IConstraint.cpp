@@ -74,6 +74,17 @@ ContactConstraint::ContactConstraint(RigidBody& rbA_, RigidBody& rbB_, float pen
 
 }
 
+ContactConstraint::ContactConstraint(RigidBody& rbA_, RigidBody& rbB_, const Mat<float>& cPointAL, const Mat<float>& cPointBL, float penetrationDepth_) : penetrationDepth(penetrationDepth_), IConstraint( rbA_, rbB_)
+{
+	AnchorAL = cPointAL;
+	AnchorBL = cPointBL;
+}
+
+ContactConstraint::~ContactConstraint()
+{
+
+}
+
 void ContactConstraint::addPenaltySpring(float dt)
 {
 
@@ -93,12 +104,15 @@ void ContactConstraint::applyPositionCorrection(float dt)
 void ContactConstraint::computeJacobians()
 {
 	//A :
+	Mat<float> Identity(0.0f,3,3);
+	for(int i=3;i--;)	Identity.set(1.0f,i+1,i+1);
 	
+	JacobianA = operatorL( Identity, (-1.0f)*crossProduct(AnchorAL) );
 	
 	//---------------------
 	
 	//B : 
-	
+	JacobianB = operatorL( (-1.0f)*Identity, crossProduct(AnchorBL) );
 }
 
 
@@ -126,6 +140,11 @@ BallAndSocketJoint::BallAndSocketJoint(RigidBody& rbA_, RigidBody& rbB_, const M
 {
 	AnchorAL = AnchorAL_;
 	AnchorBL = AnchorBL_;
+}
+
+BallAndSocketJoint::~BallAndSocketJoint()
+{
+
 }
 
 	

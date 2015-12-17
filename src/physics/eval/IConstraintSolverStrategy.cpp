@@ -379,14 +379,14 @@ void SimultaneousImpulseBasedConstraintSolverStrategy::Solve(float dt, std::vect
 void SimultaneousImpulseBasedConstraintSolverStrategy::Solve(float dt, std::vector<std::unique_ptr<IConstraint> >& c, Mat<float>& q, Mat<float>& qdot, SparseMat<float>& invM, SparseMat<float>& S, const Mat<float>& Fext )
 {
 	
-	computeConstraintsJacobian(c);
+	//computeConstraintsJacobian(c);
 	Mat<float> tempInvMFext( dt*(invM * Fext) ) ;
-	qdot += tempInvMFext;
-	//computeConstraintsJacobian(c,q,qdot);
+	//qdot += tempInvMFext;
+	computeConstraintsJacobian(c,q,qdot);
 	
 	Mat<float> offset((float)10,3,1);
 	Mat<float> C( ((RigidBody*)(sim->simulatedObjects[1].get()))->getPointInWorld(c[0]->AnchorAL )-((RigidBody*)(sim->simulatedObjects[2].get()))->getPointInWorld(c[0]->AnchorBL) );
-	offset = (0.5f/dt)*C;
+	offset = (0.8f/dt)*C;
 	//BAUMGARTE STABILIZATION ....
 	
 	std::cout << "Constraints BASJoint : norme  = " << norme2(C) << std::endl;
@@ -416,7 +416,8 @@ void SimultaneousImpulseBasedConstraintSolverStrategy::Solve(float dt, std::vect
 	//S.print();
 	std::cout << " computed Pc : " << std::endl;
 	(tConstraintsJacobian*lambda).afficher();
-	//tempInvMFext.afficher();
+	std::cout << "invM*Fext : " << std::endl;
+	tempInvMFext.afficher();
 	//temp.afficher();
 	//(constraintsJacobian*(invM*Fext)).afficher();
 	//(invM*Fext).afficher();

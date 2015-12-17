@@ -9,6 +9,7 @@ Mat<float> closestPointWOfBOXGivenPointW(RigidBody& rb, const Mat<float>& pointW
 bool testOBBPlane( RigidBody& box, RigidBody& plane);
 
 Mat<float> testOBBOBB( RigidBody& b1, RigidBody& b2, bool& intersect);
+bool equals(const Mat<float>& a, const Mat<float>& b, float precision);
 
 
 

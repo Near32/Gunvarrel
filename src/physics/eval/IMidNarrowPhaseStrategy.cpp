@@ -1,6 +1,9 @@
 #include "IMidNarrowPhaseStrategy.h"
 #include "../Simulation.h"
 
+
+#define debug
+
 IMidNarrowPhaseStrategy::IMidNarrowPhaseStrategy(Simulation* sim_) : sim(sim_)
 {
 
@@ -195,6 +198,21 @@ void MidNarrowPhaseStrategyA::checkForCollisions(std::vector<Contact>& c)
 				{
 				bool testIntersection = false;
 				Mat<float> intersectingPointsWOfA( testOBBOBB( *(contact->rbA), *(contact->rbB), testIntersection) );
+#ifdef debug
+std::cout << "COLLISION DETECTOR : midnarrowphase : box-box case : intersection ? " << testIntersection << std::endl;
+intersectingPointsWOfA.afficher();
+#endif				
+				if(testIntersection)
+				{
+					//the two boxes are intersecting : let us fill in the Contact structure :
+					for(int i=intersectingPointsWOfA.getColumn();i--;)
+					{
+						contact->contactPoint.insert( contact->contactPoint.begin(), extract(intersectingPointsWOfA, 1,i+1, 3,i+1) );
+					}
+				}
+				
+				//other view : rbB collide with rbA :
+				intersectingPointsWOfA = testOBBOBB( *(contact->rbB), *(contact->rbA), testIntersection);
 				
 				if(testIntersection)
 				{
@@ -206,6 +224,9 @@ void MidNarrowPhaseStrategyA::checkForCollisions(std::vector<Contact>& c)
 				}
 				else
 				{
+					//in the end, given that the function testOBBOBB only asserts the boolean testIntersection,
+					//if we enter here it means that both test have failed to assert it and we are entitled to
+					//erase the false positively pre-assumed contact.
 					//the two boxes are not intersecting.
 					c.erase(contact);
 					erase = true;
