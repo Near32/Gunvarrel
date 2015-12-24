@@ -26,6 +26,10 @@ void VueEngine::loop()
 	
 	init();
 	
+	Uint32 last_time = SDL_GetTicks();
+    Uint32 current_time,ellapsed_time;
+    Uint32 start_time;
+	
 	
 	ressourcesMutex.lock();
 	bool gameON = game->gameON;
@@ -99,6 +103,18 @@ std::cout << " VUE : command handled..." << std::endl;
 		Dessiner(0.0f,0.0f);
 		ressourcesMutex.unlock();
 		
+		current_time = SDL_GetTicks();
+        ellapsed_time = current_time - last_time;
+        last_time = current_time;
+		
+		ellapsed_time = SDL_GetTicks() - start_time;
+        
+        
+        if (ellapsed_time < 20)
+        {
+            SDL_Delay(20 - ellapsed_time);
+        }
+        
 		//DESSINERSDL();
 		
 		ressourcesMutex.lock();

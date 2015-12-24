@@ -90,7 +90,7 @@ void EtatEngine::init()
 	//Gunvarrel :
 	hwd *= 10.0f;
 	hwd.set(20.0f,3,1);
-	t.set( hwd.get(3,1)/2+1.0f, 3,1);	
+	t.set( hwd.get(3,1)/2+2.0f, 3,1);	
 	env->addElement( new ElementMobile(std::string("picBAS"), new se3(t), hwd) );
 	
 	t.set( t.get(3,1)+hwd.get(3,1)+2.0f, 3,1);

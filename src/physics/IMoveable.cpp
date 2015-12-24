@@ -63,9 +63,7 @@ Mat<float> IMoveable::getPosition()
 }
 	
 Quat IMoveable::getOrientation()		
-{	
-	Pose->exp().afficher();
-	
+{
 	return Qt_FromMat( this->Pose->exp());
 }
 

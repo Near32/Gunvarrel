@@ -65,7 +65,7 @@ void BroadPhaseStrategyA::checkForCollisions(std::vector<Contact>& c)
 							{
 								// then there is a potentiel contact :
 								Contact contact( (RigidBody*)(it->get()), (RigidBody*)(other->get()) );
-								contact.contactPoint.insert( contact.contactPoint.end(), ((RigidBody*)(other->get()))->getPosition()+(1.0f/2.0f)*midline);
+								//contact.contactPoint.insert( contact.contactPoint.end(), ((RigidBody*)(other->get()))->getPosition()+(1.0f/2.0f)*midline);
 								contact.normal.insert( contact.normal.end(), (1.0f/magnitude)*midline);
 						
 								c.insert(c.end(), contact );
@@ -121,7 +121,7 @@ void BroadPhaseStrategyA::checkForCollisions(std::vector<Contact>& c)
 							{
 								// then there is a potentiel contact :
 								Contact contact( ((RigidBody*)(simul[i].get())), ((RigidBody*)(simul[o].get())) );
-								contact.contactPoint.insert( contact.contactPoint.end(), ((RigidBody*)(simul[o].get()))->getPosition()+(1.0f/2.0f)*midline);
+								//contact.contactPoint.insert( contact.contactPoint.end(), ((RigidBody*)(simul[o].get()))->getPosition()+(1.0f/2.0f)*midline);
 								contact.normal.insert( contact.normal.end(), (1.0f/magnitude)*midline);
 						
 								c.insert(c.end(), contact );

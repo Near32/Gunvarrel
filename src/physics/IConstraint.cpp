@@ -1,7 +1,12 @@
 #include "IConstraint.h"
 
+//#define debug
+
 IConstraint::IConstraint(RigidBody& rbA_, RigidBody& rbB_) : rbA(rbA_), rbB(rbB_), bodiesCanCollide(true)
 {
+	type = CTIC;
+	
+	C = Mat<float>(0.0f,3,1);
 	
 	AnchorAL = rbA.getPointInLocal( rbA.getPosition() );
 	AnchorBL = rbB.getPointInLocal( rbB.getPosition() );
@@ -71,13 +76,20 @@ IConstraint::~IConstraint()
 //Axises can be initialized to the local coordinate frame axises.
 ContactConstraint::ContactConstraint(RigidBody& rbA_, RigidBody& rbB_, float penetrationDepth_) : penetrationDepth(penetrationDepth_), IConstraint( rbA_, rbB_)
 {
-
+	C = rbA.getPointInWorld(AnchorAL)-rbB.getPointInWorld(AnchorBL);
+	type = CTContactConstraint;
 }
 
 ContactConstraint::ContactConstraint(RigidBody& rbA_, RigidBody& rbB_, const Mat<float>& cPointAL, const Mat<float>& cPointBL, float penetrationDepth_) : penetrationDepth(penetrationDepth_), IConstraint( rbA_, rbB_)
 {
 	AnchorAL = cPointAL;
 	AnchorBL = cPointBL;
+
+	C = rbA.getPointInWorld(AnchorAL)-rbB.getPointInWorld(AnchorBL);
+	
+	type = CTContactConstraint;
+	
+
 }
 
 ContactConstraint::~ContactConstraint()
@@ -107,12 +119,17 @@ void ContactConstraint::computeJacobians()
 	Mat<float> Identity(0.0f,3,3);
 	for(int i=3;i--;)	Identity.set(1.0f,i+1,i+1);
 	
-	JacobianA = operatorL( Identity, (-1.0f)*crossProduct(AnchorAL) );
+	JacobianA = operatorL( Identity, (1.0f)*crossProduct(AnchorAL) );
 	
 	//---------------------
 	
 	//B : 
-	JacobianB = operatorL( (-1.0f)*Identity, crossProduct(AnchorBL) );
+	JacobianB = operatorL( (-1.0f)*Identity, (-1.0f)*crossProduct(AnchorBL) );
+	
+	
+	//--------------------------
+	//Constraint :
+	C = rbA.getPointInWorld(AnchorAL)-rbB.getPointInWorld(AnchorBL);
 }
 
 
@@ -140,6 +157,10 @@ BallAndSocketJoint::BallAndSocketJoint(RigidBody& rbA_, RigidBody& rbB_, const M
 {
 	AnchorAL = AnchorAL_;
 	AnchorBL = AnchorBL_;
+	
+	C = rbA.getPointInWorld(AnchorAL)-rbB.getPointInWorld(AnchorBL); 
+	
+	type = CTBallAndSocketJoint;
 }
 
 BallAndSocketJoint::~BallAndSocketJoint()
@@ -176,6 +197,11 @@ void BallAndSocketJoint::computeJacobians()
 	
 	//B : 
 	JacobianB = operatorL( (-1.0f)*Identity, crossProduct(AnchorBL) );
+	
+	
+	//---------------------------
+	//Constraints :
+	C = rbA.getPointInWorld(AnchorAL)-rbB.getPointInWorld(AnchorBL);
 }
 
 
@@ -208,6 +234,10 @@ HingeJoint::HingeJoint( RigidBody& rbA_, RigidBody& rbB_, const Mat<float>& HJAx
 	//TODO : verify the correctness of this use of the axises in World Reference Frame ?...!!
 	
 	//--------------------
+	Mat<float> wij(rbA.getAngularVelocity()-rbB.getAngularVelocity());
+	C = operatorC( operatorC( BASJoint->getConstraint(), transpose(rbA.getAxisInWorld(HJAxisL1))*wij ), transpose(rbA.getAxisInWorld(HJAxisL2))*wij ); 
+	
+	type = CTHingeJoint;
 }
 
 HingeJoint::~HingeJoint()
@@ -278,7 +308,7 @@ void HingeJoint::computeJacobians()
 //Axises can be initialized to the local coordinate frame axises.
 ILimitConstraint::ILimitConstraint(RigidBody& rbA_, RigidBody& rbB_, float Min_, float Max_) : Min(Min_), Max(Max_), IConstraint( rbA_, rbB_)
 {
-
+	type = CTLimitConstraint;
 }
 
 ILimitConstraint::~ILimitConstraint()

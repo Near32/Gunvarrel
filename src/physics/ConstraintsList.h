@@ -7,6 +7,7 @@
 #include "../utils/Mat/Mat.h"
 
 enum ConstraintType{
+	CTIC,
 	CTContactConstraint,
 	CTHingeJoint,
 	CTBallAndSocketJoint,

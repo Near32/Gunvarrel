@@ -2,7 +2,7 @@
 #include "../Simulation.h"
 
 
-#define debug
+//#define debug
 
 IMidNarrowPhaseStrategy::IMidNarrowPhaseStrategy(Simulation* sim_) : sim(sim_)
 {
@@ -196,17 +196,22 @@ void MidNarrowPhaseStrategyA::checkForCollisions(std::vector<Contact>& c)
 			
 				case BOX :
 				{
+				bool deleting = true;
 				bool testIntersection = false;
 				Mat<float> intersectingPointsWOfA( testOBBOBB( *(contact->rbA), *(contact->rbB), testIntersection) );
 #ifdef debug
-std::cout << "COLLISION DETECTOR : midnarrowphase : box-box case : intersection ? " << testIntersection << std::endl;
+std::cout << "COLLISION DETECTOR : midnarrowphase : b1 into b2 : box-box case : intersection ? " << testIntersection << std::endl;
 intersectingPointsWOfA.afficher();
 #endif				
 				if(testIntersection)
 				{
+					deleting = false;
 					//the two boxes are intersecting : let us fill in the Contact structure :
 					for(int i=intersectingPointsWOfA.getColumn();i--;)
 					{
+#ifdef debug
+std::cout << "COLLISION DETECTOR : midnarrowphase : b1 into b2 : box-box case : intersection point added into the contact list nbr : " << i  << " ." << std::endl;
+#endif
 						contact->contactPoint.insert( contact->contactPoint.begin(), extract(intersectingPointsWOfA, 1,i+1, 3,i+1) );
 					}
 				}
@@ -214,19 +219,30 @@ intersectingPointsWOfA.afficher();
 				//other view : rbB collide with rbA :
 				intersectingPointsWOfA = testOBBOBB( *(contact->rbB), *(contact->rbA), testIntersection);
 				
+#ifdef debug
+std::cout << "COLLISION DETECTOR : midnarrowphase : b2 into b1 : box-box case : intersection ? " << testIntersection << std::endl;
+intersectingPointsWOfA.afficher();
+#endif								
 				if(testIntersection)
 				{
+					deleting = false;
 					//the two boxes are intersecting : let us fill in the Contact structure :
 					for(int i=intersectingPointsWOfA.getColumn();i--;)
 					{
-						contact->contactPoint.insert( contact->contactPoint.begin(), extract(intersectingPointsWOfA, 1,i+1, 3,i+1) );
+#ifdef debug
+std::cout << "COLLISION DETECTOR : midnarrowphase : b2 into b1 : box-box case : intersection point added into the contact list nbr : " << i  << " ." << std::endl;
+#endif					
+						contact->contactPoint.insert( contact->contactPoint.end(), extract(intersectingPointsWOfA, 1,i+1, 3,i+1) );
 					}
+					
+					//let us exchange the rb :
+					RigidBody* temp = contact->rbA;
+					contact->rbA = contact->rbB;
+					contact->rbA = temp;
 				}
-				else
+				
+				if(deleting)
 				{
-					//in the end, given that the function testOBBOBB only asserts the boolean testIntersection,
-					//if we enter here it means that both test have failed to assert it and we are entitled to
-					//erase the false positively pre-assumed contact.
 					//the two boxes are not intersecting.
 					c.erase(contact);
 					erase = true;

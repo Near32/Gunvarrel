@@ -14,10 +14,14 @@ class IConstraintSolverStrategy
 
 	protected :
 	
+	Mat<float> C;
 	Mat<float> constraintsJacobian;
 	Mat<float> constraintsImpulse;
+	Mat<float> offset;
 	Mat<float> lambda;
 	Mat<float> M;
+	
+	float dt;
 	
 	Simulation* sim;
 	
@@ -31,6 +35,8 @@ class IConstraintSolverStrategy
 	virtual void Solve(float dt, std::vector<std::unique_ptr<IConstraint> >& c, Mat<float>& q, Mat<float>& qdot, SparseMat<float>& invM, SparseMat<float>& S, const Mat<float>& Fext) = 0;
 
 	//------------------------------------
+	
+	Mat<float> getConstraints()	const;
 	
 	Mat<float> getConstraintsJacobian() const;
 	
@@ -69,6 +75,7 @@ class SimultaneousImpulseBasedConstraintSolverStrategy : public IConstraintSolve
 	
 	void computeConstraintsJacobian(std::vector<std::unique_ptr<IConstraint> >& c);
 	void computeConstraintsJacobian(std::vector<std::unique_ptr<IConstraint> >& c, const Mat<float>& q, const Mat<float>& qdot);
+	void computeConstraintsANDJacobian(std::vector<std::unique_ptr<IConstraint> >& c, const Mat<float>& q, const Mat<float>& qdot);
 		
 	virtual void Solve(float dt, std::vector<std::unique_ptr<IConstraint> >& c, Mat<float>& q, Mat<float>& qdot, SparseMat<float>& invM, SparseMat<float>& S, const Mat<float>& Fext ) override;
 

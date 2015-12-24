@@ -4,10 +4,21 @@
 #include "RigidBody.h"
 #include "ConstraintsList.h"
 
+/* cf previous included file
+enum ConstraintType{
+	CTI,
+	CTContact,
+	CTBAS,
+	CTH,
+	CTIL
+};
+*/
+
 class IConstraint
 {
 	public :
 	
+	ConstraintType type;	
 	RigidBody& rbA;
 	RigidBody& rbB;
 	
@@ -27,6 +38,7 @@ class IConstraint
 	Mat<float> JacobianA;
 	Mat<float> JacobianB;
 	
+	Mat<float> C;
 	//-----------------------------------
 	//-----------------------------------
 	
@@ -52,7 +64,15 @@ class IConstraint
 		return JacobianB;
 	}
 	
+	Mat<float> getConstraint()	const
+	{
+		return C;
+	}
 	
+	ConstraintType getType()	const
+	{
+		return type;
+	}
 	
 };
 

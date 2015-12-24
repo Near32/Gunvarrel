@@ -8,12 +8,18 @@
 
 IConstraintSolverStrategy::IConstraintSolverStrategy(Simulation* sim_) : sim(sim_)
 {
-
+	C = Mat<float>(0.0f,1,1);
+	constraintsJacobian = Mat<float>(0.0f,1,1);
 }
 
 IConstraintSolverStrategy::~IConstraintSolverStrategy()
 {
 
+}
+
+Mat<float> IConstraintSolverStrategy::getConstraints() const
+{
+	return C;
 }
 
 Mat<float> IConstraintSolverStrategy::getConstraintsJacobian() const
@@ -173,7 +179,178 @@ void SimultaneousImpulseBasedConstraintSolverStrategy::computeConstraintsJacobia
 		
 		constraintsJacobian = operatorC(constraintsJacobian, temp );
 	}
+	
+	
+	//Let us delete the contact constraints that are ephemarous by essence :
+	std::vector<std::unique_ptr<IConstraint> >::iterator itC = c.begin();
+	bool erased = false;
+	while(itC != c.end())
+	{
+		if( (itC->get())->getType() == CTContactConstraint )
+		{
+			erased = true;
+			c.erase(itC);
+		}
+	
+		if(!erased)
+			itC++;
+			
+		erased = false;
+	}
 }
+
+void SimultaneousImpulseBasedConstraintSolverStrategy::computeConstraintsANDJacobian(std::vector<std::unique_ptr<IConstraint> >& c, const Mat<float>& q, const Mat<float>& qdot)
+{
+	//MAJ qdot :
+	int b1 = 0;
+	int b2 = 0;
+	for( auto& o : sim->simulatedObjects ) 
+	{	
+		//((RigidBody*)(o.get()))->setPosition( extract(q, b1+1,1, b1+3,1) );	
+		//((RigidBody*)(o.get()))->setMatOrientation( extract(q, b1+4,1, b1+7,1) );
+		((RigidBody*)(o.get()))->setLinearVelocity( extract( qdot, b2+1,1, b2+3,1) );
+		((RigidBody*)(o.get()))->setAngularVelocity( extract( qdot, b2+4,1, b1+6,1) );
+		
+		b1+=7;
+		b2+=6;	
+	}
+	
+	//-------------------------------------
+	//-------------------------------------
+	//-------------------------------------
+	
+	size_t size = c.size();
+	int n = sim->simulatedObjects.size();
+
+	c[0]->computeJacobians();
+	
+	int idA = 6 * ( c[0]->rbA.getID() );
+	int idB = 6 * ( c[0]->rbB.getID() );
+	
+	Mat<float> tJA(c[0]->getJacobianA());
+	Mat<float> tJB(c[0]->getJacobianB());
+	//Constraint :
+	Mat<float> tC(c[0]->getConstraint());
+	
+	int sl = tJA.getLine();
+	
+	Mat<float> temp((float)0,sl, 6*n );
+	
+	for(int i=1;i<=sl;i++)
+	{
+		for(int j=1;j<=6;j++)
+		{
+			temp.set( tJA.get(i,j) , i, idA+j);
+			temp.set( tJB.get(i,j), i, idB+j  );
+		}
+	}
+	
+	constraintsJacobian = temp;
+	//Constraint :
+	float baumgarteBAS = 0.5f;
+	float baumgarteC = 0.8f;
+	C = tC;
+	//----------------------------------------
+	//BAUMGARTE STABILIZATION
+	//----------------------------------------
+	//Contact offset :
+	if( c[0]->getType() == CTContactConstraint)
+	{
+		//Baumgarte stabilization :
+		//temp *= 0.1f/this->dt;
+		tC *= baumgarteC/this->dt;
+	}
+	//BAS JOINT :
+	if( c[0]->getType() == CTBallAndSocketJoint)
+	{
+		tC*= baumgarteBAS/this->dt;
+	}
+	//----------------------------------------
+	//----------------------------------------
+	offset = tC;
+	
+	
+#ifdef debuglvl1
+std::cout << "CONSTRAINTS : type = " << c[0]->getType() << " ; ids are : " << c[0]->rbA.getID() << " : " << c[0]->rbB.getID() << std::endl;
+offset.afficher();
+#endif	
+	
+	for(int i=1;i<size;i++)
+	{
+
+		c[i]->computeJacobians();
+		
+		tJA = c[i]->getJacobianA();
+		tJB = c[i]->getJacobianB();
+		//Constraint :
+		tC = c[i]->getConstraint();
+		
+		size_t sl = tJA.getLine();
+		int idA = 6 * ( c[i]->rbA.getID() );
+		int idB = 6 * ( c[i]->rbB.getID() );
+		
+		temp = Mat<float>((float)0,sl, 6*n );
+		
+		//Constraints :
+		C = operatorC(C, tC);
+		//----------------------------------------
+		//BAUMGARTE STABILIZATION
+		//----------------------------------------
+		//Contact offset :
+		if( c[i]->getType() == CTContactConstraint)
+		{
+			//Baumgarte stabilization :
+			//temp *= 0.1f/this->dt;
+			tC *= baumgarteC/this->dt;
+		}
+		//BAS JOINT :
+		if( c[i]->getType() == CTBallAndSocketJoint)
+		{
+			tC*= baumgarteBAS/this->dt;
+		}
+		//----------------------------------------
+		//----------------------------------------
+		
+						
+		for(int i=1;i<=sl;i++)
+		{
+			for(int j=1;j<=6;j++)
+			{
+				temp.set( tJA.get(i,j) , i, idA+j);
+				temp.set( tJB.get(i,j), i, idB+j  );
+			}
+		}
+		
+		constraintsJacobian = operatorC(constraintsJacobian, temp );
+		//Constraint :
+		offset = operatorC( offset, tC);
+		
+#ifdef debug
+std::cout << "CONSTRAINTS : type = " << c[i]->getType() << " ; ids are : " << c[i]->rbA.getID() << " : " << c[i]->rbB.getID() << std::endl;
+offset.afficher();
+#endif
+		
+	}
+	
+	
+	//Let us delete the contact constraints that are ephemarous by essence :
+	std::vector<std::unique_ptr<IConstraint> >::iterator itC = c.begin();
+	bool erased = false;
+	while(itC != c.end())
+	{
+		if( (itC->get())->getType() == CTContactConstraint )
+		{
+			erased = true;
+			c.erase(itC);
+		}
+	
+		if(!erased)
+			itC++;
+			
+		erased = false;
+	}
+}
+
 
 /*
 void SimultaneousImpulseBasedConstraintSolverStrategy::Solve(float dt, std::vector<std::unique_ptr<IConstraint> >& c, Mat<float>& q, Mat<float>& qdot, SparseMat<float>& invM, SparseMat<float>& S, const Mat<float>& Fext )
@@ -375,26 +552,28 @@ void SimultaneousImpulseBasedConstraintSolverStrategy::Solve(float dt, std::vect
 
 
 //KKT :
-
+//BACKUP.... the new one is to handle contact constraints... baumgarte watch out...
+/*
 void SimultaneousImpulseBasedConstraintSolverStrategy::Solve(float dt, std::vector<std::unique_ptr<IConstraint> >& c, Mat<float>& q, Mat<float>& qdot, SparseMat<float>& invM, SparseMat<float>& S, const Mat<float>& Fext )
 {
 	
 	//computeConstraintsJacobian(c);
 	Mat<float> tempInvMFext( dt*(invM * Fext) ) ;
 	//qdot += tempInvMFext;
-	computeConstraintsJacobian(c,q,qdot);
+	//computeConstraintsJacobian(c,q,qdot);
+	computeConstraintsANDJacobian(c,q,qdot);
 	
 	Mat<float> offset((float)10,3,1);
 	Mat<float> C( ((RigidBody*)(sim->simulatedObjects[1].get()))->getPointInWorld(c[0]->AnchorAL )-((RigidBody*)(sim->simulatedObjects[2].get()))->getPointInWorld(c[0]->AnchorBL) );
-	offset = (0.8f/dt)*C;
+	offset = (0.5f/dt)*C;
 	//BAUMGARTE STABILIZATION ....
 	
 	std::cout << "Constraints BASJoint : norme  = " << norme2(C) << std::endl;
 	C.afficher();
-	c[0]->AnchorAL.afficher();
-	((RigidBody*)(sim->simulatedObjects[1].get()))->getPointInWorld(c[0]->AnchorAL ).afficher();
-	c[0]->AnchorBL.afficher();
-	((RigidBody*)(sim->simulatedObjects[2].get()))->getPointInWorld(c[0]->AnchorBL ).afficher();
+	//c[0]->AnchorAL.afficher();
+	//((RigidBody*)(sim->simulatedObjects[1].get()))->getPointInWorld(c[0]->AnchorAL ).afficher();
+	//c[0]->AnchorBL.afficher();
+	//((RigidBody*)(sim->simulatedObjects[2].get()))->getPointInWorld(c[0]->AnchorBL ).afficher();
 	
 	Mat<float> tConstraintsJacobian( transpose(constraintsJacobian) );
 	Mat<float> A( (-1.0f)*tConstraintsJacobian );
@@ -428,7 +607,59 @@ void SimultaneousImpulseBasedConstraintSolverStrategy::Solve(float dt, std::vect
 	//tdot.afficher();
 	//qdot.afficher();
 	//t.afficher();
-	//q.afficher();
+	q.afficher();
+	
+}
+*/
+
+//KKT : with baumgarte handling the whole constraints : contacts are handled too :
+
+void SimultaneousImpulseBasedConstraintSolverStrategy::Solve(float dt, std::vector<std::unique_ptr<IConstraint> >& c, Mat<float>& q, Mat<float>& qdot, SparseMat<float>& invM, SparseMat<float>& S, const Mat<float>& Fext )
+{
+	this->dt = dt;
+	//computeConstraintsJacobian(c);
+	Mat<float> tempInvMFext( dt*(invM * Fext) ) ;
+	//qdot += tempInvMFext;
+	//computeConstraintsJacobian(c,q,qdot);
+	computeConstraintsANDJacobian(c,q,qdot);
+	
+	//BAUMGARTE STABILIZATION has been handled in the computeConstraintsANDJacobian function....
+	std::cout << "Constraints : norme  = " << norme2(C) << std::endl;
+	C.afficher();
+	
+	Mat<float> tConstraintsJacobian( transpose(constraintsJacobian) );
+	Mat<float> A( (-1.0f)*tConstraintsJacobian );
+	Mat<float> M( invGJ( invM.SM2mat() ) );
+	A = operatorL( M, A);
+	A = operatorC( A , operatorL( constraintsJacobian, Mat<float>((float)0,constraintsJacobian.getLine(), constraintsJacobian.getLine()) ) );
+	
+	Mat<float> invA( invGJ(A) );//invM*tConstraintsJacobian ) * constraintsJacobian );
+	
+	Mat<float> tempLambda( invA * operatorC( Mat<float>((float)0,invA.getLine()-constraintsJacobian.getLine(),1) , constraintsJacobian*(invM*Fext) +offset ) );
+	lambda = extract( &tempLambda, qdot.getLine()+1, 1, tempLambda.getLine(), 1);
+	
+	qdot = extract(  &tempLambda, 1,1, qdot.getLine(), 1)+tempInvMFext;
+	
+	
+	Mat<float> t( dt*( S*qdot ) );
+	q += t;
+	
+	//S.print();
+	std::cout << " computed Pc : " << std::endl;
+	(tConstraintsJacobian*lambda).afficher();
+	std::cout << "invM*Fext : " << std::endl;
+	tempInvMFext.afficher();
+	//temp.afficher();
+	//(constraintsJacobian*(invM*Fext)).afficher();
+	//(invM*Fext).afficher();
+	//invA.afficher();
+	lambda.afficher();
+	qdot.afficher();
+	//tempInvMFext.afficher();
+	//tdot.afficher();
+	//qdot.afficher();
+	//t.afficher();
+	q.afficher();
 	
 }
 

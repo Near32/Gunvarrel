@@ -1,7 +1,7 @@
 #include "HelperFunctions.h"
 
 
-#define debug 
+//#define debug 
 
 Mat<float> closestPointLOfBOXGivenPointL(RigidBody& rb, const Mat<float>& pointL)
 {
@@ -66,7 +66,7 @@ bool testOBBPlane( RigidBody& box, RigidBody& plane)
 */
 Mat<float> testOBBOBB( RigidBody& b1, RigidBody& b2, bool& intersect)
 {
-	float precision = 1e-1f;
+	float precision = 1e-2f;
 	Mat<float> ret((float)0,3,1);
 	bool initialized = false;
 	BoxShape& box1 = (BoxShape&)(b1.getShapeReference());
@@ -134,6 +134,8 @@ std::cout << "COLLISION DETECTOR : midnarrowphase : testOBBOBB : voronoi and tem
 std::cout << " ids : b1 = " << b1.getID() << " ; b2 = " << b2.getID() << std::endl;
 voronoiTemp.afficher();
 temp.afficher();
+std::cout << "COLLISION POINTS :" << std::endl;
+ret.afficher();
 //tempL.afficher();
 #endif				
 				}
@@ -175,6 +177,54 @@ bool equals(const Mat<float>& a, const Mat<float>& b, float precision)
 	}
 		
 	return true;
+}
+
+void innerVoronoiProjection(RigidBody& rb, Mat<float>& pointL)
+{
+	//given an inner point, let us find out its closest projection on the surface of the OBB :
+	BoxShape& box = (BoxShape&)(rb.getShapeReference());
+	Mat<float> min((float)0,3,1);
+	Mat<float> max((float)0,3,1);
+	
+	min.set( -box.getHeight()/2.0f, 1,1);
+	min.set( -box.getWidth()/2.0f, 2,1);
+	min.set( -box.getDepth()/2.0f, 3,1);
+	max.set( -min.get(1,1), 1,1);
+	max.set( -min.get(2,1), 2,1);
+	max.set( -min.get(3,1), 3,1);
+	
+	
+	float distance[6];
+	Mat<float> tempProj[6];
+	int idxMin=3;
+	float distMin=1e3f;
+	int line = 1;
+	for(int k=3;k--;)
+	{
+		tempProj[k] = pointL;
+		tempProj[k].set( min.get(line,1), line,1);
+		tempProj[k+3] = pointL;
+		tempProj[k+3].set( max.get(line,1), line,1);
+		
+		distance[k] = norme2(pointL-tempProj[k]);
+		distance[k+3] = norme2(pointL-tempProj[k+3]);
+		
+		if(distMin > distance[k])
+		{
+			distMin = distance[k];
+			idxMin = k;
+		}
+		
+		if(distMin > distance[k+3])
+		{
+			distMin = distance[k+3];
+			idxMin = k+3;
+		}
+		
+		line++;
+	}
+	
+	pointL = tempProj[idxMin];
 }
 
 

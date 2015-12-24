@@ -1299,6 +1299,14 @@ void Simulation::applyForces(float timeStep)
 		}
 	}
 
+	/*
+	Mat<float> forceLATERAL( (float)0,3,1);
+	forceLATERAL.set( 1.0f, 1,1);
+	Mat<float> bodyPoint( (float)0,3,1);
+	bodyPoint.set( 5.0f,1,1);
+	bodyPoint.set( 10.0f,3,1);
+	((RigidBody*)simulatedObjects[2].get())->addForceAtBodyPoint( forceLATERAL, bodyPoint); 
+	*/
 #ifdef debuglvl2	
 	for( auto& it : simulatedObjects)
 	{
@@ -1361,7 +1369,10 @@ void Simulation::updateStates()
 			
 			((RigidBody*)simulatedObjects[id].get())->clearUser();
 		}
+		
+		ressourcesMutex.lock();
 	}
+	ressourcesMutex.unlock();
 	
 }
 
