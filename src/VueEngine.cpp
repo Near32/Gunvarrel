@@ -227,6 +227,14 @@ ressourcesMutex.unlock();
 			ressourcesMutex.unlock();
 			//drawElement( pathElement );
 			drawElement( containerV[pathElement], containerUV[pathElement], containerN[pathElement] );
+			
+			glBegin(GL_QUADS);
+			glColor3ub(0,0,200);
+			glVertex3d(-10,-10,0);
+			glVertex3d(10,-10,0);
+			glVertex3d(10,10,0);
+			glVertex3d(-10,10,0);
+			glEnd();
 		}
 		else
 		{
