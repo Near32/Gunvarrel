@@ -248,7 +248,7 @@ void SimultaneousImpulseBasedConstraintSolverStrategy::computeConstraintsANDJaco
 	constraintsJacobian = temp;
 	//Constraint :
 	float baumgarteBAS = 0.5f;
-	float baumgarteC = 1.0f;
+	float baumgarteC = 0.7f;
 	C = tC;
 	//----------------------------------------
 	//BAUMGARTE STABILIZATION
@@ -626,8 +626,8 @@ void SimultaneousImpulseBasedConstraintSolverStrategy::Solve(float dt, std::vect
 
 void SimultaneousImpulseBasedConstraintSolverStrategy::Solve(float dt, std::vector<std::unique_ptr<IConstraint> >& c, Mat<float>& q, Mat<float>& qdot, SparseMat<float>& invM, SparseMat<float>& S, const Mat<float>& Fext )
 {
-	std::cout << "STATE :" << std::endl;
-	q.afficher();
+	//std::cout << "STATE :" << std::endl;
+	//q.afficher();
 	
 	
 	this->dt = dt;
@@ -638,12 +638,12 @@ void SimultaneousImpulseBasedConstraintSolverStrategy::Solve(float dt, std::vect
 	computeConstraintsANDJacobian(c,q,qdot);
 	
 	//BAUMGARTE STABILIZATION has been handled in the computeConstraintsANDJacobian function....
-	std::cout << "Constraints : norme  = " << norme2(C) << std::endl;
-	C.afficher();
+	//std::cout << "Constraints : norme  = " << norme2(C) << std::endl;
+	//C.afficher();
 	
 	Mat<float> tConstraintsJacobian( transpose(constraintsJacobian) );
-	std::cout << "t Constraints Jacobian :" << std::endl;
-	tConstraintsJacobian.afficher();
+	//std::cout << "t Constraints Jacobian :" << std::endl;
+	//tConstraintsJacobian.afficher();
 	Mat<float> A( (-1.0f)*tConstraintsJacobian );
 	Mat<float> M( invGJ( invM.SM2mat() ) );
 	A = operatorL( M, A);
@@ -671,13 +671,13 @@ void SimultaneousImpulseBasedConstraintSolverStrategy::Solve(float dt, std::vect
 	//temp.afficher();
 	//(constraintsJacobian*(invM*Fext)).afficher();
 	//(invM*Fext).afficher();
-	std::cout << " A : " << std::endl;
-	A.afficher();
+	//std::cout << " A : " << std::endl;
+	//A.afficher();
     //std::cout << " SVD A*tA :  S : " << std::endl;
     //SVD<float> instanceSVD(A*transpose(A));
     //instanceSVD.getS().afficher();
-	std::cout << " invA : " << std::endl;
-	invA.afficher();
+	//std::cout << " invA : " << std::endl;
+	//invA.afficher();
 	std::cout << " LAMBDA : " << std::endl;
 	lambda.afficher();
 	std::cout << " qdot+ : " << std::endl;

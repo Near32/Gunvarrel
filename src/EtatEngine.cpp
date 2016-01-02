@@ -36,7 +36,7 @@ void EtatEngine::loop()
 				//DEBUGGING :
 				case TCSimulateStride:
 				{
-				float timestep = 1e-1f;
+				float timestep = 5e-2f;
 				float time = sim->getTime();
 #ifdef debug
 std::cout << "SIMULATION : run : ..." << std::endl;
@@ -110,9 +110,9 @@ void EtatEngine::init()
 	t.set( t.get(3,1)+2.0f+offset, 3,1);	
 	env->addElement( new ElementMobile(std::string("picBAS"), new se3(t), hwd) );
 	
-	t.set( t.get(3,1)+hwd.get(3,1)+1.0f, 3,1);
+	t.set( t.get(3,1)+hwd.get(3,1)+2.0f, 3,1);
 	
-	t.set( t.get(2,1)+2.0f, 2,1);
+	t.set( t.get(2,1)+0.0f, 2,1);
 		
 	env->addElement( new ElementMobile(std::string("picHAUT"), new se3(t), hwd) );
 	
