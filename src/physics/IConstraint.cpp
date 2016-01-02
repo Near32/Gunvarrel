@@ -76,19 +76,36 @@ IConstraint::~IConstraint()
 //Axises can be initialized to the local coordinate frame axises.
 ContactConstraint::ContactConstraint(RigidBody& rbA_, RigidBody& rbB_, float penetrationDepth_) : penetrationDepth(penetrationDepth_), IConstraint( rbA_, rbB_)
 {
-	C = rbA.getPointInWorld(AnchorAL)-rbB.getPointInWorld(AnchorBL);
 	type = CTContactConstraint;
+	normalAL = Mat<float>(0.0f,3,1);
+	normalAL.set( 1.0f,3,1);
+	
+	//C = transpose(rbA.getAxisInWorld(normalAL))*(rbB.getPointInWorld(AnchorBL)-rbA.getPointInWorld(AnchorAL));
+	C = Mat<float>(penetrationDepth,1,1);
 }
 
 ContactConstraint::ContactConstraint(RigidBody& rbA_, RigidBody& rbB_, const Mat<float>& cPointAL, const Mat<float>& cPointBL, float penetrationDepth_) : penetrationDepth(penetrationDepth_), IConstraint( rbA_, rbB_)
 {
 	AnchorAL = cPointAL;
 	AnchorBL = cPointBL;
-
-	C = rbA.getPointInWorld(AnchorAL)-rbB.getPointInWorld(AnchorBL);
 	
 	type = CTContactConstraint;
+	normalAL = Mat<float>(0.0f,3,1);
+	normalAL.set( 1.0f,3,1);
 	
+	C = Mat<float>(penetrationDepth,1,1);
+
+}
+
+ContactConstraint::ContactConstraint(RigidBody& rbA_, RigidBody& rbB_, const Mat<float>& cPointAL, const Mat<float>& cPointBL, const Mat<float>& normalAL_, float penetrationDepth_) : penetrationDepth(penetrationDepth_), IConstraint( rbA_, rbB_)
+{
+	AnchorAL = cPointAL;
+	AnchorBL = cPointBL;
+	
+	type = CTContactConstraint;
+	normalAL = normalAL_;
+	
+	C = Mat<float>(penetrationDepth,1,1);
 
 }
 
@@ -119,17 +136,21 @@ void ContactConstraint::computeJacobians()
 	Mat<float> Identity(0.0f,3,3);
 	for(int i=3;i--;)	Identity.set(1.0f,i+1,i+1);
 	
-	JacobianA = operatorL( Identity, (1.0f)*crossProduct(AnchorAL) );
+	//JacobianA = operatorL( Identity, (1.0f)*crossProduct(AnchorAL) );
+	Mat<float> normalG(rbA.getAxisInWorld(normalAL));
+	JacobianA = operatorL( (-1.0f)*transpose(normalG), transpose((-1.0f)*crossproductV( rbA.getPointInWorld(AnchorAL)-rbA.getPosition(), normalG)) );
 	
 	//---------------------
 	
 	//B : 
-	JacobianB = operatorL( (-1.0f)*Identity, (-1.0f)*crossProduct(AnchorBL) );
+	//JacobianB = operatorL( (-1.0f)*Identity, (-1.0f)*crossProduct(AnchorBL) );
+	JacobianB = operatorL( (1.0f)*transpose(normalG), transpose((1.0f)*crossproductV( rbA.getPointInWorld(AnchorAL) - rbB.getPosition(), normalG)) );
 	
 	
 	//--------------------------
 	//Constraint :
-	C = rbA.getPointInWorld(AnchorAL)-rbB.getPointInWorld(AnchorBL);
+	C = absM(transpose(normalAL)*(AnchorBL-AnchorAL));
+	//anchorBL is AnchorALProjected.
 }
 
 
@@ -191,12 +212,12 @@ void BallAndSocketJoint::computeJacobians()
 	Mat<float> Identity(0.0f,3,3);
 	for(int i=3;i--;)	Identity.set(1.0f,i+1,i+1);
 	
-	JacobianA = operatorL( Identity, (-1.0f)*crossProduct(AnchorAL) );
+	JacobianA = operatorL( (-1.0f)*Identity, (1.0f)*crossProduct(rbA.getPointInWorld(AnchorAL)-rbA.getPosition()) );
 	
 	//---------------------
 	
 	//B : 
-	JacobianB = operatorL( (-1.0f)*Identity, crossProduct(AnchorBL) );
+	JacobianB = operatorL( (1.0f)*Identity, (-1.0f)*crossProduct(rbB.getPointInWorld(AnchorBL)-rbB.getPosition()) );
 	
 	
 	//---------------------------

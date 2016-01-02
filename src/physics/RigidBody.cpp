@@ -180,12 +180,12 @@ Mat<float> RigidBody::getPointInWorld( const Mat<float>& pointL)
 std::cout << "RGB : get point in world : pose :" << std::endl;	
 Pose->exp().afficher();
 #endif
-	return transpose( extract(Pose->exp(), 1,1, 3,3)) * (pointL-extract(Pose->exp(), 1,4, 3,4) );	
+	return transpose( extract(Pose->exp(), 1,1, 3,3)) * (pointL+extract(Pose->exp(), 1,4, 3,4) );	
 }
 
 Mat<float> RigidBody::getPointInLocal( const Mat<float>& pointW)
 {
-	return extract(Pose->exp(), 1,1, 3,3) * pointW + extract(Pose->exp(), 1,4, 3,4) ;	
+	return extract(Pose->exp(), 1,1, 3,3) *pointW - extract(Pose->exp(), 1,4, 3,4) ;	
 }
 
 Mat<float> RigidBody::getAxisInWorld( const Mat<float>& aL)

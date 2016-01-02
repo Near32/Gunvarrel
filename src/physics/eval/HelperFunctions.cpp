@@ -1,7 +1,7 @@
 #include "HelperFunctions.h"
 
 
-//#define debug 
+#define debug 
 
 Mat<float> closestPointLOfBOXGivenPointL(RigidBody& rb, const Mat<float>& pointL)
 {
@@ -19,13 +19,31 @@ Mat<float> closestPointLOfBOXGivenPointL(RigidBody& rb, const Mat<float>& pointL
 	
 	Mat<float> clpL(3,1);
 	//compute the closest point by projecting the point to the closest face using Voronoi regions approach.
-	
+	bool change = false;
 	for(int i=1;i<=3;i++)
 	{
+		
 		float v = pointL.get(i,1);
-		if( v < min.get(i,1))	v = min.get(i,1);
-		if( v > max.get(i,1))	v = max.get(i,1);
+		if( v < min.get(i,1))
+		{
+			v = min.get(i,1);
+			change = true;
+		}
+		if( v > max.get(i,1))
+		{
+			v = max.get(i,1);
+			change = true;
+		}
+		
 		clpL.set( v, i,1);
+	}
+	if(!change)
+	{
+		//then it means that the given point is to be inside the BoxShape :
+#ifdef debug
+std::cout << "COLLISION DETECTOR : CLPLL : inside point : " << std::endl;
+operatorL(operatorL(clpL,pointL), rb.getPointInWorld(pointL)).afficher();
+#endif			
 	}
 	
 	return clpL;
@@ -66,7 +84,7 @@ bool testOBBPlane( RigidBody& box, RigidBody& plane)
 */
 Mat<float> testOBBOBB( RigidBody& b1, RigidBody& b2, bool& intersect)
 {
-	float precision = 1e-2f;
+	float precision = 1e-3f;
 	Mat<float> ret((float)0,3,1);
 	bool initialized = false;
 	BoxShape& box1 = (BoxShape&)(b1.getShapeReference());
@@ -103,7 +121,10 @@ Mat<float> testOBBOBB( RigidBody& b1, RigidBody& b2, bool& intersect)
 				//--------------------
 				//let us compute its coordinate in the world frame :
 				temp = b1.getPointInWorld( tempL);
-				
+				b1.getPose().exp().afficher();
+				b2.getPose().exp().afficher();
+				tempL.afficher();
+				temp.afficher();
 				//----------------------
 				//let us find its associated projected point :
 				voronoiTemp = closestPointWOfBOXGivenPointW( b2, temp);
@@ -132,16 +153,22 @@ Mat<float> testOBBOBB( RigidBody& b1, RigidBody& b2, bool& intersect)
 #ifdef debug
 std::cout << "COLLISION DETECTOR : midnarrowphase : testOBBOBB : voronoi and temp : " << std::endl;
 std::cout << " ids : b1 = " << b1.getID() << " ; b2 = " << b2.getID() << std::endl;
-voronoiTemp.afficher();
-temp.afficher();
-std::cout << "COLLISION POINTS :" << std::endl;
-ret.afficher();
+operatorL(voronoiTemp,temp).afficher();
+//std::cout << "COLLISION POINTS :" << std::endl;
+//ret.afficher();
 //tempL.afficher();
 #endif				
 				}
 				else
 				{
-
+#ifdef debug
+std::cout << "COLLISION DETECTOR : ELSE : midnarrowphase : testOBBOBB : voronoi and temp : " << std::endl;
+std::cout << " ids : b1 = " << b1.getID() << " ; b2 = " << b2.getID() << std::endl;
+operatorL(voronoiTemp,temp).afficher();
+//std::cout << "COLLISION POINTS :" << std::endl;
+//ret.afficher();
+//tempL.afficher();
+#endif
 				}
 				
 				
@@ -225,6 +252,91 @@ void innerVoronoiProjection(RigidBody& rb, Mat<float>& pointL)
 	}
 	
 	pointL = tempProj[idxMin];
+}
+
+
+void innerVoronoiProjectionANDNormal(RigidBody& rb, Mat<float>& pointL, Mat<float>& normalL)
+{
+	//given an inner point, let us find out its closest projection on the surface of the OBB :
+	//and the normal to the corresponding surface : the normal that is directed on the outside.
+	BoxShape& box = (BoxShape&)(rb.getShapeReference());
+	Mat<float> min((float)0,3,1);
+	Mat<float> max((float)0,3,1);
+	
+	min.set( -box.getHeight()/2.0f, 1,1);
+	min.set( -box.getWidth()/2.0f, 2,1);
+	min.set( -box.getDepth()/2.0f, 3,1);
+	max.set( -min.get(1,1), 1,1);
+	max.set( -min.get(2,1), 2,1);
+	max.set( -min.get(3,1), 3,1);
+	
+	
+	float distance[6];
+	Mat<float> tempProj[6];
+	int idxMin=3;
+	float distMin=1e3f;
+	int line = 1;
+	for(int k=3;k--;)
+	{
+		tempProj[k] = pointL;
+		tempProj[k].set( min.get(line,1), line,1);
+		tempProj[k+3] = pointL;
+		tempProj[k+3].set( max.get(line,1), line,1);
+		
+		distance[k] = norme2(pointL-tempProj[k]);
+		distance[k+3] = norme2(pointL-tempProj[k+3]);
+		
+		if(distMin > distance[k])
+		{
+			distMin = distance[k];
+			idxMin = k;
+		}
+		
+		if(distMin > distance[k+3])
+		{
+			distMin = distance[k+3];
+			idxMin = k+3;
+		}
+		
+		line++;
+	}
+	
+	pointL = tempProj[idxMin];
+	normalL = Mat<float>(0.0f,3,1);
+	
+	switch(idxMin)
+	{
+		case 0 :
+		//it is min on the z face :
+		normalL.set( -1.0f,3,1);
+		break;
+		
+		case 1 :
+		//it is min on the y face :
+		normalL.set( -1.0f,2,1);
+		break;
+		
+		case 2 :
+		//it is min on the x face :
+		normalL.set( -1.0f,1,1);
+		break;
+		
+		case 3 :
+		//it is max on the z face :
+		normalL.set( 1.0f,3,1);
+		break;
+		
+		case 4 :
+		//it is max on the y face :
+		normalL.set( 1.0f,2,1);
+		break;
+		
+		case 5 :
+		//it is max on the x face :
+		normalL.set( 1.0f,1,1);
+		break;
+	}
+	
 }
 
 

@@ -60,17 +60,14 @@ std::cout << "COLLISION DETECTOR : CONTACT GENERATOR : contact forces creations 
 			
 			//let us find the anchors in local frames :
 			Mat<float> anchorAL( contact.rbA->getPointInLocal(contact.contactPoint[i]) );
-			Mat<float> anchorBL( contact.rbB->getPointInLocal(contact.contactPoint[i]) );
+			Mat<float> anchorALProjected( contact.rbA->getPointInLocal(contact.contactPoint[i]) );
 			
-			innerVoronoiProjection( *(contact.rbA), anchorAL);
-			innerVoronoiProjection( *(contact.rbB), anchorBL);
-#ifdef debug
-std::cout << "COLLISION DETECTOR : CONTACT GENERATOR : point number : " << i << " : position : OKAY." << std::endl;
-operatorL(anchorAL,anchorBL).afficher();
-#endif			
-			float penetrationDepth = norme2( contact.rbA->getPointInWorld(anchorAL)-contact.rbB->getPointInWorld(anchorBL));
+			Mat<float> normalAB(0.0f,3,1);
+			innerVoronoiProjectionANDNormal( *(contact.rbA), anchorALProjected, normalAB);
 			
-			sim->collectionC.insert( sim->collectionC.end(), std::unique_ptr<IConstraint>( new ContactConstraint( *(contact.rbA), *(contact.rbB), anchorAL, anchorBL, penetrationDepth) ) );
+			float penetrationDepth = fabs(( transpose(normalAB)*(anchorALProjected-anchorAL) ).get(1,1));
+			
+			sim->collectionC.insert( sim->collectionC.end(), std::unique_ptr<IConstraint>( new ContactConstraint( *(contact.rbA), *(contact.rbB), anchorAL, anchorALProjected, normalAB, penetrationDepth) ) );
 		}
 	}
 	

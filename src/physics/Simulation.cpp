@@ -64,7 +64,7 @@ std::cout << "SIMULATION : environnement initialization : ElementFixe : Obstacle
 					
 					//IT IS THE UNMOVEABLE GROUND :
 					((RigidBody*)(simulatedObjects[id].get()))->isFixed = true;
-					((RigidBody*)(simulatedObjects[id].get()))->setIMass( 1e-1f );//numeric_limit<float>::epsilon() );
+					((RigidBody*)(simulatedObjects[id].get()))->setIMass( 1e-20f );//numeric_limit<float>::epsilon() );
 					
 					
 #ifdef debug
@@ -114,7 +114,7 @@ std::cout << "SIMULATION : environnement initialization : ElementMobile : id = "
 				if(element->getName() == std::string("picHAUT"))
 				{
 					//let us put an initial velocity :
-					((RigidBody*)(simulatedObjects[id].get()))->setLinearVelocity( Mat<float>(-100.0f,3,1) );
+					((RigidBody*)(simulatedObjects[id].get()))->setLinearVelocity( Mat<float>(100.0f,3,1) );
 					((RigidBody*)(simulatedObjects[id].get()))->setIMass( 1e2f );
 					//((RigidBody*)(simulatedObjects[id].get()))->setMass( 1e-2f );
 				}
@@ -316,7 +316,7 @@ Simulation::~Simulation()
 
 void Simulation::run(float timeStep, float endTime)
 {
-	if(timeStep <= 0.0f)	timeStep = 1e-2f;
+	if(timeStep <= 0.0f)	timeStep = 1e-4f;
 	
 	SimulationTimeStep = timeStep;
 	

@@ -41,7 +41,7 @@ void EtatEngine::loop()
 #ifdef debug
 std::cout << "SIMULATION : run : ..." << std::endl;
 #endif					
-				sim->run(timestep,time+10*timestep);
+				sim->run(timestep,time+1*timestep);
 #ifdef debug
 std::cout << "SIMULATION : run : successfully !!" << std::endl;
 #endif				
@@ -88,24 +88,41 @@ void EtatEngine::init()
 	
 	
 	//Gunvarrel :
+	float offset = 30.0f;
 	hwd *= 10.0f;
 	hwd.set(20.0f,3,1);
-	t.set( hwd.get(3,1)/2+2.0f, 3,1);	
+	
+	t.set( hwd.get(3,1)/2+1.0f, 3,1);
+	se3 obs_se3(t);
+	t.set( hwd.get(3,1)/2, 3,1);
+	
+	float roll = PI/2-0.1f;
+	float pitch = 0.0f;
+	float yaw = 0.0f;
+	Quat q = Euler2Qt(roll,pitch,yaw);
+	
+	//std::cout << " Quat : " << q.x << " : " << q.y << " : " << q.z << " : " << q.w << std::endl;
+	//Qt2Euler(q, &roll, &pitch, &yaw);
+	//std::cout << " Quat2Euler results : " << roll << " : " << pitch << " : " << yaw << std::endl;
+	//obs_se3.setOrientation( q );
+	env->addElement( new ElementMobile(std::string("OBS"), new se3(obs_se3), hwd) );
+	
+	t.set( t.get(3,1)+2.0f+offset, 3,1);	
 	env->addElement( new ElementMobile(std::string("picBAS"), new se3(t), hwd) );
 	
-	t.set( t.get(3,1)+hwd.get(3,1)+2.0f, 3,1);
+	t.set( t.get(3,1)+hwd.get(3,1)+1.0f, 3,1);
 	
-	t.set( t.get(2,1)+0.0f, 2,1);
+	t.set( t.get(2,1)+2.0f, 2,1);
 		
 	env->addElement( new ElementMobile(std::string("picHAUT"), new se3(t), hwd) );
 	
 	//constraints :
 	Mat<float> AnchorAL(0.0f,3,1);
-	AnchorAL.set( -hwd.get(3,1)/2-2.0f, 3,1);
+	AnchorAL.set( hwd.get(3,1)/2+1.0f, 3,1);
 	//Mat<float> HJAxis(0.0f,3,1);
 	//HJAxis.set( 1.0f, 1,1);
 	Mat<float> AnchorBL(0.0f,3,1);
-	AnchorBL.set( hwd.get(3,1)/2+2.0f, 3,1);
+	AnchorBL.set( -hwd.get(3,1)/2-1.0f, 3,1);
 	cl.insert( cl.end(), ConstraintInfo(std::string("picBAS"),std::string("picHAUT"), CTBallAndSocketJoint, operatorL(AnchorAL,AnchorBL) ) ); 
 	
 	//resetting :

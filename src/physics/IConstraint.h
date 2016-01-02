@@ -83,6 +83,8 @@ class ContactConstraint : public IConstraint
 	public :
 	
 	float penetrationDepth;
+	Mat<float> normalAL;	//normal of the face of rbA that is being penetrating. From rbA to rbB.
+							// So, Cdot = (vpB - vpA)*nAB
 	
 	//-----------------------------------------
 	//-----------------------------------------
@@ -92,6 +94,7 @@ class ContactConstraint : public IConstraint
 	//Axises can be initialized to the local coordinate frame axises.
 	ContactConstraint(RigidBody& rbA_, RigidBody& rbB_, float penetrationDepth_ = 0.0f);
 	ContactConstraint(RigidBody& rbA_, RigidBody& rbB_, const Mat<float>& cPointAL, const Mat<float>& cPointBL, float penetrationDepth_=0.0f);
+	ContactConstraint(RigidBody& rbA_, RigidBody& rbB_, const Mat<float>& cPointAL, const Mat<float>& cPointBL, const Mat<float>& normalAL_, float penetrationDepth_=0.0f);
 	
 	
 	~ContactConstraint();	

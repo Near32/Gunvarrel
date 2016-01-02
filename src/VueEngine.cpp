@@ -99,9 +99,9 @@ std::cout << " VUE : command handled..." << std::endl;
 		}
 		
 		//----------------------------------------
-		ressourcesMutex.lock();
+		
 		Dessiner(0.0f,0.0f);
-		ressourcesMutex.unlock();
+		//ressourcesMutex.unlock();
 		
 		current_time = SDL_GetTicks();
         ellapsed_time = current_time - last_time;
@@ -172,22 +172,31 @@ void VueEngine::Dessiner(float angleX, float angleZ)
 	//----------------------------
 
 	//drawGunvarrel();
-	
+	ressourcesMutex.lock();
 	Environnement* env = game->ptrEtat->env;//getEnvironnementFromETATENGINE();
-	
+	ressourcesMutex.unlock();
 	std::string pathElement("../res/element.obj");//el10x10x20.obj");
 
 #ifdef debug
-//ressourcesMutex.lock();
+ressourcesMutex.lock();
 std::cout << " VUE : " << env->ListeElements.size() << " element(s) to draw." << std::endl;
-//ressourcesMutex.unlock();
+ressourcesMutex.unlock();
 #endif	
+	
+	glBegin(GL_QUADS);
+	glColor3ub(0,0,0);
+	glVertex3d(-500,-500,0);
+	glVertex3d(500,-500,0);
+	glVertex3d(500,500,0);
+	glVertex3d(-500,500,0);
+	glEnd();
 	
 	for(int i=0;i<env->ListeElements.size();i++)
 	{
-		//ressourcesMutex.lock();
+		ressourcesMutex.lock();
 		Mat<float> poseElement = env->ListeElements[i]->pose->exp();
-		//ressourcesMutex.unlock();
+		ressourcesMutex.unlock();
+		
 		Mat<float> SO3( extract( poseElement, 1,1, 3,3) );
 		Mat<float> EulerAngles(3,1);
 		Rot2Euler(SO3, EulerAngles);
@@ -197,7 +206,9 @@ std::cout << " VUE : " << env->ListeElements.size() << " element(s) to draw." <<
 			if( isnan( EulerAngles.get(i,1) ) )
 				EulerAngles.set((float)0,i,1);
 		}
-		//EulerAngles.afficher();
+		
+		//Radians to degrees.
+		EulerAngles *= (float)(180.0f/PI);
 		
 		//let us go in the correct configuration to draw the Element :
 		glTranslated( poseElement.get(1,4), poseElement.get(2,4), poseElement.get(3,4));
@@ -210,16 +221,16 @@ std::cout << " VUE : " << env->ListeElements.size() << " element(s) to draw." <<
 		//--------------------------------
 		//--------------------------------
 		//let us draw the element once we have identified it...
-		//ressourcesMutex.lock();
+		ressourcesMutex.lock();
 		if( env->ListeElements[i]->name != std::string("ground") )
 		{
-			//ressourcesMutex.unlock();
+			ressourcesMutex.unlock();
 			//drawElement( pathElement );
 			drawElement( containerV[pathElement], containerUV[pathElement], containerN[pathElement] );
 		}
 		else
 		{
-			//ressourcesMutex.unlock();
+			ressourcesMutex.unlock();
 			//ground...
 			glBegin(GL_QUADS);
 			glColor3ub(230,230,230);
@@ -230,9 +241,9 @@ std::cout << " VUE : " << env->ListeElements.size() << " element(s) to draw." <<
 			glEnd();
 		}
 #ifdef debuglvl1		
-//ressourcesMutex.lock();
+ressourcesMutex.lock();
 std::cout << " VUE : element : " << env->ListeElements[i]->name << " has been drawn." << std::endl;
-//ressourcesMutex.unlock();
+ressourcesMutex.unlock();
 #endif
 		//--------------------------------
 		//--------------------------------
@@ -312,9 +323,9 @@ std::cout << " VUE : element : " << env->ListeElements[i]->name << " has been dr
     glEnd();
 
     //glFlush();
-//ressourcesMutex.lock();    
+ressourcesMutex.lock();    
     SDL_GL_SwapBuffers();
-//ressourcesMutex.unlock();    
+ressourcesMutex.unlock();    
 }
 
 

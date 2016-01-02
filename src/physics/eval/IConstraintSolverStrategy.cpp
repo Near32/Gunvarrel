@@ -248,7 +248,7 @@ void SimultaneousImpulseBasedConstraintSolverStrategy::computeConstraintsANDJaco
 	constraintsJacobian = temp;
 	//Constraint :
 	float baumgarteBAS = 0.5f;
-	float baumgarteC = 0.8f;
+	float baumgarteC = 1.0f;
 	C = tC;
 	//----------------------------------------
 	//BAUMGARTE STABILIZATION
@@ -271,8 +271,17 @@ void SimultaneousImpulseBasedConstraintSolverStrategy::computeConstraintsANDJaco
 	
 	
 #ifdef debuglvl1
-std::cout << "CONSTRAINTS : type = " << c[0]->getType() << " ; ids are : " << c[0]->rbA.getID() << " : " << c[0]->rbB.getID() << std::endl;
+std::cout << "CONSTRAINTS : nbr = " << size << std::endl;
+std::cout << "CONSTRAINTS : 0 : type = " << c[0]->getType() << " ; ids are : " << c[0]->rbA.getID() << " : " << c[0]->rbB.getID() << std::endl;
 offset.afficher();
+/*std::cout << "local Anchor A : " << std::endl;
+c[0]->AnchorAL.afficher();
+std::cout << "global Anchor A : " << std::endl;
+c[0]->rbA.getPointInWorld(c[0]->AnchorAL).afficher();
+std::cout << "local Anchor B : " << std::endl;
+c[0]->AnchorBL.afficher();
+std::cout << "global Anchor B : " << std::endl;
+c[0]->rbB.getPointInWorld(c[0]->AnchorBL).afficher();*/
 #endif	
 	
 	for(int i=1;i<size;i++)
@@ -282,6 +291,7 @@ offset.afficher();
 		
 		tJA = c[i]->getJacobianA();
 		tJB = c[i]->getJacobianB();
+		
 		//Constraint :
 		tC = c[i]->getConstraint();
 		
@@ -325,8 +335,8 @@ offset.afficher();
 		//Constraint :
 		offset = operatorC( offset, tC);
 		
-#ifdef debug
-std::cout << "CONSTRAINTS : type = " << c[i]->getType() << " ; ids are : " << c[i]->rbA.getID() << " : " << c[i]->rbB.getID() << std::endl;
+#ifdef debuglvl1
+std::cout << "CONSTRAINTS : " << i << " type = " << c[i]->getType() << " ; ids are : " << c[i]->rbA.getID() << " : " << c[i]->rbB.getID() << std::endl;
 offset.afficher();
 #endif
 		
@@ -616,6 +626,10 @@ void SimultaneousImpulseBasedConstraintSolverStrategy::Solve(float dt, std::vect
 
 void SimultaneousImpulseBasedConstraintSolverStrategy::Solve(float dt, std::vector<std::unique_ptr<IConstraint> >& c, Mat<float>& q, Mat<float>& qdot, SparseMat<float>& invM, SparseMat<float>& S, const Mat<float>& Fext )
 {
+	std::cout << "STATE :" << std::endl;
+	q.afficher();
+	
+	
 	this->dt = dt;
 	//computeConstraintsJacobian(c);
 	Mat<float> tempInvMFext( dt*(invM * Fext) ) ;
@@ -628,6 +642,8 @@ void SimultaneousImpulseBasedConstraintSolverStrategy::Solve(float dt, std::vect
 	C.afficher();
 	
 	Mat<float> tConstraintsJacobian( transpose(constraintsJacobian) );
+	std::cout << "t Constraints Jacobian :" << std::endl;
+	tConstraintsJacobian.afficher();
 	Mat<float> A( (-1.0f)*tConstraintsJacobian );
 	Mat<float> M( invGJ( invM.SM2mat() ) );
 	A = operatorL( M, A);
@@ -635,9 +651,12 @@ void SimultaneousImpulseBasedConstraintSolverStrategy::Solve(float dt, std::vect
 	
 	Mat<float> invA( invGJ(A) );//invM*tConstraintsJacobian ) * constraintsJacobian );
 	
-	Mat<float> tempLambda( invA * operatorC( Mat<float>((float)0,invA.getLine()-constraintsJacobian.getLine(),1) , constraintsJacobian*(invM*Fext) +offset ) );
+	Mat<float> tempLambda( invA * operatorC( Mat<float>((float)0,invA.getLine()-constraintsJacobian.getLine(),1) , constraintsJacobian*(invM*Fext) + offset ) );
 	lambda = extract( &tempLambda, qdot.getLine()+1, 1, tempLambda.getLine(), 1);
 	
+	if(isnanM(lambda))
+		lambda = Mat<float>(0.0f,lambda.getLine(),lambda.getColumn());
+		
 	qdot = extract(  &tempLambda, 1,1, qdot.getLine(), 1)+tempInvMFext;
 	
 	
@@ -652,14 +671,24 @@ void SimultaneousImpulseBasedConstraintSolverStrategy::Solve(float dt, std::vect
 	//temp.afficher();
 	//(constraintsJacobian*(invM*Fext)).afficher();
 	//(invM*Fext).afficher();
-	//invA.afficher();
+	std::cout << " A : " << std::endl;
+	A.afficher();
+    //std::cout << " SVD A*tA :  S : " << std::endl;
+    //SVD<float> instanceSVD(A*transpose(A));
+    //instanceSVD.getS().afficher();
+	std::cout << " invA : " << std::endl;
+	invA.afficher();
+	std::cout << " LAMBDA : " << std::endl;
 	lambda.afficher();
+	std::cout << " qdot+ : " << std::endl;
 	qdot.afficher();
-	//tempInvMFext.afficher();
-	//tdot.afficher();
-	//qdot.afficher();
-	//t.afficher();
+	std::cout << " q+ : " << std::endl;
 	q.afficher();
+	std::cout << "Cdot : " << std::endl;
+	(constraintsJacobian*qdot).afficher();
+	//BAUMGARTE STABILIZATION has been handled in the computeConstraintsANDJacobian function....
+	std::cout << "Constraints : norme  = " << norme2(C) << std::endl;
+	C.afficher();
 	
 }
 

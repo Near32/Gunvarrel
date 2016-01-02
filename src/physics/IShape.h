@@ -267,6 +267,7 @@ class BoxShape : public IShape
 	float getHeight()	{	return height;	}
 	float getWidth()	{	return width;	}
 	float getDepth()	{	return depth;	}
+	Mat<float> getHWD()	{	Mat<float> hwd(3,1);hwd.set(height,1,1);hwd.set(width,2,1);hwd.set(depth,3,1);return hwd;	}
 	
 	void setHeight(const float h)	
 	{	

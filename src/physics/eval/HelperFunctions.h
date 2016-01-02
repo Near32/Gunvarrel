@@ -12,7 +12,7 @@ Mat<float> testOBBOBB( RigidBody& b1, RigidBody& b2, bool& intersect);
 bool equals(const Mat<float>& a, const Mat<float>& b, float precision);
 
 void innerVoronoiProjection(RigidBody& rb, Mat<float>& pointL);
-
+void innerVoronoiProjectionANDNormal(RigidBody& rb, Mat<float>& pointL, Mat<float>& normalL);
 
 
 

@@ -33,6 +33,7 @@ class ISimulationObject
 	//---------------------------------
 	TypeSimulationObject getType()	const	{	return type;	}
 	int getID()	const	{	return id;	}
+	std::string getName() const	{	return name;	}
 
 };
 #endif

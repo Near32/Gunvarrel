@@ -90,7 +90,7 @@ Mat<float> Euler2Rot( const float& roll, const float& pitch, const float& yaw)
 /* Returns the corresponding roll pitch yaw euler angles from SO(3) matrix.*/
 void Rot2Euler( const Mat<float>& R, Mat<float>& angles)
 {
-	float epsilon = (float)1e-5;
+	float epsilon = (float)1e-3;
 	float R31 = R.get(3,1);
 	
 	if(  (R31 < 1+epsilon && R31 > 1-epsilon) || ( R31 > -1-epsilon && R31 < -1+epsilon ) )
