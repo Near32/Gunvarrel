@@ -2,7 +2,7 @@
 #include "../Simulation.h"
 
 
-#define debug
+//#define debug
 
 IMidNarrowPhaseStrategy::IMidNarrowPhaseStrategy(Simulation* sim_) : sim(sim_)
 {

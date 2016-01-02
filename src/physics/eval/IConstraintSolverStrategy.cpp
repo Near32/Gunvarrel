@@ -248,7 +248,7 @@ void SimultaneousImpulseBasedConstraintSolverStrategy::computeConstraintsANDJaco
 	constraintsJacobian = temp;
 	//Constraint :
 	float baumgarteBAS = 0.5f;
-	float baumgarteC = 0.7f;
+	float baumgarteC = 0.8f;
 	C = tC;
 	//----------------------------------------
 	//BAUMGARTE STABILIZATION

@@ -92,7 +92,7 @@ void EtatEngine::init()
 	hwd *= 10.0f;
 	hwd.set(20.0f,3,1);
 	
-	t.set( hwd.get(3,1)/2+1.0f, 3,1);
+	t.set( hwd.get(2,1)/2+1.0f, 3,1);
 	se3 obs_se3(t);
 	t.set( hwd.get(3,1)/2, 3,1);
 	
@@ -103,7 +103,7 @@ void EtatEngine::init()
 	//Quat q;
 	//q.x = sin(-PI/4);
 	//q.w = cos(-PI/4);
-	std::cout << " Quat : " << q.x << " : " << q.y << " : " << q.z << " : " << q.w << std::endl;
+	//std::cout << " Quat : " << q.x << " : " << q.y << " : " << q.z << " : " << q.w << std::endl;
 	//Qt2Euler(q, &roll, &pitch, &yaw);
 	//std::cout << " Quat2Euler results : " << roll << " : " << pitch << " : " << yaw << std::endl;
 	obs_se3.setOrientation( q );

@@ -1,7 +1,7 @@
 #include "HelperFunctions.h"
 
 
-#define debug 
+//#define debug 
 
 Mat<float> closestPointLOfBOXGivenPointL(RigidBody& rb, const Mat<float>& pointL)
 {
@@ -121,10 +121,12 @@ Mat<float> testOBBOBB( RigidBody& b1, RigidBody& b2, bool& intersect)
 				//--------------------
 				//let us compute its coordinate in the world frame :
 				temp = b1.getPointInWorld( tempL);
+#ifdef debug				
 				b1.getPose().exp().afficher();
 				b2.getPose().exp().afficher();
 				tempL.afficher();
 				temp.afficher();
+#endif
 				//----------------------
 				//let us find its associated projected point :
 				voronoiTemp = closestPointWOfBOXGivenPointW( b2, temp);
