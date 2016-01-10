@@ -23,7 +23,7 @@ typedef struct ConstraintInfo{
 	//BASJ :
 	//anchorsAL, anchorsBL
 	//HJ :
-	//anchorW,HJaxis
+	//HJaxisAL,AnchorAL
 	//...
 	//TODO : contact and limit
 	

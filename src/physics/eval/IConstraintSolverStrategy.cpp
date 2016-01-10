@@ -209,7 +209,7 @@ void SimultaneousImpulseBasedConstraintSolverStrategy::computeConstraintsANDJaco
 		//((RigidBody*)(o.get()))->setPosition( extract(q, b1+1,1, b1+3,1) );	
 		//((RigidBody*)(o.get()))->setMatOrientation( extract(q, b1+4,1, b1+7,1) );
 		((RigidBody*)(o.get()))->setLinearVelocity( extract( qdot, b2+1,1, b2+3,1) );
-		((RigidBody*)(o.get()))->setAngularVelocity( extract( qdot, b2+4,1, b1+6,1) );
+		((RigidBody*)(o.get()))->setAngularVelocity( extract( qdot, b1+4,1, b1+6,1) );
 		
 		b1+=7;
 		b2+=6;	
@@ -664,10 +664,13 @@ void SimultaneousImpulseBasedConstraintSolverStrategy::Solve(float dt, std::vect
 	q += t;
 	
 	//S.print();
-	std::cout << " computed Pc : " << std::endl;
-	(tConstraintsJacobian*lambda).afficher();
-	std::cout << "invM*Fext : " << std::endl;
-	tempInvMFext.afficher();
+	
+	//std::cout << " computed Pc : " << std::endl;
+	//(tConstraintsJacobian*lambda).afficher();
+	//std::cout << "invM*Fext : " << std::endl;
+	//tempInvMFext.afficher();
+	
+	
 	//temp.afficher();
 	//(constraintsJacobian*(invM*Fext)).afficher();
 	//(invM*Fext).afficher();
@@ -678,12 +681,14 @@ void SimultaneousImpulseBasedConstraintSolverStrategy::Solve(float dt, std::vect
     //instanceSVD.getS().afficher();
 	//std::cout << " invA : " << std::endl;
 	//invA.afficher();
-	std::cout << " LAMBDA : " << std::endl;
-	lambda.afficher();
-	std::cout << " qdot+ : " << std::endl;
-	qdot.afficher();
-	std::cout << " q+ : " << std::endl;
-	q.afficher();
+	
+	//std::cout << " LAMBDA : " << std::endl;
+	//lambda.afficher();
+	//std::cout << " qdot+ : " << std::endl;
+	//qdot.afficher();
+	//std::cout << " q+ : " << std::endl;
+	//q.afficher();
+	
 	std::cout << "Cdot : " << std::endl;
 	(constraintsJacobian*qdot).afficher();
 	//BAUMGARTE STABILIZATION has been handled in the computeConstraintsANDJacobian function....

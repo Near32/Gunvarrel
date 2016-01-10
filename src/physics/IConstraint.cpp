@@ -219,7 +219,8 @@ void BallAndSocketJoint::computeJacobians()
 	//B : 
 	JacobianB = operatorL( (1.0f)*Identity, (-1.0f)*crossProduct(rbB.getPointInWorld(AnchorBL)-rbB.getPosition()) );
 	
-	
+	rbB.getPointInWorld(AnchorBL).afficher();
+	rbA.getPointInWorld(AnchorAL).afficher();
 	//---------------------------
 	//Constraints :
 	C = rbA.getPointInWorld(AnchorAL)-rbB.getPointInWorld(AnchorBL);
@@ -244,7 +245,7 @@ HingeJoint::HingeJoint( RigidBody& rbA_, RigidBody& rbB_, const Mat<float>& HJAx
 {
 	HJAxisL = HJAxisL_;
 	AnchorL = AnchorL_;
-	BASJoint = std::unique_ptr<BallAndSocketJoint>(new BallAndSocketJoint( rbA_,rbB_, AnchorL, rbB.getAxisInLocal( rbA.getAxisInWorld(AnchorL) ) ) );
+	BASJoint = std::unique_ptr<BallAndSocketJoint>(new BallAndSocketJoint( rbA_,rbB_, AnchorL, rbB.getPointInLocal( rbA.getPointInWorld(AnchorL) ) ) );
 	
 	//--------------------
 	
@@ -255,8 +256,10 @@ HingeJoint::HingeJoint( RigidBody& rbA_, RigidBody& rbB_, const Mat<float>& HJAx
 	//TODO : verify the correctness of this use of the axises in World Reference Frame ?...!!
 	
 	//--------------------
+	BASJoint->computeJacobians();
 	Mat<float> wij(rbA.getAngularVelocity()-rbB.getAngularVelocity());
 	C = operatorC( operatorC( BASJoint->getConstraint(), transpose(rbA.getAxisInWorld(HJAxisL1))*wij ), transpose(rbA.getAxisInWorld(HJAxisL2))*wij ); 
+	//C = operatorC( operatorC( BASJoint->getConstraint(), transpose(HJAxisL1)*wij ), transpose(HJAxisL2)*wij ); 
 	
 	type = CTHingeJoint;
 }
@@ -285,7 +288,6 @@ void HingeJoint::applyPositionCorrection(float dt)
 void HingeJoint::computeJacobians()
 {
 	BASJoint->computeJacobians();
-	
 	//---------------------------
 	
 	
@@ -295,9 +297,11 @@ void HingeJoint::computeJacobians()
 	JacobianA = operatorC( 
 	
 		operatorC( BASJoint->getJacobianA(),
-					operatorL( zero, transpose( rbA.getAxisInWorld(HJAxisL1) ) ) ),
+					operatorL( zero, (1.0f)*transpose( rbA.getAxisInWorld(HJAxisL1) ) ) ),
+					//operatorL( zero, (1.0f)*transpose(HJAxisL1) ) ),
 					
-		operatorL( zero, transpose( rbA.getAxisInWorld(HJAxisL2) ) )
+		operatorL( zero, (1.0f)*transpose( rbA.getAxisInWorld(HJAxisL2) ) )
+		//operatorL( zero, (1.0f)*transpose(HJAxisL2) )
 							 );
 	
 	//-----------------------
@@ -307,10 +311,15 @@ void HingeJoint::computeJacobians()
 	
 		operatorC( BASJoint->getJacobianB(),
 					operatorL( zero, (-1.0f)*transpose( rbA.getAxisInWorld( HJAxisL1 ) ) ) ),
+					//operatorL( zero, (-1.0f)*transpose( HJAxisL1 ) ) ),
 					
 		operatorL( zero, (-1.0f)*transpose( rbA.getAxisInWorld( HJAxisL2 ) ) )
+		//operatorL( zero, (-1.0f)*transpose( HJAxisL2 ) )
 							 );
-	
+
+	Mat<float> wij(rbA.getAngularVelocity()-rbB.getAngularVelocity());
+	//C = operatorC( operatorC( BASJoint->getConstraint(), transpose(HJAxisL1)*wij ), transpose(HJAxisL2)*wij ); 
+	C = operatorC( operatorC( BASJoint->getConstraint(), transpose(rbA.getAxisInWorld(HJAxisL1))*wij ), transpose(rbA.getAxisInWorld(HJAxisL2))*wij ); 	
 }
 
 
